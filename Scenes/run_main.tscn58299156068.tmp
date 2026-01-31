@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://d3dd372cut47v"]
+
+[ext_resource type="Script" uid="uid://d1t84c52jtssw" path="res://Scripts/timeline_manager.gd" id="1_882wi"]
+[ext_resource type="Script" uid="uid://ccamc7sskx0dd" path="res://Scripts/grid_layer.gd" id="2_85m8a"]
+[ext_resource type="Texture2D" uid="uid://cqq82un1s3x4" path="res://icon.svg" id="3_4qt4q"]
+[ext_resource type="Script" uid="uid://cu20kah6ku6q3" path="res://Scripts/signal_manager.gd" id="4_jx6wh"]
+[ext_resource type="Script" uid="uid://gms8x710vr6g" path="res://Scripts/window_manager.gd" id="5_wudor"]
+
+[node name="RunMain" type="Node2D" unique_id=567975848]
+
+[node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
+position = Vector2(0, 50)
+
+[node name="TimelineManager" type="Node2D" parent="SignalTimeline" unique_id=1093280978]
+script = ExtResource("1_882wi")
+
+[node name="GridLayer" type="Node2D" parent="SignalTimeline" unique_id=1499063150]
+script = ExtResource("2_85m8a")
+
+[node name="Debug" type="Label" parent="SignalTimeline/GridLayer" unique_id=1352355150]
+offset_top = -50.0
+offset_right = 40.0
+offset_bottom = -27.0
+text = "TEXT"
+
+[node name="RunnerTeam" type="Sprite2D" parent="SignalTimeline/GridLayer" unique_id=988804363]
+position = Vector2(50, 50)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("3_4qt4q")
+
+[node name="SignalManager" type="Node2D" parent="SignalTimeline" unique_id=1320650835]
+script = ExtResource("4_jx6wh")
+
+[node name="OverlayLayer" type="Node2D" parent="SignalTimeline" unique_id=1228212272]
+
+[node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
+script = ExtResource("5_wudor")

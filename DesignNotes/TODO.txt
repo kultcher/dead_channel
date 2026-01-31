@@ -1,0 +1,14 @@
+- Add heat to camera
+- Get full terminal loop with camera
+
+Stray ideas:
+	Normal vs. Enhanced cameras:
+	Normal is standard heat,
+	Enhanced has built in recognition and triggers immediate alerts
+
+	Utility signals:
+	Security terminal: disable nearby IC, open doors, reduce difficulty
+	Comms terminal: get guard positions, dissipate heat
+	Data terminal: pay boost
+
+	T1 ice: reboot, punish, lockout

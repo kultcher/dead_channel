@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://dbqweh3v2f0bq"]
+
+[ext_resource type="Script" uid="uid://bm803e3nvucc8" path="res://Scripts/terminal_window.gd" id="1_3t686"]
+
+[sub_resource type="SystemFont" id="SystemFont_k17vg"]
+font_names = PackedStringArray("OCR A")
+subpixel_positioning = 0
+
+[node name="TerminalWindow" type="PanelContainer" unique_id=340148133]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1120.0
+offset_bottom = -480.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3t686")
+
+[node name="TerminalVBox" type="VBoxContainer" parent="." unique_id=411553728]
+layout_mode = 2
+
+[node name="TitleBar" type="PanelContainer" parent="TerminalVBox" unique_id=726981794]
+self_modulate = Color(3.1864944, 5.158506, 18.892157, 1)
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+
+[node name="TitleText" type="RichTextLabel" parent="TerminalVBox/TitleBar" unique_id=1173367343]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_fonts/normal_font = SubResource("SystemFont_k17vg")
+text = "DC_OS | [/cAl4x/pRk09s]"
+vertical_alignment = 1
+
+[node name="TerminalHistory" type="RichTextLabel" parent="TerminalVBox" unique_id=6905137]
+layout_mode = 2
+size_flags_vertical = 0
+text = "Connecting"
+fit_content = true
+scroll_following = true
+
+[node name="CmdLineHBox" type="HBoxContainer" parent="TerminalVBox" unique_id=1082637649]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="InputPrefix" type="RichTextLabel" parent="TerminalVBox/CmdLineHBox" unique_id=323186512]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+theme_override_fonts/normal_font = SubResource("SystemFont_k17vg")
+text = "--["
+fit_content = true
+vertical_alignment = 1
+
+[node name="CommandLine" type="LineEdit" parent="TerminalVBox/CmdLineHBox" unique_id=1172740283]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/caret_width = 3
+keep_editing_on_text_submit = true
+caret_blink = true
+
+[connection signal="text_submitted" from="TerminalVBox/CmdLineHBox/CommandLine" to="." method="_on_command_line_text_submitted"]

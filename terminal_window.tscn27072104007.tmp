@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dbqweh3v2f0bq"]
+
+[ext_resource type="Script" uid="uid://bm803e3nvucc8" path="res://terminal_window.gd" id="1_k17vg"]
+
+[node name="TerminalWindow" type="PanelContainer" unique_id=340148133]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1120.0
+offset_bottom = -480.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_k17vg")
+
+[node name="CommandLine" type="LineEdit" parent="." unique_id=1172740283]
+layout_mode = 2
+text = "LORUM IPSUM ETC"
+
+[node name="TerminalHistory" type="RichTextLabel" parent="." unique_id=6905137]
+layout_mode = 2
+text = "LORUM IPSUM ETC"

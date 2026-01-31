@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://d3dd372cut47v"]
+
+[ext_resource type="Script" uid="uid://d1t84c52jtssw" path="res://timeline_manager.gd" id="1_3qkjy"]
+[ext_resource type="Texture2D" uid="uid://cqq82un1s3x4" path="res://icon.svg" id="1_yqrng"]
+[ext_resource type="Script" uid="uid://ccamc7sskx0dd" path="res://grid_layer.gd" id="2_7cwoc"]
+
+[node name="RunMain" type="Node2D" unique_id=567975848]
+
+[node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
+
+[node name="TimelineManager" type="Node" parent="SignalTimeline" unique_id=694359167]
+script = ExtResource("1_3qkjy")
+
+[node name="GridLayer" type="Node2D" parent="SignalTimeline" unique_id=1499063150]
+position = Vector2(50, 50)
+script = ExtResource("2_7cwoc")
+
+[node name="RunnerTeam" type="Sprite2D" parent="SignalTimeline" unique_id=988804363]
+position = Vector2(100, 100)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_yqrng")
+
+[node name="SignalLayer" type="Node2D" parent="SignalTimeline" unique_id=1320650835]
+
+[node name="OverlayLayer" type="Node2D" parent="SignalTimeline" unique_id=1228212272]
