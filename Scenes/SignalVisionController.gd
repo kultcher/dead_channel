@@ -2,6 +2,7 @@ class_name SignalVisionController extends Node2D
 
 var parent_sig: Node2D # Reference to the main SignalEntity
 var vision_poly: Polygon2D
+var size: Vector2 = Vector2(1,1)
 
 var is_alert_active: bool = false
 var alert_tween: Tween
@@ -21,10 +22,10 @@ func handle_vision_overlay():
 		vision_poly.queue_free()
 		vision_poly = null
 		
-	if parent_sig.my_data.type == SignalData.Type.CAMERA and parent_sig.my_data.effect_area:
-		_build_vision_poly(parent_sig.my_data.effect_area)
+	if parent_sig.my_data.type == SignalData.Type.CAMERA:
+		_build_vision_poly()
 
-func _build_vision_poly(area_comp: EffectAreaComponent):
+func _build_vision_poly():
 	# Create the node dynamically
 	vision_poly = Polygon2D.new()
 	
@@ -37,8 +38,8 @@ func _build_vision_poly(area_comp: EffectAreaComponent):
 	
 	# Example for Rectangle (adapt for Cone logic we discussed earlier)
 	# Logic: "I am 3 cells long, 1 lane wide"
-	var width_px = area_comp.size.x * cell_w
-	var height_px = area_comp.size.y * lane_h
+	var width_px = size.x * cell_w
+	var height_px = size.y * lane_h
 	
 	# Draw centered on the signal's lane
 	var points = PackedVector2Array([
@@ -78,6 +79,12 @@ func _start_flash_sequence():
 		alert_tween.tween_property(vision_poly, "color", base_color, 0.4)
 
 func _reset_visuals():
-	if vision_poly:
+	if alert_tween:
 		alert_tween.kill()
+	if vision_poly:
 		vision_poly.color = base_color
+		
+func disable_vision():
+	await _reset_visuals()
+	var fade_tween = create_tween()
+	fade_tween.tween_property(vision_poly, "self_modulate", Color(1, 0.8, 0.2, .1), 0.5)

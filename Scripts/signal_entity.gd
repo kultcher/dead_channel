@@ -19,6 +19,8 @@ var my_active_sig: ActiveSignal
 var tooltip_main_initial_x: float
 var vision_poly: Polygon2D = null
 
+var is_disabled: bool = false
+
 signal signal_interaction(data: SignalData)
 signal scan_requested(clicked_signal: ActiveSignal)
 signal scan_aborted(scanning_signal: ActiveSignal)
@@ -59,6 +61,10 @@ func update_visuals():
 			shape.color = Color.BLUE
 			# Draw a simple hexagon as a circle approximation
 			shape.polygon = PackedVector2Array([Vector2(-20,-25), Vector2(20,-25), Vector2(25,0), Vector2(20,25), Vector2(-20,25), Vector2(-25,0)])
+	
+	if my_active_sig.is_disabled:
+		print("is disabled")
+		shape.color = Color.BLACK
 
 func set_scan_highlight(active: bool):
 	if active:
@@ -91,8 +97,6 @@ func scan_cleanup():
 	tooltip_active_scan.visible = false
 	tooltip_body.visible = false
 
-
-
 func initialize_tooltip():
 	tooltip_header.text = my_data.display_name
 
@@ -107,7 +111,7 @@ func append_tooltip(info: String):
 func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			signal_interaction.emit(my_data)
+			signal_interaction.emit(my_active_sig)
 			
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			scan_lock_requested.emit(my_active_sig)

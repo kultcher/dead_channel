@@ -7,6 +7,8 @@ extends Node2D
 @export var cells_per_second: float = 0.25 # Cells moved per second
 @export var slow_speed_modifier: float = 0.5
 @export var fast_speed_modifier: float = 2.0
+@export var runner_screen_offset_cells: float = 1
+
 
 # TIMELINE DIMENSIONS
 var LANES = 5
@@ -36,7 +38,7 @@ func _ready():
 	
 	cell_width_px = screen_width / VISIBLE_CELLS
 	lane_height = (screen_height * 0.25) / LANES
-
+	
 func _process(delta):
 	if is_paused:
 		return

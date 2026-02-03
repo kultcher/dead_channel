@@ -1,26 +1,40 @@
 # VisionComponent.gd
 # Signal component for vision behaviors
 
-class_name VisionComponent extends BehaviorComponent
+class_name VisionComponent extends Resource
 
 @export var watch_offset_cells: float = -1.0
 @export var watch_width_cells: float = 1.0
-@export var heat_per_second: float = 1.0
+@export var heat_per_second: float = 10
 
-func process_behavior(active_sig: ActiveSignal, delta: float, timeline):
+var parent_entity: Node2D
+var vision_disabled: bool = false
+
+func process_vision(active_sig: ActiveSignal, delta: float, timeline):
+	if active_sig.is_disabled: return
 	var camera_cell = active_sig.start_cell_index
 	var runner_cell = timeline.current_cell_pos
 
-	var watch_start = camera_cell + watch_offset_cells - .5		#WARNING: Watch out for this offset maybe?
-	var watch_end = watch_start + watch_width_cells
-
-	if runner_cell >= watch_start and runner_cell < watch_end:
+	# If offset is -1.0, the vision starts 1 cell behind camera.
+	# If width is 3.0, it extends 3 cells further back from there.
+	
+	# Start checking from the Camera's position + offset
+	var zone_start = camera_cell + watch_offset_cells 
+	
+	var dist = camera_cell - runner_cell
+	
+	# If Camera is 100, Runner is 97. Dist is 3.
+	# If vision is 0 to 4 meters in front of camera:
+	if dist >= 0 and dist <= watch_width_cells:
 		_apply_detection(active_sig, delta)
-		
+
 func _apply_detection(active_sig: ActiveSignal, delta):
-	var heat = active_sig.data.effect_area.heat_per_second * delta
-	GlobalEvents.heat_generated.emit(heat)
+	var heat = heat_per_second * delta
+	GlobalEvents.heat_modified.emit(heat_per_second, "Detected by camera.")
 	GlobalEvents.runner_in_vision.emit(active_sig)
+
+func disable_vision():
+	vision_disabled = true
 
 func get_desc():
 	return "Static"

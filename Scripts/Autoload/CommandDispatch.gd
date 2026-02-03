@@ -4,31 +4,34 @@
 extends Node
 
 var timeline_manager: Node2D = null
+var signal_manager: Node2D = null
+var terminal_window: Control = null
+
 var window_manager: CanvasLayer = null
 
 # === SIGNALS ===
-signal command_success(command: String, args: Array, flags: Array, context: SignalData)
-signal command_error(error_msg: String, context: SignalData)
+signal command_complete(command: String, args: Array, flags: Array, context: ActiveSignal)
+signal command_error(error_msg: String, context: ActiveSignal)
 
 # === COMMAND REGISTRY ===
 # Easy to expand later
 const VALID_COMMANDS = {
-	"ACC": {
+	"ACCESS": {
 		"requires_arg": true,
 		"valid_flag": ["-bp"],
 		"description": "Access: Access a system"
 	},
-	"INS": {
+	"INSPECT": {
 		"requires_arg": false,
 		"valid_flags": [],
 		"description": "Inspect: Inspect a system"
 	},
-	"SPF": {
+	"SPOOF": {
 		"requires_arg": true,
 		"valid_flags": [],
 		"description": "Spoof: Deceive a system"
 	},
-	"KIL": {
+	"KILL": {
 		"requires_arg": true,
 		"valid_flags": [],
 		"description": "Kill: Disable a system"
@@ -40,21 +43,58 @@ const VALID_COMMANDS = {
 	}
 }
 
+const COMMAND_SHORTCUTS = {
+	"ACC": "ACCESS", "INS": "INSPECT", "SPF": "SPOOF", "KIL": "KILL"
+}
+
 # === MAIN ENTRY POINT ===
-func process_command(input: String, signal_context: SignalData) -> void:
-	print("CommandDispatch: process_command ->", input)
-	var parsed = parse_input(input)
+
+# Package commands and sorts it depending on if terminal session matches signal
+func process_command(input: String, active_sig: ActiveSignal = null) -> void:
+	var parsed = parse_input(input.to_lower())
 	
 	if parsed.has("error"):
-		command_error.emit(parsed.error, signal_context)
+		command_error.emit(parsed.error, active_sig)
 		return
-	
-	# Dispatch to handler
-	var handler_method = "_cmd_" + parsed.command.to_lower()
-	if has_method(handler_method):
-		call(handler_method, parsed, signal_context)
+
+	var target_sig = signal_manager.get_active_signal(parsed.arg)
+
+	var cmd_context = CommandContext.new()
+	cmd_context.active_sig = active_sig
+	cmd_context.flags = parsed.flags
+	cmd_context.command = parsed.command
+	cmd_context.arg = parsed.arg
+
+	if active_sig == target_sig:
+		process_command_matched(cmd_context)
 	else:
-		command_error.emit("Command not implemented: " + parsed.command, signal_context)
+		process_command_mismatch(cmd_context, target_sig)
+
+func process_command_matched(cmd_context: CommandContext):
+	var handler_method = "_cmd_" + cmd_context.command.to_lower()
+	if has_method(handler_method):
+		call(handler_method, cmd_context)
+	else:
+		command_error.emit("Invalid command: " + cmd_context.command, cmd_context.active_sig)
+
+func process_command_mismatch(cmd_context: CommandContext, target_sig: ActiveSignal):
+	var handler_method = "_cmd_" + cmd_context.command.to_lower()
+
+	# ACCESS can switch sessions from the terminal regardless
+	if cmd_context.command == "ACCESS":
+		cmd_context.active_sig = target_sig
+		_cmd_access(cmd_context)
+		return
+
+	# Signal despawned
+	if !cmd_context.active_sig in signal_manager.signal_queue:
+		command_error.emit("!!> " + cmd_context.command + " failed. Connection lost.")
+		return
+
+	# Wrong session TODO: Add auto-connect to new other session name with prompt
+	if cmd_context.active_sig.data.system_id != cmd_context.arg:
+		command_error.emit("!!> " + cmd_context.command + " failed. " + cmd_context.arg + " out of context.", cmd_context.active_sig)
+		return
 
 # === PARSER ===
 func parse_input(input: String) -> Dictionary:
@@ -70,6 +110,9 @@ func parse_input(input: String) -> Dictionary:
 	
 	var parts = trimmed.split(" ", false)  # false = skip empty strings
 	var cmd = parts[0].to_upper()
+	
+	if cmd in COMMAND_SHORTCUTS:
+		cmd = COMMAND_SHORTCUTS[cmd]
 	
 	if not cmd in VALID_COMMANDS:
 		return {"error": "Unknown command: " + cmd}
@@ -90,13 +133,28 @@ func parse_input(input: String) -> Dictionary:
 	
 	return result
 
-# === COMMAND HANDLERS ===
-func _cmd_acc(parsed: Dictionary, context: SignalData) -> void:
-	if parsed.arg == context.system_id:
-		command_success.emit("ACCESS", parsed.arg, parsed.flags, context)
-	else:
-		command_error.emit("error: " + parsed.arg + " not found.", context)
-		
 
-func _cmd_ins(parsed: Dictionary, context: SignalData) -> void:
-	command_success.emit("SCAN", parsed.arg, parsed.flags, context)
+
+# === COMMAND HANDLERS ===
+func _cmd_access(cmd_context: CommandContext) -> void:
+	cmd_context.log.append("ACCESS GRANTED")
+	terminal_window.switch_session(cmd_context.active_sig)
+	_finalize_command(cmd_context)
+		
+func _cmd_kill(cmd_context: CommandContext) -> void:
+	for ic in cmd_context.active_sig.data.ic_protection:
+		var stopped = (ic.try_kill)
+		if stopped:
+			_interrupt_command(cmd_context)
+			return
+	cmd_context.active_sig.data.killable.try_kill(cmd_context)
+	_finalize_command(cmd_context)
+		
+func _cmd_inspect(parsed: Dictionary, context: ActiveSignal) -> void:
+	command_complete.emit("SCAN", parsed.arg, parsed.flags, context)
+	
+func _interrupt_command(cmd_context: CommandContext):
+	pass
+	
+func _finalize_command(cmd_context: CommandContext):
+	command_complete.emit(cmd_context)

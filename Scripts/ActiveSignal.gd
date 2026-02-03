@@ -19,12 +19,22 @@ var current_layer_progress: float = 0.0
 var is_being_scanned: bool = false
 var is_scan_locked: bool = false
 
+var is_disabled: bool = false
+
+var ic_modules = []
+
 func setup():
+	# Assign name based on possible obfuscations
 	if data.spoof_id != "":
 		data.display_name = data.spoof_id
 	if !data.display_name:
 		data.display_name = data.system_id
-		
+
+func disable_signal():
+	is_disabled = true
+	instance_node.vision_controller.disable_vision()
+	instance_node.update_visuals()
+
 func generate_scan_layers():
 	scan_layers.clear()
 	build_id_layer()

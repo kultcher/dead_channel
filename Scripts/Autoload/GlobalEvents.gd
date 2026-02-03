@@ -10,8 +10,9 @@ signal terminal_command_failed(signal_data, command)
 # GAMEPLAY EVENTS
 signal signal_scanned(signal_data: SignalData, scan_depth)
 signal signal_hacked(data: SignalData, success: bool)
+signal signal_killed(active_sig: ActiveSignal)
 signal runner_in_vision(active_sig: ActiveSignal)
-signal heat_generated(source_name, amount)
+signal heat_modified(amount, source)
 signal runner_damaged(amount: float)
 signal ic_triggered(ice_type: String)
 

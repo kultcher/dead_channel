@@ -5,6 +5,24 @@
 [ext_resource type="Texture2D" uid="uid://cqq82un1s3x4" path="res://icon.svg" id="3_4qt4q"]
 [ext_resource type="Script" uid="uid://cu20kah6ku6q3" path="res://Scripts/signal_manager.gd" id="4_jx6wh"]
 [ext_resource type="Script" uid="uid://gms8x710vr6g" path="res://Scripts/window_manager.gd" id="5_wudor"]
+[ext_resource type="Script" uid="uid://biyb8hixpkc42" path="res://Scenes/heat_tracker.gd" id="6_85m8a"]
+[ext_resource type="PackedScene" uid="uid://dbqweh3v2f0bq" path="res://Scenes/terminal_window.tscn" id="7_4qt4q"]
+
+[sub_resource type="Gradient" id="Gradient_882wi"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_85m8a"]
+gradient = SubResource("Gradient_882wi")
+height = 256
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Gradient" id="Gradient_4qt4q"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_jx6wh"]
+gradient = SubResource("Gradient_4qt4q")
+height = 256
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
 
 [node name="RunMain" type="Node2D" unique_id=567975848]
 
@@ -21,10 +39,11 @@ script = ExtResource("2_85m8a")
 offset_top = -50.0
 offset_right = 40.0
 offset_bottom = -27.0
-text = "TEXT"
 
-[node name="RunnerTeam" type="Sprite2D" parent="SignalTimeline/GridLayer" unique_id=988804363]
+[node name="RunnerTeam" type="Node2D" parent="SignalTimeline/GridLayer" unique_id=868639655]
 scale = Vector2(0.4, 0.4)
+
+[node name="RunnerIcon" type="Sprite2D" parent="SignalTimeline/GridLayer/RunnerTeam" unique_id=2139578560]
 texture = ExtResource("3_4qt4q")
 
 [node name="SignalManager" type="Node2D" parent="SignalTimeline" unique_id=1320650835]
@@ -34,3 +53,29 @@ script = ExtResource("4_jx6wh")
 
 [node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
 script = ExtResource("5_wudor")
+
+[node name="HeatTracker" type="TextureProgressBar" parent="." unique_id=1028315604]
+offset_top = 824.0
+offset_right = 64.0
+offset_bottom = 1080.0
+max_value = 5000.0
+fill_mode = 3
+texture_under = SubResource("GradientTexture2D_85m8a")
+texture_progress = SubResource("GradientTexture2D_jx6wh")
+tint_progress = Color(1, 0, 0, 1)
+script = ExtResource("6_85m8a")
+
+[node name="HeatDebug" type="Label" parent="HeatTracker" unique_id=1874187724]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 184.0
+offset_right = 133.0
+offset_bottom = 235.0
+tooltip_text = "Test"
+
+[node name="TerminalWindow" parent="HeatTracker/HeatDebug" unique_id=340148133 instance=ExtResource("7_4qt4q")]
+layout_mode = 1
+offset_left = 406.0
+offset_top = -667.0
+offset_right = 987.0
+offset_bottom = -173.0

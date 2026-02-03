@@ -5,7 +5,10 @@ extends Node2D
 
 @onready var timeline_manager = $"../TimelineManager"
 @onready var runner_team = $RunnerTeam
+@onready var runner_icon = $RunnerTeam/RunnerIcon
 @onready var debug_label = $Debug
+
+
 
 # CONFIGURATION
 var LANES = 5
@@ -17,23 +20,24 @@ var grid_color = Color(1, 0.441, 0.0, 1.0)
 @onready var screen_width: float = timeline_manager.screen_width
 @onready var screen_height: float = timeline_manager.screen_height
 
-
 func _ready():
+	print("Cell width: ", cell_width, "Lane height: ", lane_height)
 	if runner_team:
-		runner_team.position = Vector2(cell_width / 2, (lane_height * 2.5))
+		var x_pos = timeline_manager.cells_to_pixels(timeline_manager.runner_screen_offset_cells)
+		var y_pos = (lane_height * 2.5)
+		runner_team.position = Vector2(x_pos, y_pos)
 
 func _process(delta):
 	queue_redraw()
 
-	var display_string = "%.0f" % timeline_manager.current_cell_pos
+	var display_string = "Current cell pos:%.1f " % floor(timeline_manager.current_cell_pos)
 	debug_label.text = display_string
 
 func _draw():
-	# Update these every frame just in case window resizes or manager updates
 	cell_width = timeline_manager.cell_width_px
 	lane_height = timeline_manager.lane_height
 
-	# --- DRAW HORIZONTAL LANES ---
+	## --- DRAW HORIZONTAL LANES ---
 	for i in range(LANES + 1):
 		var y_pos = i * lane_height
 		draw_line(
@@ -42,20 +46,24 @@ func _draw():
 			grid_color,
 			1.0 
 		)
-	
-	# --- DRAW MOVING VERTICAL LINES (CELLS/ROOMS) ---
-	
-	# 1. Get Distance in Cells
-	var world_pos_cells = timeline_manager.current_cell_pos
-	
-	# 2. Find the index of the first vertical line visible
-	var first_visible_index = floor(world_pos_cells)
-	
-	# 3. Calculate the offset
-	var distance_in_cells = first_visible_index - world_pos_cells
-	
-	# 5. Apply Runner Offset
-	var draw_x = timeline_manager.cells_to_pixels(distance_in_cells)
+
+	# 1. Where is the Runner?
+	var runner_pos = timeline_manager.current_cell_pos
+
+	# 2. Where is the Left Edge of the screen in "World Coordinates"?
+	# If runner is at 100, and offset is 1.5... Left edge is 98.5.
+	var left_edge_world_pos = runner_pos - timeline_manager.runner_screen_offset_cells
+
+	# 3. Find first visible grid line index based on Left Edge
+	var first_visible_index = floor(left_edge_world_pos)
+
+	# 4. Calculate offset from the Left Edge of the screen
+	# e.g. Line 99 - Edge 98.5 = 0.5 cells from left
+	var distance_from_edge_cells = first_visible_index - left_edge_world_pos
+
+	# 5. Convert to pixels
+	var draw_x = timeline_manager.cells_to_pixels(distance_from_edge_cells)
+
 
 	while draw_x < screen_width + cell_width:
 		if draw_x > -10: 
@@ -63,6 +71,5 @@ func _draw():
 				Vector2(draw_x, 0), 
 				Vector2(draw_x, lane_height * LANES),
 				grid_color, 
-				2.0 
-			)
+				2.0) 
 		draw_x += cell_width

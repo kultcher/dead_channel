@@ -5,36 +5,40 @@ extends PanelContainer
 
 @onready var command_line = $TerminalVBox/CmdLineHBox/CommandLine
 @onready var history = $TerminalVBox/TerminalHistory
-@onready var linked_signal: Node2D
+@onready var prefix = $TerminalVBox/CmdLineHBox/InputPrefix
+@onready var title_bar = $TerminalVBox/TitleBar
+@onready var linked_signal: Node2D = null
 
-var signal_data: SignalData		# assigned by window_manager
+var active_signal: ActiveSignal		# assigned by window_manager
 
 func _ready():
 	set_context()
 	command_line.grab_focus()
-	CommandDispatch.command_success.connect(_on_command_success)
+	CommandDispatch.terminal_window = self
+	CommandDispatch.command_complete.connect(_on_command_complete)
 	CommandDispatch.command_error.connect(_on_command_error)
+
+func switch_session(new_sig: ActiveSignal):
+	active_signal = new_sig
+	prefix.text = "-" + new_sig.data.system_id + "-["
+	title_bar.self_modulate = Color(1.0, 1.0, 0.0, 1.0)
+	print_to_log("New session started with " + new_sig.data.system_id)
+	
 
 func _on_command_line_text_submitted(new_text: String) -> void:
 	print_to_log("--[ " + new_text)
-	CommandDispatch.process_command(new_text, signal_data)
+	CommandDispatch.process_command(new_text, active_signal)
 	command_line.clear()
 
-func _on_command_success(command: String, arg: String, flags: Array, context: SignalData) -> void:
-	if context != signal_data:		# ensure command signaldata matches terminal signaldata
+func _on_command_complete(cmd_context: CommandContext) -> void:
+	if cmd_context.active_sig != active_signal:		# ensure command signaldata matches terminal signaldata
 		return
+	for str in cmd_context.log:
+		print_to_log(str)
 
-	match command:
-		"ACCESS":
-			print_to_log("--[ ACCESS granted to " + arg)
-			print_to_log("--[ Awaiting next command... ")
-		"SCAN":
-			print_to_log("--[ Scanning " + arg + "...")
-
-func _on_command_error(error_msg: String, context: SignalData) -> void:
-	if context != signal_data:
+func _on_command_error(error_msg: String, signal_context: ActiveSignal) -> void:
+	if signal_context != active_signal:
 		return
-	
 	print_to_log("!! ERROR: " + error_msg)
 
 func process_result(results: Array):
@@ -57,13 +61,7 @@ func set_context():	# add args later
 	history.text += "."
 	print("Window setup...")
 	await get_tree().create_timer(0.2).timeout
-	if signal_data != null:
-		history.text += "\nConnected to " + signal_data.system_id
+	if active_signal != null:
+		history.text += "\nConnected to " + active_signal.data.system_id
 	await get_tree().create_timer(0.2).timeout
 	history.text += "\nEnter command.\n"
-
-func lock_input(duration: float):
-	pass
-
-func inject_text(text: String, delay := 0.0):
-	pass

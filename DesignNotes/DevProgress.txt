@@ -1,0 +1,28 @@
+Development Progress
+
+- Signal Timeline: timeline_manager.gd, grid_layer.gd
+> Mostly functional in a basic state. timeline_manager is the "arbiter of truth" that measures the runners' distance from signals. grid_layer draws and animates the grid using Node2D's _draw().
+
+- Signals: signal_entity.gd, SignalData.gd, ActiveSignal.gd + various components
+> Baseline functional. Using a factory + composition pattern. SignalData defines a Signal's properties, ActiveSignal translates them into on-screen signal_entities. Currently, Signals scroll toward the player at appropriate speed, can be scanned by mouse-over to show a detailed tooltip. Scan information is revealed in layers, as defined in ActiveSignal.gd. The only piece of actual interaction with the runners currently is a "vision" component (like for Cameras) that will be hooked into the heat system when implemented. Signals can also be left-clicked to open a terminal_window.
+
+- Terminal: terminal_window.gd, window_manager.gd, CommandDispatch.gd
+> Baseline functional, most commands not yet implemented. Clicking a signal pops up the terminal window and allows the user to type commands. Currently only "ACC" (access) command has a baseline implementation. Commands are sent to CommandDispatch, which processes them and communicates back to the terminal and other areas impacted by the command. window_manager handles linking the terminal window to the ActiveSignal. (Note: Future consideration is having the terminal not explicitly linked to Signals so the player can access any visible node via a single terminal window.) window_manager will also be used to manager puzzle windows when those are implemented.
+
+Not Yet Implemented (priority):
+- Robust terminal implementation
+- Puzzles
+- Heat
+- Advanced Signal functions/behaviors
+- IC
+- Programs and RAM
+- "Jargonizer" - for generating flavorful but semi-random terminal noise
+
+Not Yet Implemented (long-term):
+- Runner stats
+- Distinct corporate identities
+- Management layer
+- Consumables
+- Split Lanes
+- White Hats
+- "Combat" mode

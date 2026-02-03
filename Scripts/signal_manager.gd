@@ -14,9 +14,17 @@ var currently_scanning_signal: ActiveSignal = null
 signal signal_clicked(data: SignalData)
 
 func _ready():
+	GlobalEvents.signal_killed.connect(kill_signal)
+	CommandDispatch.signal_manager = self
+
 	create_test_cam("05", 2.5, 2)
 	create_test_cam("06", 6.5, 1)
 
+func get_active_signal(display_name: String):
+	print("Search queue for: ", display_name)
+	for sig in signal_queue:
+		if sig.data.display_name == display_name:
+			return sig
 	
 func create_test_cam(id, distance, lane):
 	var cam = SignalData.new()
@@ -29,11 +37,11 @@ func create_test_cam(id, distance, lane):
 	vision.watch_width_cells = 1.0
 	vision.heat_per_second = 1.0
 
-	cam.behavior = vision
+	cam.vision = vision
 
-	var effect = EffectAreaComponent.new()
-	effect.heat_per_second = 1.0
-	cam.effect_area = effect
+	var killable = KillableComponent.new()
+	
+	cam.killable = killable
 
 	spawn_signal_data(cam, distance)
 
@@ -45,6 +53,8 @@ func _process(delta):
 
 func _process_signal_behaviors(delta: float):
 	for sig in signal_queue:
+		if sig.data.vision:
+			sig.data.vision.process_vision(sig, delta, timeline_manager)
 		if sig.data.behavior:
 			sig.data.behavior.process_behavior(sig, delta, timeline_manager)
 
@@ -59,11 +69,12 @@ func spawn_signal_data(data: SignalData, cell_index: float):
 func update_signal_position():
 	var cleared_signals = []
 	for active_sig in signal_queue:
-		# 1. Logic Math (Cells)
-		var dist_in_cells = active_sig.start_cell_index - timeline_manager.current_cell_pos
+		# Distance from Runner (who is at current_cell_pos)
+		var dist_from_runner_cells = active_sig.start_cell_index - timeline_manager.current_cell_pos
 		
-		# 2. Render Math (Pixels)
-		var visual_x = timeline_manager.cells_to_pixels(dist_in_cells)
+		# Visual Position = Runner's Screen X + Distance * Pixels/Cell
+		var runner_screen_x = timeline_manager.cells_to_pixels(timeline_manager.runner_screen_offset_cells)
+		var visual_x = runner_screen_x + (dist_from_runner_cells * timeline_manager.cell_width_px)
 		var is_on_screen = visual_x > -100 and visual_x < timeline_manager.screen_width + 100
 		
 		if is_on_screen:
@@ -89,10 +100,17 @@ func update_signal_position():
 			active_sig.instance_node = null
 			signal_queue.erase(active_sig)
 
+# === KILL SIGNALS ===
+func kill_signal(active_sig: ActiveSignal):
+	if active_sig == currently_scanning_signal:
+		cancel_scan(active_sig)
+	signal_queue.erase(active_sig)
+	active_sig.instance_node.queue_free()
+
 # === SCAN & LOCK LOGIC ===
 
-func _on_signal_left_clicked(data: SignalData):
-	window_manager.route_signal_to_window(data)
+func _on_signal_left_clicked(active_signal: ActiveSignal):
+	window_manager.route_signal_to_window(active_signal)
 	
 func _on_signal_mouse_enter(signal_entered: ActiveSignal):
 	if currently_scanning_signal != null and currently_scanning_signal.is_scan_locked:

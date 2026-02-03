@@ -8,7 +8,12 @@ Stray ideas:
 
 	Utility signals:
 	Security terminal: disable nearby IC, open doors, reduce difficulty
-	Comms terminal: get guard positions, dissipate heat
+	Comms terminal: get guard positions for a time, or dissipate heat
 	Data terminal: pay boost
 
 	T1 ice: reboot, punish, lockout
+
+Story/Lore stuff:
+- white hats as inquisitors and true believers
+- maintenance as rituals
+- AI-dependence leads to knowledge loss, collapse

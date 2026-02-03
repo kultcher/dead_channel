@@ -24,8 +24,9 @@ var identity_dict = {
 @export var scans_to_reveal: int = 1
 
 # COMPONENTS
+@export var killable: KillableComponent
 @export var vision: VisionComponent
 @export var effect_area: EffectAreaComponent
 @export var behavior: BehaviorComponent
 @export var puzzle: PuzzleComponent
-@export var ic_protection: ICComponent
+@export var ic_protection: Array[ICComponent]
