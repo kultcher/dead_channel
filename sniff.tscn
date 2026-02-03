@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://hjsy8naghiwy"]
+
+[ext_resource type="Script" uid="uid://dgrt0ubi2jaiy" path="res://sniff_puzzle.gd" id="1_t8yyu"]
+[ext_resource type="Script" uid="uid://e6qs3vr1gvw2" path="res://sniff_cell.gd" id="2_uylnt"]
+
+[sub_resource type="SystemFont" id="SystemFont_t8yyu"]
+
+[node name="SniffWindow" type="Window" unique_id=1187498287]
+oversampling_override = 1.0
+initial_position = 1
+size = Vector2i(500, 500)
+script = ExtResource("1_t8yyu")
+
+[node name="Panel" type="Panel" parent="." unique_id=42392778]
+self_modulate = Color(0, 0, 0, 1)
+offset_right = 500.0
+offset_bottom = 500.0
+mouse_filter = 2
+
+[node name="Layer" type="CanvasLayer" parent="Panel" unique_id=369522615]
+
+[node name="Label" type="Label" parent="Panel/Layer" unique_id=1642667921]
+offset_left = -100.0
+offset_top = -100.0
+size_flags_vertical = 3
+mouse_filter = 0
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 1, 0.54200006)
+theme_override_colors/font_outline_color = Color(6.317161e-07, 0.31662995, 2.4065375e-07, 1)
+theme_override_fonts/font = SubResource("SystemFont_t8yyu")
+theme_override_font_sizes/font_size = 36
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+script = ExtResource("2_uylnt")
+
+[node name="Target" type="Label" parent="." unique_id=911439054]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "test"
+
+[connection signal="gui_input" from="Panel/Layer/Label" to="Panel/Layer/Label" method="_on_gui_input"]

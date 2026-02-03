@@ -10,7 +10,8 @@ var terminal_window: Control = null
 var window_manager: CanvasLayer = null
 
 # === SIGNALS ===
-signal command_complete(command: String, args: Array, flags: Array, context: ActiveSignal)
+signal set_terminal_signal(active_sig: ActiveSignal)
+signal command_complete(cmd_context: CommandContext)
 signal command_error(error_msg: String, context: ActiveSignal)
 
 # === COMMAND REGISTRY ===
@@ -47,17 +48,26 @@ const COMMAND_SHORTCUTS = {
 	"ACC": "ACCESS", "INS": "INSPECT", "SPF": "SPOOF", "KIL": "KILL"
 }
 
+func switch_terminal_session(active_sig: ActiveSignal):
+	terminal_window.switch_session(active_sig)
+
 # === MAIN ENTRY POINT ===
 
 # Package commands and sorts it depending on if terminal session matches signal
 func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 	var parsed = parse_input(input.to_lower())
-	
+	var session_sig = terminal_window.active_signal
+	var target_sig = signal_manager.get_active_signal(parsed.arg)
+
+	# syntax error
 	if parsed.has("error"):
 		command_error.emit(parsed.error, active_sig)
 		return
 
-	var target_sig = signal_manager.get_active_signal(parsed.arg)
+	# Signal despawned
+	if !target_sig in signal_manager.signal_queue:
+		command_error.emit("!!> " + parsed.command + " failed. Connection lost.")
+		return
 
 	var cmd_context = CommandContext.new()
 	cmd_context.active_sig = active_sig
@@ -65,10 +75,27 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 	cmd_context.command = parsed.command
 	cmd_context.arg = parsed.arg
 
-	if active_sig == target_sig:
-		process_command_matched(cmd_context)
+	# ACCESS can switch sessions from the terminal regardless
+	if cmd_context.command == "ACCESS":
+		cmd_context.active_sig = target_sig
+		_cmd_access(cmd_context)
+		return
+
+	if !session_sig:
+		command_error.emit("!!> " + parsed.command + " failed. Incorrect context.")
+		return
+
+	# Wrong session TODO: Add auto-connect to new other session name with prompt
+	if session_sig.data.system_id != cmd_context.arg:
+		command_error.emit("!!> " + parsed.command + " failed. " + parsed.arg + " out of context.", cmd_context.active_sig)
+		return	
+		
+	# execute
+	var handler_method = "_cmd_" + cmd_context.command.to_lower()
+	if has_method(handler_method):
+		call(handler_method, cmd_context)
 	else:
-		process_command_mismatch(cmd_context, target_sig)
+		command_error.emit("Invalid command: " + cmd_context.command, cmd_context.active_sig)
 
 func process_command_matched(cmd_context: CommandContext):
 	var handler_method = "_cmd_" + cmd_context.command.to_lower()
@@ -95,6 +122,7 @@ func process_command_mismatch(cmd_context: CommandContext, target_sig: ActiveSig
 	if cmd_context.active_sig.data.system_id != cmd_context.arg:
 		command_error.emit("!!> " + cmd_context.command + " failed. " + cmd_context.arg + " out of context.", cmd_context.active_sig)
 		return
+
 
 # === PARSER ===
 func parse_input(input: String) -> Dictionary:

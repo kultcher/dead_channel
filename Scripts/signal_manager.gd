@@ -3,8 +3,9 @@
 
 extends Node2D
 
-@onready var timeline_manager = $"../TimelineManager"
+@onready var timeline_manager = CommandDispatch.timeline_manager
 @onready var window_manager = $"../../WindowManager"
+@onready var terminal_window = CommandDispatch.terminal_window
 
 var signal_scene = preload("res://Scenes/signal_entity.tscn")
 
@@ -109,8 +110,8 @@ func kill_signal(active_sig: ActiveSignal):
 
 # === SCAN & LOCK LOGIC ===
 
-func _on_signal_left_clicked(active_signal: ActiveSignal):
-	window_manager.route_signal_to_window(active_signal)
+func _on_signal_left_clicked(active_sig: ActiveSignal):
+	CommandDispatch.switch_terminal_session(active_sig)
 	
 func _on_signal_mouse_enter(signal_entered: ActiveSignal):
 	if currently_scanning_signal != null and currently_scanning_signal.is_scan_locked:

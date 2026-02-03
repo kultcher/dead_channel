@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://gms8x710vr6g" path="res://Scripts/window_manager.gd" id="5_wudor"]
 [ext_resource type="Script" uid="uid://biyb8hixpkc42" path="res://Scenes/heat_tracker.gd" id="6_85m8a"]
 [ext_resource type="PackedScene" uid="uid://dbqweh3v2f0bq" path="res://Scenes/terminal_window.tscn" id="7_4qt4q"]
+[ext_resource type="PackedScene" uid="uid://hjsy8naghiwy" path="res://sniff.tscn" id="8_jx6wh"]
 
 [sub_resource type="Gradient" id="Gradient_882wi"]
 
@@ -79,3 +80,7 @@ offset_left = 406.0
 offset_top = -667.0
 offset_right = 987.0
 offset_bottom = -173.0
+
+[node name="SniffWindow" parent="." unique_id=1932794128 instance=ExtResource("8_jx6wh")]
+initial_position = 0
+position = Vector2i(710, 102)

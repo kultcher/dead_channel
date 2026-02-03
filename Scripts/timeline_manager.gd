@@ -4,7 +4,7 @@
 extends Node2D
 
 # SETTINGS
-@export var cells_per_second: float = 0.25 # Cells moved per second
+@export var cells_per_second: float = 0.15 # Cells moved per second
 @export var slow_speed_modifier: float = 0.5
 @export var fast_speed_modifier: float = 2.0
 @export var runner_screen_offset_cells: float = 1
