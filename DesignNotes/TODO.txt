@@ -1,5 +1,4 @@
-- Add heat to camera
-- Get full terminal loop with camera
+- puzzles
 
 Stray ideas:
 	Normal vs. Enhanced cameras:
@@ -11,9 +10,36 @@ Stray ideas:
 	Comms terminal: get guard positions for a time, or dissipate heat
 	Data terminal: pay boost
 
+	Stealing credentials from guards/terminals, escalating credentials
+	Access-locked terminals still solvable, credentials let you shortcut
+	Credentials decay over time?
+	big maybes: keylogger (or social engineering?) for delayed credential access, counter-surveillance on credential usage, ICE credential burn
+
+	- using doors to block line of sight or trap guards
+
+	- linked nodes
+
+	Signal properties instead of or in addition to processes: modify camera FOV, etc.
+
 	T1 ice: reboot, punish, lockout
+	- ICE concept: one "board" effect and one "puzzle" effect
+
+	guards "comms pulse" to get brief location hints
+
+"Matrix Search" names:
+Sniff
+Scrape
+Sift
+Sweep
+
 
 Story/Lore stuff:
 - white hats as inquisitors and true believers
 - maintenance as rituals
 - AI-dependence leads to knowledge loss, collapse
+
+Heat isn't just "Alert Level"; it’s "Variance." You are introducing variance into a perfect system.
+IC (Intrusion Countermeasures): Instead of distinct software names, they are named after virtues or corporate values.
+Standard Cyberpunk: "Killer.exe", "Firewall", "Black ICE".
+Dead Channel: "Protocol: Purity", "Asset: Retention", "Human Resources Mitigation".
+Terminal Minigame: When you fail a puzzle or decay happens, the text isn't ACCESS DENIED. It’s NON-COMPLIANT. FAITH IN SUITE 3.0 REQUIRED. SUBMIT TICKET FOR PENANCE.

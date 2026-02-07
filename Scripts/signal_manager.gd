@@ -93,7 +93,7 @@ func update_signal_position():
 			active_sig.instance_node.position = Vector2(visual_x, visual_y)
 			
 		else:
-			if active_sig.instance_node != null:
+			if visual_x < -100 and active_sig.instance_node != null:
 				active_sig.instance_node.queue_free()
 				cleared_signals.append(active_sig)
 

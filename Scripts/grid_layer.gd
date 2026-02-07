@@ -11,8 +11,6 @@ extends Node2D
 
 
 # CONFIGURATION
-var LANES = 5
-var VISIBLE_CELLS = 8.0
 var grid_color = Color(1, 0.441, 0.0, 1.0)
 
 @onready var cell_width: float = timeline_manager.cell_width_px
@@ -38,7 +36,7 @@ func _draw():
 	lane_height = timeline_manager.lane_height
 
 	## --- DRAW HORIZONTAL LANES ---
-	for i in range(LANES + 1):
+	for i in range(timeline_manager.LANES + 1):
 		var y_pos = i * lane_height
 		draw_line(
 			Vector2(0, y_pos),
@@ -69,7 +67,7 @@ func _draw():
 		if draw_x > -10: 
 			draw_line(
 				Vector2(draw_x, 0), 
-				Vector2(draw_x, lane_height * LANES),
+				Vector2(draw_x, lane_height * timeline_manager.LANES),
 				grid_color, 
 				2.0) 
 		draw_x += cell_width

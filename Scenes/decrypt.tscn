@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/Puzzles/decrypt_puzzle.gd" id="1_6s9ux"]
+
+[node name="DecryptWindow" type="PanelContainer"]
+script = ExtResource("1_6s9ux")

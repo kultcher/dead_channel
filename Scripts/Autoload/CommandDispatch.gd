@@ -97,32 +97,6 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 	else:
 		command_error.emit("Invalid command: " + cmd_context.command, cmd_context.active_sig)
 
-func process_command_matched(cmd_context: CommandContext):
-	var handler_method = "_cmd_" + cmd_context.command.to_lower()
-	if has_method(handler_method):
-		call(handler_method, cmd_context)
-	else:
-		command_error.emit("Invalid command: " + cmd_context.command, cmd_context.active_sig)
-
-func process_command_mismatch(cmd_context: CommandContext, target_sig: ActiveSignal):
-	var handler_method = "_cmd_" + cmd_context.command.to_lower()
-
-	# ACCESS can switch sessions from the terminal regardless
-	if cmd_context.command == "ACCESS":
-		cmd_context.active_sig = target_sig
-		_cmd_access(cmd_context)
-		return
-
-	# Signal despawned
-	if !cmd_context.active_sig in signal_manager.signal_queue:
-		command_error.emit("!!> " + cmd_context.command + " failed. Connection lost.")
-		return
-
-	# Wrong session TODO: Add auto-connect to new other session name with prompt
-	if cmd_context.active_sig.data.system_id != cmd_context.arg:
-		command_error.emit("!!> " + cmd_context.command + " failed. " + cmd_context.arg + " out of context.", cmd_context.active_sig)
-		return
-
 
 # === PARSER ===
 func parse_input(input: String) -> Dictionary:
@@ -171,7 +145,7 @@ func _cmd_access(cmd_context: CommandContext) -> void:
 		
 func _cmd_kill(cmd_context: CommandContext) -> void:
 	for ic in cmd_context.active_sig.data.ic_protection:
-		var stopped = (ic.try_kill)
+		var stopped = (ic.try_kill())
 		if stopped:
 			_interrupt_command(cmd_context)
 			return

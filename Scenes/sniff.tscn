@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://hjsy8naghiwy"]
+
+[ext_resource type="Script" uid="uid://dgrt0ubi2jaiy" path="res://Scripts/Puzzles/sniff_puzzle.gd" id="1_t8yyu"]
+
+[node name="SniffWindow" type="PanelContainer" unique_id=650256936]
+script = ExtResource("1_t8yyu")
+
+[node name="Label" type="LineEdit" parent="." unique_id=721710458]
+layout_mode = 2
