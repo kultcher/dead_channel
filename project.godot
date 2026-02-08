@@ -31,6 +31,10 @@ window/size/viewport_height=1080
 window/stretch/mode="viewport"
 window/stretch/scale=0.95
 
+[global_group]
+
+runner=""
+
 [input]
 
 ui_text_submit={

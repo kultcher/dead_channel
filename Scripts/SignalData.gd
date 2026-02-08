@@ -27,6 +27,5 @@ var identity_dict = {
 @export var hackable: HackableComponent
 @export var detection: DetectionComponent
 @export var response: ResponseComponent
-@export var effect_area: EffectAreaComponent
 @export var puzzle: PuzzleComponent
-@export var ic_protection: Array[ICComponent]
+@export var ic_modules: ICComponent

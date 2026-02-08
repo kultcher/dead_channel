@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dg7ccusnlj801"]
 
 [ext_resource type="Script" uid="uid://bu5j0vtniw7no" path="res://Scripts/signal_entity.gd" id="1_syivg"]
-[ext_resource type="Script" uid="uid://bf3h4o3iodo4" path="res://Scenes/SignalVisionController.gd" id="2_6hws6"]
+[ext_resource type="Script" uid="uid://bf3h4o3iodo4" path="res://Scenes/DetectionController.gd" id="2_6hws6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_syivg"]
 size = Vector2(50, 50)
@@ -121,9 +121,10 @@ fit_content = true
 autowrap_mode = 0
 
 [node name="SignalVisionController" type="Node2D" parent="." unique_id=904355384]
-script = ExtResource("2_6hws6")
 
 [node name="DetectionArea" type="Area2D" parent="." unique_id=737056803]
+collision_layer = 2
+script = ExtResource("2_6hws6")
 
 [node name="DetectionShape" type="CollisionShape2D" parent="DetectionArea" unique_id=473789932]
 
@@ -131,3 +132,5 @@ script = ExtResource("2_6hws6")
 [connection signal="mouse_entered" from="SignalIcon" to="." method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="SignalIcon" to="." method="_on_area_2d_mouse_exited"]
 [connection signal="resized" from="DetailTooltip" to="." method="_on_detail_tooltip_resized"]
+[connection signal="area_entered" from="DetectionArea" to="." method="_on_detection_area_entered"]
+[connection signal="area_exited" from="DetectionArea" to="." method="_on_detection_area_exited"]

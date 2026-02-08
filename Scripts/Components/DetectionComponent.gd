@@ -3,30 +3,92 @@
 
 class_name DetectionComponent extends Resource
 
-@export var watch_offset_cells: float = -1.0
-@export var watch_width_cells: float = 1.0
+enum ShapeType { CONE, ARC, CIRCLE }
+
+@export var watch_offset_cells: float = -1.0:
+	set = _set_watch_offset_cells
 @export var heat_per_second: float = 10
+@export var vision_length_cells: float = 2.0:
+	set = _set_vision_length_cells
+@export var vision_angle_deg: float = 30.0:
+	set = _set_vision_angle_deg
+@export var vision_segments: int = 12:
+	set = _set_vision_segments
+@export var shape_type: ShapeType = ShapeType.CONE:
+	set = _set_shape_type
 
 var parent_entity: Node2D
 var detection_disabled: bool = false
 
-func process_detection(active_sig: ActiveSignal, delta: float, timeline):
-	if active_sig.is_disabled: return
-	var camera_cell = active_sig.start_cell_index
-	var runner_cell = timeline.current_cell_pos
+func _set_vision_length_cells(value: float) -> void:
+	vision_length_cells = max(0.0, value)
+	emit_changed()
 
-	# If offset is -1.0, the vision starts 1 cell behind camera.
-	# If width is 3.0, it extends 3 cells further back from there.
-	
-	# Start checking from the Camera's position + offset
-	var zone_start = camera_cell + watch_offset_cells 
-	
-	var dist = camera_cell - runner_cell
-	
-	# If Camera is 100, Runner is 97. Dist is 3.
-	# If vision is 0 to 4 meters in front of camera:
-	if dist >= 0 and dist <= watch_width_cells:
-		_apply_detection(active_sig, delta)
+func _set_watch_offset_cells(value: float) -> void:
+	watch_offset_cells = value
+	emit_changed()
+
+func _set_vision_angle_deg(value: float) -> void:
+	vision_angle_deg = clamp(value, 1.0, 179.0)
+	emit_changed()
+
+func _set_vision_segments(value: int) -> void:
+	vision_segments = max(3, value)
+	emit_changed()
+
+func _set_shape_type(value: ShapeType) -> void:
+	shape_type = value
+	emit_changed()
+
+func apply_detection(active_sig: ActiveSignal, delta: float) -> void:
+	if active_sig.is_disabled or detection_disabled:
+		return
+	_apply_detection(active_sig, delta)
+
+func build_collision_shape(cell_width_px: float) -> Shape2D:
+	match shape_type:
+		ShapeType.CIRCLE:
+			var circle = CircleShape2D.new()
+			circle.radius = max(1.0, vision_length_cells * cell_width_px)
+			return circle
+		_:
+			var poly = ConvexPolygonShape2D.new()
+			poly.points = _build_polygon_points(cell_width_px)
+			return poly
+
+func get_visual_polygon(cell_width_px: float) -> PackedVector2Array:
+	return _build_polygon_points(cell_width_px)
+
+func _build_polygon_points(cell_width_px: float) -> PackedVector2Array:
+	var points := PackedVector2Array()
+	var offset_px = watch_offset_cells * cell_width_px
+	var length_px = max(1.0, vision_length_cells * cell_width_px)
+
+	match shape_type:
+		ShapeType.CONE:
+			var half_width = tan(deg_to_rad(vision_angle_deg * 0.5)) * length_px
+			points.append(Vector2(offset_px, 0)) # tip
+			points.append(Vector2(offset_px - length_px, -half_width))
+			points.append(Vector2(offset_px - length_px, half_width))
+		ShapeType.ARC:
+			var radius = length_px
+			var angle_rad = deg_to_rad(vision_angle_deg)
+			var start_angle = PI - (angle_rad * 0.5)
+			var end_angle = PI + (angle_rad * 0.5)
+			points.append(Vector2(offset_px, 0)) # fan center
+			for i in range(vision_segments + 1):
+				var t = float(i) / float(vision_segments)
+				var theta = lerp(start_angle, end_angle, t)
+				points.append(Vector2(offset_px, 0) + Vector2(cos(theta), sin(theta)) * radius)
+		ShapeType.CIRCLE:
+			var radius = length_px
+			points.append(Vector2(offset_px, 0)) # center
+			for i in range(vision_segments + 1):
+				var t = float(i) / float(vision_segments)
+				var theta = lerp(0.0, TAU, t)
+				points.append(Vector2(offset_px, 0) + Vector2(cos(theta), sin(theta)) * radius)
+
+	return points
 
 func _apply_detection(active_sig: ActiveSignal, delta):
 	var heat = heat_per_second * delta

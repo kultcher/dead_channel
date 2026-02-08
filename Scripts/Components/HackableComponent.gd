@@ -3,7 +3,11 @@
 
 class_name HackableComponent extends Resource
 
-func try_kill(cmd_context):
+func try_command(cmd_context):
+	match cmd_context.command:
+		"KILL": _kill(cmd_context)
+
+func _kill(cmd_context):
 	cmd_context.active_sig.disable_signal()
 	var name = cmd_context.active_sig.data.system_id
 	cmd_context.log.append("Shutting down " + name + "...")

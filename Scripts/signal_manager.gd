@@ -34,15 +34,24 @@ func create_test_cam(id, distance, lane):
 	cam.system_id = "cam_" + id
 
 	var detection = DetectionComponent.new()
-	detection.watch_offset_cells = -1.0
-	detection.watch_width_cells = 1.0
+	detection.watch_offset_cells = 0.0
+	detection.vision_length_cells = 1.0
+	detection.vision_angle_deg = 30.0
+	detection.vision_segments = 3
+	detection.shape_type = DetectionComponent.ShapeType.CONE
 	detection.heat_per_second = 1.0
-
 	cam.detection = detection
 
 	var hackable = HackableComponent.new()
-	
 	cam.hackable = hackable
+
+	var response = ResponseComponent.new()
+	cam.response = response
+
+	var ic = ICComponent.new()
+	var reboot = RebootModule.new()
+	ic.add_module(reboot)
+	cam.ic_modules = ic
 
 	spawn_signal_data(cam, distance)
 
@@ -50,12 +59,6 @@ func _process(delta):
 	if currently_scanning_signal != null:
 		_process_active_scan(delta)
 	update_signal_position()
-	_process_signal_behaviors(delta)
-
-func _process_signal_behaviors(delta: float):
-	for sig in signal_queue:
-		if sig.data.detection:
-			sig.data.detection.process_detection(sig, delta, timeline_manager)
 
 func spawn_signal_data(data: SignalData, cell_index: float):
 	var new_signal = ActiveSignal.new()

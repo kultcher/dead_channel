@@ -91,11 +91,7 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 		return	
 		
 	# execute
-	var handler_method = "_cmd_" + cmd_context.command.to_lower()
-	if has_method(handler_method):
-		call(handler_method, cmd_context)
-	else:
-		command_error.emit("Invalid command: " + cmd_context.command, cmd_context.active_sig)
+	_try_command(cmd_context)
 
 
 # === PARSER ===
@@ -143,13 +139,13 @@ func _cmd_access(cmd_context: CommandContext) -> void:
 	terminal_window.switch_session(cmd_context.active_sig)
 	_finalize_command(cmd_context)
 		
-func _cmd_kill(cmd_context: CommandContext) -> void:
-	for ic in cmd_context.active_sig.data.ic_protection:
-		var stopped = (ic.try_kill())
-		if stopped:
-			_interrupt_command(cmd_context)
-			return
-	cmd_context.active_sig.data.hackable.try_kill(cmd_context)
+func _try_command(cmd_context: CommandContext) -> void:
+	var ic_modules = cmd_context.active_sig.data.ic_modules
+	var stopped = (ic_modules.command_intercept(cmd_context))
+	if stopped:
+		_interrupt_command(cmd_context)
+		return
+	cmd_context.active_sig.data.hackable.try_command(cmd_context)
 	_finalize_command(cmd_context)
 		
 func _cmd_inspect(parsed: Dictionary, context: ActiveSignal) -> void:

@@ -32,7 +32,14 @@ func setup():
 
 func disable_signal():
 	is_disabled = true
-	instance_node.vision_controller.disable_vision()
+	instance_node.detection_controller.disable_vision()
+	data.ic_modules.notify_disabled(self)
+	instance_node.update_visuals()
+
+func enable_signal():
+	is_disabled = false
+	instance_node.detection_controller.enable_vision()
+	data.ic_modules.notify_enabled(self)
 	instance_node.update_visuals()
 
 func generate_scan_layers():
@@ -62,9 +69,6 @@ func build_response_layer(difficulty_modifier: float = 1.0):
 	if data.response:
 		response_desc = data.response.get_desc()
 	else: response_desc = "Static"
-	if data.effect_area:
-		effect_desc = data.effect_area.get_desc()
-	else: effect_desc = ""
 	l1.description = "Mode: " + response_desc
 	scan_layers.append(l1)
 

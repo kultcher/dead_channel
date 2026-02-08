@@ -5,6 +5,10 @@ Stray ideas:
 	Normal is standard heat,
 	Enhanced has built in recognition and triggers immediate alerts
 
+
+	-max heat effect: reboot, full lockout for X seconds
+	-decrypt: add cull pause
+
 	Utility signals:
 	Security terminal: disable nearby IC, open doors, reduce difficulty
 	Comms terminal: get guard positions for a time, or dissipate heat
@@ -22,9 +26,14 @@ Stray ideas:
 	Signal properties instead of or in addition to processes: modify camera FOV, etc.
 
 	T1 ice: reboot, punish, lockout
+	ICE classes: 
+		-white: purely defensive
+		-grey: disruptor
 	- ICE concept: one "board" effect and one "puzzle" effect
-
+	- ICE concept: "ping pong" - rhythm time game, can only act during downtimes
+			(or similar puzzle where you hold a key while marker overlaps target area...?)
 	guards "comms pulse" to get brief location hints
+
 
 "Matrix Search" names:
 Sniff
