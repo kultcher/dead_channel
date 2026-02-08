@@ -7,7 +7,6 @@ enum ShapeType { CONE, ARC, CIRCLE }
 
 @export var watch_offset_cells: float = -1.0:
 	set = _set_watch_offset_cells
-@export var heat_per_second: float = 10
 @export var vision_length_cells: float = 2.0:
 	set = _set_vision_length_cells
 @export var vision_angle_deg: float = 30.0:
@@ -17,7 +16,6 @@ enum ShapeType { CONE, ARC, CIRCLE }
 @export var shape_type: ShapeType = ShapeType.CONE:
 	set = _set_shape_type
 
-var parent_entity: Node2D
 var detection_disabled: bool = false
 
 func _set_vision_length_cells(value: float) -> void:
@@ -91,8 +89,9 @@ func _build_polygon_points(cell_width_px: float) -> PackedVector2Array:
 	return points
 
 func _apply_detection(active_sig: ActiveSignal, delta):
-	var heat = heat_per_second * delta
-	GlobalEvents.heat_modified.emit(heat_per_second, "Detected by camera.")
+	active_sig.instance_node.detection_controller.runner_spotted()
+	if active_sig.data.response:
+		active_sig.data.response.on_detection(active_sig, delta)
 	GlobalEvents.runner_in_vision.emit(active_sig)
 
 func disable_detection():

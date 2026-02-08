@@ -20,8 +20,7 @@ var identity_dict = {
 
 # STATE
 @export var visual_state: VisualState = VisualState.REVEALED
-@export var scan_depth: int = 0
-@export var scans_to_reveal: int = 1
+@export var clearance_level: int = 0
 
 # COMPONENTS
 @export var hackable: HackableComponent

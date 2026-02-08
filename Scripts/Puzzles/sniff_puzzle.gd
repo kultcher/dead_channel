@@ -15,6 +15,7 @@ var config := {
 }
 
 # --- REFERENCES ---
+var linked_signal: ActiveSignal = null
 var grid_panel: Panel
 var grid_container: Control
 var target_footer: HBoxContainer

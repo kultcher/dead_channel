@@ -33,7 +33,7 @@ func _on_command_line_text_submitted(new_text: String) -> void:
 func _on_command_complete(cmd_context: CommandContext) -> void:
 	if cmd_context.active_sig != active_signal:		# ensure command signaldata matches terminal signaldata
 		return
-	for str in cmd_context.log:
+	for str in cmd_context.log_text:
 		print_to_log(str)
 
 func _on_command_error(error_msg: String, signal_context: ActiveSignal = null) -> void:

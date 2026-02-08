@@ -12,11 +12,11 @@ signal signal_scanned(signal_data: SignalData, scan_depth)
 signal signal_hacked(data: SignalData, success: bool)
 signal signal_killed(active_sig: ActiveSignal)
 signal runner_in_vision(active_sig: ActiveSignal)
-signal heat_modified(amount, source)
+signal heat_increased(amount, source)
 signal runner_damaged(amount: float)
 signal ic_triggered(ice_type: String)
 
 # PUZZLE EVENTS
-signal puzzle_started(signal_data, puzzle_type)
+signal puzzle_started(active_signal: ActiveSignal, puzzle_type: PuzzleComponent.Type)
 signal puzzle_failed(signal_data)
 signal puzzle_solved(signal_data)

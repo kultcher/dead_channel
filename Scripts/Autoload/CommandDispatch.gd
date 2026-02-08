@@ -22,7 +22,7 @@ const VALID_COMMANDS = {
 		"valid_flag": ["-bp"],
 		"description": "Access: Access a system"
 	},
-	"INSPECT": {
+	"PROBE": {
 		"requires_arg": false,
 		"valid_flags": [],
 		"description": "Inspect: Inspect a system"
@@ -45,7 +45,7 @@ const VALID_COMMANDS = {
 }
 
 const COMMAND_SHORTCUTS = {
-	"ACC": "ACCESS", "INS": "INSPECT", "SPF": "SPOOF", "KIL": "KILL"
+	"ACC": "ACCESS", "INS": "INSPECT", "SPF": "SPOOF", "KIL": "KILL", "PRB": "PROBE", "LNK": "LINK"
 }
 
 func switch_terminal_session(active_sig: ActiveSignal):
@@ -64,8 +64,9 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 		command_error.emit(parsed.error, active_sig)
 		return
 
+
 	# Signal despawned
-	if !target_sig in signal_manager.signal_queue:
+	if !target_sig in signal_manager.signal_queue and parsed.command != "RUN":
 		command_error.emit("!!> " + parsed.command + " failed. Connection lost.")
 		return
 
@@ -81,14 +82,19 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 		_cmd_access(cmd_context)
 		return
 
+	# Not connected to a session
 	if !session_sig:
-		command_error.emit("!!> " + parsed.command + " failed. Incorrect context.")
+		command_error.emit("!!> " + parsed.command + " failed. No applicable context.")
+		return
+
+	if cmd_context.command == "RUN":
+		_try_command(cmd_context)
 		return
 
 	# Wrong session TODO: Add auto-connect to new other session name with prompt
 	if session_sig.data.system_id != cmd_context.arg:
 		command_error.emit("!!> " + parsed.command + " failed. " + parsed.arg + " out of context.", cmd_context.active_sig)
-		return	
+		return
 		
 	# execute
 	_try_command(cmd_context)
@@ -135,11 +141,12 @@ func parse_input(input: String) -> Dictionary:
 
 # === COMMAND HANDLERS ===
 func _cmd_access(cmd_context: CommandContext) -> void:
-	cmd_context.log.append("ACCESS GRANTED")
+	cmd_context.log_text.append("ACCESS GRANTED")
 	terminal_window.switch_session(cmd_context.active_sig)
 	_finalize_command(cmd_context)
 		
 func _try_command(cmd_context: CommandContext) -> void:
+	print("Command Dispatch trying command: " + cmd_context.command)
 	var ic_modules = cmd_context.active_sig.data.ic_modules
 	var stopped = (ic_modules.command_intercept(cmd_context))
 	if stopped:
@@ -147,10 +154,7 @@ func _try_command(cmd_context: CommandContext) -> void:
 		return
 	cmd_context.active_sig.data.hackable.try_command(cmd_context)
 	_finalize_command(cmd_context)
-		
-func _cmd_inspect(parsed: Dictionary, context: ActiveSignal) -> void:
-	command_complete.emit("SCAN", parsed.arg, parsed.flags, context)
-	
+			
 func _interrupt_command(cmd_context: CommandContext):
 	pass
 	

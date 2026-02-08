@@ -11,18 +11,13 @@ extends Node2D
 @onready var tooltip_active_scan = $DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel
 @onready var tooltip_active_scan_text = $DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel/MarginContainer/ActiveScanText
 
-@onready var detection_controller = $DetectionArea
-@onready var detection_area = $DetectionArea
-@onready var detection_shape = $DetectionArea/DetectionShape
+@onready var detection_controller = $DetectionController
 
 var my_data: SignalData
 var my_active_sig: ActiveSignal
 
 var tooltip_main_initial_x: float
-var detection_poly: Polygon2D = null
-
 var is_disabled: bool = false
-var runner_in_vision: bool = false
 
 signal signal_interaction(data: SignalData)
 signal scan_requested(clicked_signal: ActiveSignal)
@@ -43,7 +38,6 @@ func setup(signal_wrapper: ActiveSignal):
 
 	GlobalEvents.signal_scanned.connect(check_scan_completion)
 
-	_setup_detection_shape()
 	detection_controller.initialize(self)
 	update_visuals()
 	
@@ -69,28 +63,6 @@ func update_visuals():
 	if my_active_sig.is_disabled:
 		print("is disabled")
 		shape.color = Color.BLACK
-
-func _setup_detection_shape() -> void:
-	if my_data.detection == null:
-		detection_area.visible = false
-		detection_area.monitoring = false
-		return
-
-	var timeline_manager = CommandDispatch.timeline_manager
-	detection_shape.shape = my_data.detection.build_collision_shape(timeline_manager.cell_width_px)
-	detection_area.monitoring = true
-	if not my_data.detection.changed.is_connected(_on_detection_changed):
-		my_data.detection.changed.connect(_on_detection_changed)
-
-func _on_detection_changed() -> void:
-	if my_data.detection == null:
-		return
-	var timeline_manager = CommandDispatch.timeline_manager
-	detection_shape.shape = my_data.detection.build_collision_shape(timeline_manager.cell_width_px)
-
-func _process(delta: float) -> void:
-	if runner_in_vision and my_data.detection:
-		my_data.detection.apply_detection(my_active_sig, delta)
 
 func set_scan_highlight(active: bool):
 	if active:
@@ -152,14 +124,6 @@ func _on_detail_tooltip_resized() -> void:
 	# reposition tooltip based on new size
 	if !is_node_ready(): return
 	tooltip_main.position.x = (tooltip_main.size.x / 2) * -1
-
-func _on_detection_area_entered(area: Area2D) -> void:
-	if area.is_in_group("runner"):
-		runner_in_vision = true
-
-func _on_detection_area_exited(area: Area2D) -> void:
-	if area.is_in_group("runner"):
-		runner_in_vision = false
 
 
 func show_scanning_tooltip():

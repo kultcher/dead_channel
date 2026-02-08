@@ -5,7 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://cqq82un1s3x4" path="res://icon.svg" id="3_4qt4q"]
 [ext_resource type="Script" uid="uid://cu20kah6ku6q3" path="res://Scripts/signal_manager.gd" id="4_jx6wh"]
 [ext_resource type="Script" uid="uid://gms8x710vr6g" path="res://Scripts/window_manager.gd" id="5_wudor"]
-[ext_resource type="Script" uid="uid://biyb8hixpkc42" path="res://Scenes/heat_tracker.gd" id="6_85m8a"]
+[ext_resource type="Script" uid="uid://biyb8hixpkc42" path="res://Scripts/heat_tracker.gd" id="6_85m8a"]
 [ext_resource type="PackedScene" uid="uid://dbqweh3v2f0bq" path="res://Scenes/terminal_window.tscn" id="7_4qt4q"]
 [ext_resource type="PackedScene" uid="uid://hjsy8naghiwy" path="res://Scenes/sniff.tscn" id="8_jx6wh"]
 [ext_resource type="PackedScene" path="res://Scenes/decrypt.tscn" id="9_wudor"]

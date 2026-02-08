@@ -6,6 +6,7 @@ extends Node2D
 @onready var timeline_manager = CommandDispatch.timeline_manager
 @onready var window_manager = $"../../WindowManager"
 @onready var terminal_window = CommandDispatch.terminal_window
+@onready var spawner = SignalSpawner.new()
 
 var signal_scene = preload("res://Scenes/signal_entity.tscn")
 
@@ -18,8 +19,8 @@ func _ready():
 	GlobalEvents.signal_killed.connect(kill_signal)
 	CommandDispatch.signal_manager = self
 
-	create_test_cam("05", 2.5, 2)
-	create_test_cam("06", 6.5, 1)
+	spawn_signal_data(spawner.create_test_cam("05", 2), 2.5)
+	spawn_signal_data(spawner.create_test_cam("06", 3), 6.5)
 
 func get_active_signal(display_name: String):
 	print("Search queue for: ", display_name)
@@ -27,34 +28,6 @@ func get_active_signal(display_name: String):
 		if sig.data.display_name == display_name:
 			return sig
 	
-func create_test_cam(id, distance, lane):
-	var cam = SignalData.new()
-	cam.type = SignalData.Type.CAMERA
-	cam.lane = lane
-	cam.system_id = "cam_" + id
-
-	var detection = DetectionComponent.new()
-	detection.watch_offset_cells = 0.0
-	detection.vision_length_cells = 1.0
-	detection.vision_angle_deg = 30.0
-	detection.vision_segments = 3
-	detection.shape_type = DetectionComponent.ShapeType.CONE
-	detection.heat_per_second = 1.0
-	cam.detection = detection
-
-	var hackable = HackableComponent.new()
-	cam.hackable = hackable
-
-	var response = ResponseComponent.new()
-	cam.response = response
-
-	var ic = ICComponent.new()
-	var reboot = RebootModule.new()
-	ic.add_module(reboot)
-	cam.ic_modules = ic
-
-	spawn_signal_data(cam, distance)
-
 func _process(delta):
 	if currently_scanning_signal != null:
 		_process_active_scan(delta)

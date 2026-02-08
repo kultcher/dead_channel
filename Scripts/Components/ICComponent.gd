@@ -6,7 +6,19 @@ class_name ICComponent extends Resource
 @export var modules: Array[Resource] = [] # Array of ICModule resources
 
 func get_desc():
-	return "Blank"
+	var formatted: String = ""
+	var module_info = []
+	for module in modules:
+		module_info.append(module.get_desc())
+	if module_info.size() == 0:
+		return module_info[0]
+	else:
+		for info in module_info:
+			if info == module_info[-1]:
+				formatted += info
+			else:
+				formatted += info + " | "
+	return formatted
 
 func add_module(module: Resource):
 	modules.append(module)

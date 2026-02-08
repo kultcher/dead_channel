@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ResponseEffect" format=3 uid="uid://c43su3v53wrbw"]
+
+[ext_resource type="Script" uid="uid://d4r370y7ufys" path="res://Scripts/Components/ResponseEffect.gd" id="1_6ywwl"]
+
+[resource]
+script = ExtResource("1_6ywwl")
+amount = 100.0
+metadata/_custom_type_script = "uid://d4r370y7ufys"

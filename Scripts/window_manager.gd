@@ -3,6 +3,10 @@
 
 extends CanvasLayer
 
+var sniff = preload("res://Scenes/sniff.tscn")
+#var fuzz = preload("res://Scenes/fuzz.tscn")
+var decrypt = preload("res://Scenes/decrypt.tscn")
+
 @onready var timeline_manager = $"../SignalTimeline/TimelineManager"
 @onready var signal_manager = $"../SignalTimeline/SignalManager"
 @onready var terminal_window = preload("res://Scenes/terminal_window.tscn")
@@ -13,4 +17,9 @@ extends CanvasLayer
 var window_count := 0
 
 func _ready():
-	pass
+	GlobalEvents.puzzle_started.connect(_puzzle_started)
+
+func _puzzle_started(active_sig: ActiveSignal, puzzle_type: PuzzleComponent.Type):
+	var puzzle_window = sniff.instantiate()
+	puzzle_window.linked_signal = active_sig
+	add_child(puzzle_window)

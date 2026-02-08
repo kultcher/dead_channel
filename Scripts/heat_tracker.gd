@@ -11,7 +11,7 @@ func modify_heat(amount:float, source: String):
 	value += amount
 	last_source = source
 	
-func _process(_delta: float):
+func _process(delta: float):
 	value += 1
 	var display_string = "Heat:%.2f\n" % value
 	var display_string2 = "Last Source:\n" + last_source
