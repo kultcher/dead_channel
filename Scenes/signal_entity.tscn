@@ -123,6 +123,10 @@ autowrap_mode = 0
 [node name="SignalVisionController" type="Node2D" parent="." unique_id=904355384]
 script = ExtResource("2_6hws6")
 
+[node name="DetectionArea" type="Area2D" parent="." unique_id=737056803]
+
+[node name="DetectionShape" type="CollisionShape2D" parent="DetectionArea" unique_id=473789932]
+
 [connection signal="input_event" from="SignalIcon" to="." method="_on_area_2d_input_event"]
 [connection signal="mouse_entered" from="SignalIcon" to="." method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="SignalIcon" to="." method="_on_area_2d_mouse_exited"]

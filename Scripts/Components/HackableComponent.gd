@@ -1,7 +1,7 @@
-# KillableComponent.gd
+# HackableComponent.gd
 # Governs how Signals are disabled
 
-class_name KillableComponent extends Resource
+class_name HackableComponent extends Resource
 
 func try_kill(cmd_context):
 	cmd_context.active_sig.disable_signal()

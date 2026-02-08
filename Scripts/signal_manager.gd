@@ -33,16 +33,16 @@ func create_test_cam(id, distance, lane):
 	cam.lane = lane
 	cam.system_id = "cam_" + id
 
-	var vision = VisionComponent.new()
-	vision.watch_offset_cells = -1.0
-	vision.watch_width_cells = 1.0
-	vision.heat_per_second = 1.0
+	var detection = DetectionComponent.new()
+	detection.watch_offset_cells = -1.0
+	detection.watch_width_cells = 1.0
+	detection.heat_per_second = 1.0
 
-	cam.vision = vision
+	cam.detection = detection
 
-	var killable = KillableComponent.new()
+	var hackable = HackableComponent.new()
 	
-	cam.killable = killable
+	cam.hackable = hackable
 
 	spawn_signal_data(cam, distance)
 
@@ -54,10 +54,8 @@ func _process(delta):
 
 func _process_signal_behaviors(delta: float):
 	for sig in signal_queue:
-		if sig.data.vision:
-			sig.data.vision.process_vision(sig, delta, timeline_manager)
-		if sig.data.behavior:
-			sig.data.behavior.process_behavior(sig, delta, timeline_manager)
+		if sig.data.detection:
+			sig.data.detection.process_detection(sig, delta, timeline_manager)
 
 func spawn_signal_data(data: SignalData, cell_index: float):
 	var new_signal = ActiveSignal.new()

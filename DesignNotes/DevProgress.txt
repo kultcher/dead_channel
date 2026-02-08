@@ -10,11 +10,12 @@ Development Progress
 > Baseline functional, most commands not yet implemented. Clicking a signal pops up the terminal window and allows the user to type commands. Currently only "ACC" (access) command has a baseline implementation. Commands are sent to CommandDispatch, which processes them and communicates back to the terminal and other areas impacted by the command. window_manager handles linking the terminal window to the ActiveSignal. (Note: Future consideration is having the terminal not explicitly linked to Signals so the player can access any visible node via a single terminal window.) window_manager will also be used to manager puzzle windows when those are implemented.
 
 - Sniffer minigame: Prototype complete, awaiting cleanup.
+- Decrypt minigame: Prototype complete
+- Heat: Basic visual and tracking
 
 Not Yet Implemented (priority):
 - More robust terminal implementation
-- Puzzles
-- Heat
+- Robust heat implementation with difficulty scaling
 - Advanced Signal functions/behaviors
 - IC
 - Programs and RAM

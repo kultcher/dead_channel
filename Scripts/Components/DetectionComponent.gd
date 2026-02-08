@@ -1,16 +1,16 @@
-# VisionComponent.gd
+# DetectionComponent.gd
 # Signal component for vision behaviors
 
-class_name VisionComponent extends Resource
+class_name DetectionComponent extends Resource
 
 @export var watch_offset_cells: float = -1.0
 @export var watch_width_cells: float = 1.0
 @export var heat_per_second: float = 10
 
 var parent_entity: Node2D
-var vision_disabled: bool = false
+var detection_disabled: bool = false
 
-func process_vision(active_sig: ActiveSignal, delta: float, timeline):
+func process_detection(active_sig: ActiveSignal, delta: float, timeline):
 	if active_sig.is_disabled: return
 	var camera_cell = active_sig.start_cell_index
 	var runner_cell = timeline.current_cell_pos
@@ -33,8 +33,8 @@ func _apply_detection(active_sig: ActiveSignal, delta):
 	GlobalEvents.heat_modified.emit(heat_per_second, "Detected by camera.")
 	GlobalEvents.runner_in_vision.emit(active_sig)
 
-func disable_vision():
-	vision_disabled = true
+func disable_detection():
+	detection_disabled = true
 
 func get_desc():
 	return "Static"

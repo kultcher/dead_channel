@@ -149,7 +149,7 @@ func _cmd_kill(cmd_context: CommandContext) -> void:
 		if stopped:
 			_interrupt_command(cmd_context)
 			return
-	cmd_context.active_sig.data.killable.try_kill(cmd_context)
+	cmd_context.active_sig.data.hackable.try_kill(cmd_context)
 	_finalize_command(cmd_context)
 		
 func _cmd_inspect(parsed: Dictionary, context: ActiveSignal) -> void:

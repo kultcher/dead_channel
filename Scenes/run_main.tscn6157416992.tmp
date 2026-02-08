@@ -10,9 +10,6 @@
 [ext_resource type="PackedScene" uid="uid://hjsy8naghiwy" path="res://Scenes/sniff.tscn" id="8_jx6wh"]
 [ext_resource type="PackedScene" path="res://Scenes/decrypt.tscn" id="9_wudor"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_wudor"]
-radius = 60.0
-
 [sub_resource type="Gradient" id="Gradient_882wi"]
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_85m8a"]
@@ -50,11 +47,6 @@ scale = Vector2(0.4, 0.4)
 
 [node name="RunnerIcon" type="Sprite2D" parent="SignalTimeline/GridLayer/RunnerTeam" unique_id=2139578560]
 texture = ExtResource("3_4qt4q")
-
-[node name="RunnerArea" type="Area2D" parent="SignalTimeline/GridLayer/RunnerTeam" unique_id=2001800265]
-
-[node name="RunnerShape" type="CollisionShape2D" parent="SignalTimeline/GridLayer/RunnerTeam/RunnerArea" unique_id=1342940088]
-shape = SubResource("CircleShape2D_wudor")
 
 [node name="SignalManager" type="Node2D" parent="SignalTimeline" unique_id=1320650835]
 script = ExtResource("4_jx6wh")

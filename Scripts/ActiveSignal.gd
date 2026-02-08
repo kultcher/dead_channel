@@ -38,7 +38,7 @@ func disable_signal():
 func generate_scan_layers():
 	scan_layers.clear()
 	build_id_layer()
-	build_behavior_layer()
+	build_response_layer()
 	build_puzzle_layer()
 	build_component_layers()
 		
@@ -53,19 +53,19 @@ func build_id_layer(difficulty_modifier: float = 1.0):
 		current_scan_index = 1 # Skip to next
 	scan_layers.append(l0)
 
-func build_behavior_layer(difficulty_modifier: float = 1.0):
+func build_response_layer(difficulty_modifier: float = 1.0):
 	var l1 = ScanLayer.new()
-	var behavior_desc
+	var response_desc
 	var effect_desc
 	l1.name = "MODE"
 	l1.duration = 0.5
-	if data.behavior:
-		behavior_desc = data.behavior.get_desc()
-	else: behavior_desc = "Static"
+	if data.response:
+		response_desc = data.response.get_desc()
+	else: response_desc = "Static"
 	if data.effect_area:
 		effect_desc = data.effect_area.get_desc()
 	else: effect_desc = ""
-	l1.description = "Mode: " + behavior_desc
+	l1.description = "Mode: " + response_desc
 	scan_layers.append(l1)
 
 func build_puzzle_layer(difficulty_modifier: float = 1.0):
