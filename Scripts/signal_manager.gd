@@ -13,8 +13,6 @@ var signal_scene = preload("res://Scenes/signal_entity.tscn")
 var signal_queue: Array[ActiveSignal] = []
 var currently_scanning_signal: ActiveSignal = null
 
-signal signal_clicked(data: SignalData)
-
 func _ready():
 	GlobalEvents.signal_killed.connect(kill_signal)
 	CommandDispatch.signal_manager = self

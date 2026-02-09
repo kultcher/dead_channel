@@ -237,16 +237,15 @@ func _build_solution(cipher: Array[String]) -> Array[String]:
 	return out
 
 func _build_keyspaces(cipher: Array[String], solution: Array[String]) -> Array[PackedStringArray]:
+	var out: Array[PackedStringArray] = []
 	if config.keyspaces.size() == cipher.size():
-		var out: Array[PackedStringArray] = []
-		for set in config.keyspaces:
-			out.append(PackedStringArray(set))
+		for keyset in config.keyspaces:
+			out.append(PackedStringArray(keyset))
 		return out
 	
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
 	var alphabet = _alphabet()
-	var out: Array[PackedStringArray] = []
 	
 	for i in cipher.size():
 		var size = rng.randi_range(config.keyspace_min, config.keyspace_max)

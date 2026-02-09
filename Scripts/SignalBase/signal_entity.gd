@@ -31,7 +31,6 @@ func setup(signal_wrapper: ActiveSignal):
 	my_data = signal_wrapper.data
 	my_active_sig = signal_wrapper
 
-	var timeline_manager = CommandDispatch.timeline_manager 
 	tooltip_main_initial_x = tooltip_main.size.x
 
 	initialize_tooltip()

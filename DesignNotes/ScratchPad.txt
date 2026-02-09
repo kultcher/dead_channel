@@ -29,6 +29,7 @@ Stray ideas:
 	ICE classes: 
 		-white: purely defensive
 		-grey: disruptor
+	- trace IC that forces you to close a session within a timeframe or risk big heat gain
 	- ICE concept: one "board" effect and one "puzzle" effect
 	- ICE concept: "ping pong" - rhythm time game, can only act during downtimes
 			(or similar puzzle where you hold a key while marker overlaps target area...?)

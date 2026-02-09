@@ -6,18 +6,25 @@ Development Progress
 - Signals: signal_entity.gd, SignalData.gd, ActiveSignal.gd + various components
 > Baseline functional. Using a factory + composition pattern. SignalData defines a Signal's properties, ActiveSignal translates them into on-screen signal_entities. Currently, Signals scroll toward the player at appropriate speed, can be scanned by mouse-over to show a detailed tooltip. Scan information is revealed in layers, as defined in ActiveSignal.gd. The only piece of actual interaction with the runners currently is a "vision" component (like for Cameras) that will be hooked into the heat system when implemented. Signals can also be left-clicked to open a terminal_window.
 
-- Terminal: terminal_window.gd, window_manager.gd, CommandDispatch.gd
-> Baseline functional, most commands not yet implemented. Clicking a signal pops up the terminal window and allows the user to type commands. Currently only "ACC" (access) command has a baseline implementation. Commands are sent to CommandDispatch, which processes them and communicates back to the terminal and other areas impacted by the command. window_manager handles linking the terminal window to the ActiveSignal. (Note: Future consideration is having the terminal not explicitly linked to Signals so the player can access any visible node via a single terminal window.) window_manager will also be used to manager puzzle windows when those are implemented.
-
-- Sniffer minigame: Prototype complete, awaiting cleanup.
-- Decrypt minigame: Prototype complete
 - Heat: Basic visual and tracking
 
+- Terminal: terminal_window.gd, window_manager.gd, CommandDispatch.gd
+> Baseline functional, most commands not yet implemented. Clicking a signal pops up the terminal window and allows the user to type commands. Currently only "ACC" (access) command has a baseline implementation. Commands are sent to CommandDispatch, which processes them and communicates back to the terminal and other areas impacted by the command. window_manager handles linking the terminal window to the ActiveSignal. (Note: Future consideration is having the terminal not explicitly linked to Signals so the player can access any visible node via a single terminal window.) window_manager will also be used to manager puzzle windows when those are implemented.
+> ACCESS, KILL and RUN baseline functional
+
+2/7/2026:
+- Sniffer minigame: Prototype complete, awaiting cleanup.
+- Decrypt minigame: Prototype complete
+
+2/8/2026:
+- IC: Template built, simple IC crated.
+- ResponseComponent and Response effects: template for discrete effects created.
+
 Not Yet Implemented (priority):
-- More robust terminal implementation
+- Even More robust terminal implementation
 - Robust heat implementation with difficulty scaling
 - Advanced Signal functions/behaviors
-- IC
+- More and more advanced IC
 - Programs and RAM
 - "Jargonizer" - for generating flavorful but semi-random terminal noise
 
