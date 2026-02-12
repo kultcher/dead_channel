@@ -56,11 +56,11 @@ func match_puzzle(puzzle, cmd_context):
 	cmd_context.log_text.append(puzzle_mismatch[arg])
 
 
-func _spoof(cmd_context):
+func _spoof(_cmd_context):
 	pass
 
-func _probe(cmd_context):
+func _probe(_cmd_context):
 	pass
 
-func _link(cmd_context):
+func _link(_cmd_context):
 	pass

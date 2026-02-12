@@ -55,6 +55,10 @@ func build_collision_shape(cell_width_px: float) -> Shape2D:
 			var poly = ConvexPolygonShape2D.new()
 			poly.points = _build_polygon_points(cell_width_px)
 			return poly
+		ShapeType.ARC:
+			var poly = ConvexPolygonShape2D.new()
+			poly.points = _build_polygon_points(cell_width_px)
+			return poly
 	return
 
 func get_visual_polygon(cell_width_px: float) -> PackedVector2Array:
@@ -73,15 +77,22 @@ func _build_polygon_points(cell_width_px: float) -> PackedVector2Array:
 			points.append(Vector2(offset_px - length_px, -half_width))
 			points.append(Vector2(offset_px - length_px, half_width))
 		ShapeType.ARC:
-			var radius = length_px
-			var angle_rad = deg_to_rad(vision_angle_deg)
-			var start_angle = PI - (angle_rad * 0.5)
-			var end_angle = PI + (angle_rad * 0.5)
-			points.append(Vector2(offset_px, 0)) # fan center
+			# D-shape profile:
+			# - Flat "peripheral" backline cuts through icon center
+			# - Rounded front projects outward
+			# Depth equals full backline height.
+			var depth = length_px
+			var half_height = depth * 0.5
+			var front_radius = half_height
+			var front_center = Vector2(offset_px + depth - front_radius, 0.0)
+
+			points.append(Vector2(offset_px, -half_height))
+			points.append(Vector2(front_center.x, -half_height))
 			for i in range(vision_segments + 1):
 				var t = float(i) / float(vision_segments)
-				var theta = lerp(start_angle, end_angle, t)
-				points.append(Vector2(offset_px, 0) + Vector2(cos(theta), sin(theta)) * radius)
+				var theta = lerp(-PI * 0.5, PI * 0.5, t)
+				points.append(front_center + Vector2(cos(theta), sin(theta)) * front_radius)
+			points.append(Vector2(offset_px, half_height))
 		ShapeType.CIRCLE:
 			var radius = length_px
 			for i in range(vision_segments):

@@ -74,6 +74,10 @@ func _build_detection_poly():
 	add_child(detection_poly)
 	detection_poly.z_index = -1
 
+func set_overlay_visible(poly_visible: bool) -> void:
+	if detection_poly:
+		detection_poly.visible = poly_visible
+
 func runner_spotted():
 	var was_alert = is_alert_active
 	is_alert_active = true
@@ -83,6 +87,7 @@ func runner_spotted():
 		_start_flash_sequence()
 
 func _process(delta: float):
+	_sync_mobility_facing()
 	if is_alert_active:
 		vision_timeout -= delta
 		if vision_timeout <= 0:
@@ -90,6 +95,17 @@ func _process(delta: float):
 			_reset_visuals()
 	if runner_in_vision and parent_sig and parent_sig.my_data and parent_sig.my_data.detection:
 		parent_sig.my_data.detection.apply_detection(parent_sig.my_active_sig, delta)
+
+func _sync_mobility_facing() -> void:
+	if parent_sig == null:
+		return
+	if parent_sig.mobility_controller == null:
+		return
+	if parent_sig.my_active_sig == null:
+		return
+	if not parent_sig.my_active_sig.runtime_position_initialized:
+		return
+	rotation_degrees = parent_sig.my_active_sig.runtime_facing_deg
 
 func _start_flash_sequence():
 	alert_tween = create_tween().set_loops()

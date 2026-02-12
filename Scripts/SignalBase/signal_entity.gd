@@ -3,6 +3,7 @@
 
 extends Node2D
 @onready var shape = $Shape
+@onready var signal_icon: Area2D = $SignalIcon
 
 @onready var scan_radial = $ScanRadial
 @onready var tooltip_main = $DetailTooltip
@@ -12,6 +13,8 @@ extends Node2D
 @onready var tooltip_active_scan_text = $DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel/MarginContainer/ActiveScanText
 
 @onready var detection_controller = $DetectionController
+var mobility_controller: MobilityController = null
+var _guard_revealed: bool = true
 
 var my_data: SignalData
 var my_active_sig: ActiveSignal
@@ -38,6 +41,9 @@ func setup(signal_wrapper: ActiveSignal):
 	GlobalEvents.signal_scanned.connect(check_scan_completion)
 
 	detection_controller.initialize(self)
+	_setup_mobility(signal_wrapper)
+	if my_data.type == SignalData.Type.GUARD and my_data.mobility != null:
+		set_guard_revealed(false)
 	update_visuals()
 	
 	
@@ -58,10 +64,34 @@ func update_visuals():
 			shape.color = Color.BLUE
 			# Draw a simple hexagon as a circle approximation
 			shape.polygon = PackedVector2Array([Vector2(-20,-25), Vector2(20,-25), Vector2(25,0), Vector2(20,25), Vector2(-20,25), Vector2(-25,0)])
+			if my_data.mobility != null:
+				set_guard_revealed(_guard_revealed)
 	
 	if my_active_sig.is_disabled:
 		print("is disabled")
 		shape.color = Color.BLACK
+
+func _setup_mobility(signal_wrapper: ActiveSignal) -> void:
+	if signal_wrapper == null:
+		return
+	if signal_wrapper.data == null:
+		return
+	if signal_wrapper.data.mobility == null:
+		return
+
+	mobility_controller = MobilityController.new()
+	add_child(mobility_controller)
+	mobility_controller.initialize(signal_wrapper)
+
+func set_guard_revealed(is_revealed: bool) -> void:
+	_guard_revealed = is_revealed
+	if my_data == null or my_data.type != SignalData.Type.GUARD:
+		return
+
+	shape.visible = is_revealed
+	tooltip_main.visible = is_revealed
+	signal_icon.input_pickable = is_revealed
+	detection_controller.set_overlay_visible(is_revealed)
 
 func set_scan_highlight(active: bool):
 	if active:

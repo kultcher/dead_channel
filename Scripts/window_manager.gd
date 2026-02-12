@@ -20,6 +20,25 @@ func _ready():
 	GlobalEvents.puzzle_started.connect(_puzzle_started)
 
 func _puzzle_started(active_sig: ActiveSignal, puzzle_type: PuzzleComponent.Type):
-	var puzzle_window = sniff.instantiate()
+	var puzzle_window
+	match puzzle_type:
+		PuzzleComponent.Type.DECRYPT:
+			puzzle_window = decrypt.instantiate()
+		_:
+			puzzle_window = sniff.instantiate()
+
 	puzzle_window.linked_signal = active_sig
+	puzzle_window.puzzle_solved.connect(_on_puzzle_solved.bind(active_sig, puzzle_window))
+	puzzle_window.puzzle_failed.connect(_on_puzzle_failed.bind(active_sig))
 	add_child(puzzle_window)
+
+func _on_puzzle_solved(active_sig: ActiveSignal, puzzle_window: Control) -> void:
+	if active_sig != null and active_sig.data != null and active_sig.data.puzzle != null:
+		active_sig.data.puzzle.solved = true
+		GlobalEvents.puzzle_solved.emit(active_sig.data)
+	if puzzle_window != null and is_instance_valid(puzzle_window):
+		puzzle_window.queue_free()
+
+func _on_puzzle_failed(active_sig: ActiveSignal) -> void:
+	if active_sig != null and active_sig.data != null:
+		GlobalEvents.puzzle_failed.emit(active_sig.data)

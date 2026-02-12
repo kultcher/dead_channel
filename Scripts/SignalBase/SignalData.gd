@@ -9,6 +9,7 @@ enum VisualState { HIDDEN, UNKNOWN, SPOOFED, REVEALED }
 var identity_dict = {
 	Type.DOOR: "Door | Mech",
 	Type.CAMERA: "Camera | Mech",
+	Type.GUARD: "Guard | Bio",
  }
 
 # IDENTIFIERS
@@ -28,3 +29,4 @@ var identity_dict = {
 @export var response: ResponseComponent
 @export var puzzle: PuzzleComponent
 @export var ic_modules: ICComponent
+@export var mobility: MobilityComponent

@@ -14,6 +14,9 @@ var config := {
 	"col_speeds": [],          # override: if non-empty, used directly
 }
 
+const MATRIX_RAIN_SHADER = preload("res://Shaders/matrix_rain.gdshader")
+const RAIN_TINT = Color(0.0, 1.0, 0.25)
+
 # --- REFERENCES ---
 var linked_signal: ActiveSignal = null
 var grid_panel: Panel
@@ -51,6 +54,8 @@ func _ready():
 	panel_style.bg_color = Color.BLACK
 	grid_panel.add_theme_stylebox_override("panel", panel_style)
 	vbox.add_child(grid_panel)
+
+	_add_rain_layers()
 	
 	grid_container = Control.new()
 	grid_panel.add_child(grid_container)
@@ -60,6 +65,31 @@ func _ready():
 	_populate_grid()
 	_generate_targets()
 	_update_footer()
+
+func _add_rain_layers():
+	# columns, rows, speed, density, seed_value, alpha_strength
+	_add_rain_layer(float(config.grid_cols) * 8.0, 14.0, 0.45, 0.56, 11.0, 0.44)
+	_add_rain_layer(float(config.grid_cols) * 12.0, 18.0, 0.70, 0.38, 43.0, 0.28)
+
+func _add_rain_layer(columns: float, rows: float, speed: float, density: float, seed_value: float, alpha_strength: float):
+	var rain_rect = ColorRect.new()
+	rain_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	rain_rect.color = Color(0, 0, 0, 0)
+	rain_rect.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var rain_material = ShaderMaterial.new()
+	rain_material.shader = MATRIX_RAIN_SHADER
+	rain_material.set_shader_parameter("columns", columns)
+	rain_material.set_shader_parameter("rows", rows)
+	rain_material.set_shader_parameter("speed", speed)
+	rain_material.set_shader_parameter("density", density)
+	rain_material.set_shader_parameter("layer_seed", seed_value)
+	rain_material.set_shader_parameter("trail_decay", 8.0)
+	rain_material.set_shader_parameter("brightness", 1.875)
+	rain_material.set_shader_parameter("rain_color", Color(RAIN_TINT.r, RAIN_TINT.g, RAIN_TINT.b, alpha_strength))
+	rain_rect.material = rain_material
+
+	grid_panel.add_child(rain_rect)
 
 func _process(delta: float):
 	time_to_solve += delta
@@ -88,6 +118,7 @@ func _calculate_speeds():
 			var t = float(i) / max(config.grid_cols - 1, 1)
 			var variance = lerp(-config.speed_variance, config.speed_variance, t)
 			col_speeds.append(config.base_speed * (1.0 + variance))
+		col_speeds.shuffle()
 
 # === GRID & CELLS ===
 

@@ -56,3 +56,53 @@ func create_test_door(id, lane):
 	response.effects.append(door_base)
 
 	return door
+
+func create_test_guard(id: String, start_cell: float, lane: int) -> SignalData:
+	var guard := SignalData.new()
+	guard.type = SignalData.Type.GUARD
+	guard.lane = lane
+	guard.system_id = "guard_" + id
+	guard.visual_state = SignalData.VisualState.HIDDEN
+
+	var detection := DetectionComponent.new()
+	detection.shape_type = DetectionComponent.ShapeType.ARC
+	detection.watch_offset_cells = 0.0
+	detection.vision_length_cells = .5
+	detection.vision_angle_deg = 00.0
+	detection.vision_segments = 16
+	guard.detection = detection
+
+	var response := ResponseComponent.new()
+	guard.response = response
+	response.effects.append(base_camera_heat)
+
+	var hackable := HackableComponent.new()
+	guard.hackable = hackable
+
+	var mobility := MobilityComponent.new()
+	mobility.move_speed_cells_per_sec = 0.15
+
+	var p0 := MobilityPatrolPoint.new()
+	p0.cell_x = start_cell
+	p0.lane = lane
+	p0.dwell_sec = 2.0
+
+	var p1 := MobilityPatrolPoint.new()
+	p1.cell_x = start_cell + 1.5
+	p1.lane = clampi(lane, 0, 4)
+	p1.dwell_sec = 2.0
+
+	var p2 := MobilityPatrolPoint.new()
+	p2.cell_x = start_cell + 1.5
+	p2.lane = clampi(lane + 1, 0, 4)
+	p2.dwell_sec = 2.0
+
+	var p3 := MobilityPatrolPoint.new()
+	p3.cell_x = start_cell
+	p3.lane = clampi(lane + 1, 0, 4)
+	p3.dwell_sec = 2.0
+
+	mobility.patrol_points = [p0, p1, p2, p3]
+	guard.mobility = mobility
+
+	return guard

@@ -5,6 +5,8 @@ extends PanelContainer
 signal puzzle_solved
 signal puzzle_failed
 
+var linked_signal: ActiveSignal = null
+
 var config := {
 	"cipher": "ABCD",          # String or Array of cipher letters
 	"mapping_offset": 5,       # Used if no explicit solution is provided
@@ -248,9 +250,9 @@ func _build_keyspaces(cipher: Array[String], solution: Array[String]) -> Array[P
 	var alphabet = _alphabet()
 	
 	for i in cipher.size():
-		var size = rng.randi_range(config.keyspace_min, config.keyspace_max)
+		var chars = rng.randi_range(config.keyspace_min, config.keyspace_max)
 		var options: Array[String] = [solution[i]]
-		while options.size() < size:
+		while options.size() < chars:
 			var pick = alphabet[rng.randi_range(0, alphabet.size() - 1)]
 			if pick not in options:
 				options.append(pick)

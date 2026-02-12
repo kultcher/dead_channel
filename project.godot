@@ -24,6 +24,10 @@ config/icon="res://icon.svg"
 GlobalEvents="*uid://dpxrdgggbs7x0"
 CommandDispatch="*uid://bpcqwqydjiyf8"
 
+[debug]
+
+gdscript/warnings/unused_signal=0
+
 [display]
 
 window/size/viewport_width=1920

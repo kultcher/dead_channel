@@ -22,6 +22,7 @@ func _ready():
 	spawn_signal_data(spawner.create_test_cam("07", 4), 4.5)
 	spawn_signal_data(spawner.create_test_cam("08", 0), 7.5)
 	spawn_signal_data(spawner.create_test_door("01", 2), 1.5)
+	spawn_signal_data(spawner.create_test_guard("01", 5.0, 1), 5.0)
 
 func get_active_signal(display_name: String):
 	print("Search queue for: ", display_name)
@@ -45,8 +46,14 @@ func spawn_signal_data(data: SignalData, cell_index: float):
 func update_signal_position():
 	var cleared_signals = []
 	for active_sig in signal_queue:
+		var signal_cell_index := active_sig.start_cell_index
+		var signal_lane := float(active_sig.data.lane)
+		if active_sig.runtime_position_initialized:
+			signal_cell_index = active_sig.runtime_cell_x
+			signal_lane = active_sig.runtime_lane_pos
+
 		# Distance from Runner (who is at current_cell_pos)
-		var dist_from_runner_cells = active_sig.start_cell_index - timeline_manager.current_cell_pos
+		var dist_from_runner_cells = signal_cell_index - timeline_manager.current_cell_pos
 		
 		# Visual Position = Runner's Screen X + Distance * Pixels/Cell
 		var runner_screen_x = timeline_manager.cells_to_pixels(timeline_manager.runner_screen_offset_cells)
@@ -64,7 +71,7 @@ func update_signal_position():
 				new_node.scan_aborted.connect(_on_signal_mouse_exit)
 				active_sig.instance_node = new_node
 			
-			var visual_y = (active_sig.data.lane * timeline_manager.lane_height) + (timeline_manager.lane_height * 0.5)
+			var visual_y = (signal_lane * timeline_manager.lane_height) + (timeline_manager.lane_height * 0.5)
 			active_sig.instance_node.position = Vector2(visual_x, visual_y)
 			
 		else:
