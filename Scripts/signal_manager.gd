@@ -17,10 +17,11 @@ func _ready():
 	GlobalEvents.signal_killed.connect(kill_signal)
 	CommandDispatch.signal_manager = self
 
-	spawn_signal_data(spawner.create_test_cam("05", 2), 2.5)
+	spawn_signal_data(spawner.create_test_cam("05", 2), 3.5)
 	spawn_signal_data(spawner.create_test_cam("06", 3), 6.5)
 	spawn_signal_data(spawner.create_test_cam("07", 4), 4.5)
 	spawn_signal_data(spawner.create_test_cam("08", 0), 7.5)
+	spawn_signal_data(spawner.create_test_door("01", 2), 1.5)
 
 func get_active_signal(display_name: String):
 	print("Search queue for: ", display_name)

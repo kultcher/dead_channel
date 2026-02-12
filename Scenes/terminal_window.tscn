@@ -49,10 +49,7 @@ tab_0/title = "root"
 [node name="SessionTabs" type="TabBar" parent="TerminalVBox/TitleBar/TitleHBox" unique_id=725126711]
 layout_mode = 2
 size_flags_horizontal = 3
-current_tab = 0
 tab_close_display_policy = 2
-tab_count = 1
-tab_0/title = "root"
 
 [node name="TerminalHistory" type="RichTextLabel" parent="TerminalVBox" unique_id=6905137]
 layout_mode = 2

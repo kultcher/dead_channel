@@ -33,7 +33,7 @@ func setup():
 func disable_signal():
 	is_disabled = true
 	instance_node.detection_controller.disable_vision()
-	data.ic_modules.notify_disabled(self)
+	if data.ic_modules: data.ic_modules.notify_disabled(self)
 	instance_node.update_visuals()
 
 func enable_signal():
@@ -60,9 +60,15 @@ func build_id_layer(difficulty_modifier: float = 1.0):
 	scan_layers.append(l0)
 
 func build_puzzle_layer(difficulty_modifier: float = 1.0):
-	pass
+	var l3 = ScanLayer.new()
+	l3.name = "ACCESS"
+	l3.duration = 0.5
+	if data.puzzle: l3.description = "Access: " + data.puzzle.get_desc()
+	else: l3.description = "Access: Open"
+	scan_layers.append(l3)
 
 func build_ic_layer(difficulty_modifier: float = 1.0):
+	if data.ic_modules == null: return
 	var l4 = ScanLayer.new()
 	l4.name = "IC"
 	l4.duration = 0.5

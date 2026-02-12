@@ -38,7 +38,10 @@ func _ready():
 	
 	cell_width_px = screen_width / VISIBLE_CELLS
 	lane_height = (screen_height * 0.25) / LANES
-	
+
+	GlobalEvents.runners_stopped.connect(_on_runners_stopped)
+	GlobalEvents.runners_resumed.connect(_on_runners_resumed)
+
 func _process(delta):
 	if is_paused:
 		return
@@ -62,3 +65,9 @@ func _handle_speed_input():
 		
 	# Optional: Emit signal if you want UI to show "FAST FORWARD" text
 	# emit_signal("speed_changed", current_speed_mult)
+
+func _on_runners_stopped():
+	cells_per_second = 0.0
+
+func _on_runners_resumed():
+	cells_per_second = 0.15

@@ -54,7 +54,7 @@ func handle_vision_overlay():
 		detection_poly.queue_free()
 		detection_poly = null
 		
-	if parent_sig.my_data.type == SignalData.Type.CAMERA:
+	if parent_sig and parent_sig.my_data and parent_sig.my_data.detection:
 		_build_detection_poly()
 
 func _build_detection_poly():
@@ -110,6 +110,7 @@ func _reset_visuals():
 
 		
 func disable_vision():
+	if !detection_poly: return
 	await _reset_visuals()
 	var fade_tween = create_tween()
 	fade_tween.tween_property(detection_poly, "color", fade_color, 0.5)

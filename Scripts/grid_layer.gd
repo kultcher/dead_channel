@@ -18,6 +18,8 @@ var grid_color = Color(1, 0.441, 0.0, 1.0)
 @onready var screen_width: float = timeline_manager.screen_width
 @onready var screen_height: float = timeline_manager.screen_height
 
+var time_elapsed: float = 0.0
+
 func _ready():
 	print("Cell width: ", cell_width, "Lane height: ", lane_height)
 	if runner_team:
@@ -27,8 +29,8 @@ func _ready():
 
 func _process(delta):
 	queue_redraw()
-
-	var display_string = "Current cell pos:%.1f " % floor(timeline_manager.current_cell_pos)
+	time_elapsed += delta
+	var display_string = "Current cell pos:%.1f" % floor(timeline_manager.current_cell_pos) + "Time elapsed: %.1f" % time_elapsed
 	debug_label.text = display_string
 
 func _draw():

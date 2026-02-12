@@ -11,9 +11,10 @@ signal terminal_command_failed(signal_data, command)
 signal signal_scanned(signal_data: SignalData, scan_depth)
 signal signal_hacked(data: SignalData, success: bool)
 signal signal_killed(active_sig: ActiveSignal)
-signal runner_in_vision(active_sig: ActiveSignal)
 signal heat_increased(amount, source)
-signal runner_damaged(amount: float)
+signal runners_damaged(amount: float)
+signal runners_stopped()
+signal runners_resumed()
 signal ic_triggered(ice_type: String)
 
 # PUZZLE EVENTS

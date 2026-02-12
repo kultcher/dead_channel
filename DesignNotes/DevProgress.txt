@@ -20,6 +20,13 @@ Development Progress
 - IC: Template built, simple IC crated.
 - ResponseComponent and Response effects: template for discrete effects created.
 
+2/12/2026:
+- Added terminal tabbing
+
+TODO:
+- Fix circle detection display - collision shape but no graphics
+- Implement door stuff
+
 Not Yet Implemented (priority):
 - Even More robust terminal implementation
 - Robust heat implementation with difficulty scaling

@@ -148,10 +148,11 @@ func _cmd_access(cmd_context: CommandContext) -> void:
 func _try_command(cmd_context: CommandContext) -> void:
 	print("Command Dispatch trying command: " + cmd_context.command)
 	var ic_modules = cmd_context.active_sig.data.ic_modules
-	var stopped = (ic_modules.command_intercept(cmd_context))
-	if stopped:
-		_interrupt_command(cmd_context)
-		return
+	if ic_modules != null:
+		var stopped = (ic_modules.command_intercept(cmd_context))
+		if stopped:
+			_interrupt_command(cmd_context)
+			return
 	cmd_context.active_sig.data.hackable.try_command(cmd_context)
 	_finalize_command(cmd_context)
 			
@@ -159,4 +160,5 @@ func _interrupt_command(cmd_context: CommandContext):
 	pass
 	
 func _finalize_command(cmd_context: CommandContext):
+	print("Command Dispatch finished command: " + cmd_context.command)
 	command_complete.emit(cmd_context)

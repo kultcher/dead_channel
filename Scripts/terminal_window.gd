@@ -16,8 +16,6 @@ var active_session: TerminalSession
 var root_signal: ActiveSignal
 var root_session: TerminalSession
 
-var session_dict = {}
-
 func _ready():
 	set_context()
 	command_line.grab_focus()
@@ -32,7 +30,8 @@ func _ready():
 	root_session.has_tab = true
 	root_session.active_signal = root_signal
 	root_signal.terminal_session = root_session
-	session_dict.set(0, root_session)
+	session_tabs.add_tab("root")
+	_set_tab_session(0, root_session)
 
 func switch_session(new_sig: ActiveSignal):
 	if new_sig == null:
@@ -51,7 +50,7 @@ func switch_session(new_sig: ActiveSignal):
 		new_session.has_tab = true
 		new_sig.terminal_session = new_session
 		active_session = new_session
-		create_tab(new_sig, new_session)
+		ensure_tab_for_session(new_session)
 		clear_log()
 		print_to_log("New session started with " + new_sig.data.system_id)
 		prefix.text = "-" + new_sig.data.system_id + "-["
@@ -59,14 +58,7 @@ func switch_session(new_sig: ActiveSignal):
 	# Switch to existing session
 	elif active_signal.terminal_session != null:
 		active_session = active_signal.terminal_session
-		restore_session(active_session, active_session.index)
-
-func create_tab(active_sig: ActiveSignal, session: TerminalSession = null):
-	session_tabs.add_tab(active_sig.data.system_id)
-	session.index = session_tabs.tab_count - 1
-	session_tabs.current_tab = session.index
-	session_dict.set(session.index, session)
-	session.has_tab = true
+		restore_session(active_session)
 
 func _on_command_line_text_submitted(new_text: String) -> void:
 	print_to_log("--[ " + new_text)
@@ -94,12 +86,14 @@ func print_unlogged(text: String):
 func clear_log():
 	history.text = ""
 
-func restore_session(session: TerminalSession, tab: int):
+func restore_session(session: TerminalSession):
 	if active_session == null: return
 	active_session = session
 	if active_session.has_tab == false:
-		create_tab(active_session.active_signal, active_session)
-	session_tabs.current_tab = tab
+		ensure_tab_for_session(active_session)
+	var tab_index = _find_tab_for_session(active_session)
+	if tab_index != -1:
+		session_tabs.current_tab = tab_index
 	clear_log()
 	for s in session.history:
 		history.text += s + "\n"
@@ -121,23 +115,41 @@ func set_context():	# add args later
 	history.text += "\nEnter command.\n"
 
 func _on_session_tabs_tab_clicked(tab: int) -> void:
-	var session = session_dict.get(tab)
+	var session = _get_tab_session(tab)
 	if session == active_session: return
-	restore_session(session, tab)
+	restore_session(session)
 
 func _on_session_tabs_tab_close_pressed(tab: int) -> void:
 	if tab == 0: return
-	if session_dict.get(tab) == active_session:
-		restore_session(root_session, 0)
-	session_dict.get(tab).has_tab = false
+	var session = _get_tab_session(tab)
+	if session == active_session:
+		restore_session(root_session)
+	if session != null:
+		session.has_tab = false
 	session_tabs.remove_tab(tab)
-	session_dict.erase(tab)
-	reindex_sessions(tab)
 
-func reindex_sessions(tab: int):
-	print("reindexing: ", session_tabs.tab_count)
-	for i in range(tab, session_tabs.tab_count):
-		var old_session = session_dict.get(i + 1)
-		print("Old session: ", old_session, "i: ", i)
-		session_dict[i] = old_session
-	print(session_dict)
+func ensure_tab_for_session(session: TerminalSession):
+	var existing_index = _find_tab_for_session(session)
+	if existing_index != -1:
+		session_tabs.current_tab = existing_index
+		return
+	var tab_label = "root"
+	if session != root_session and session.active_signal != null:
+		tab_label = session.active_signal.data.system_id
+	session_tabs.add_tab(tab_label)
+	var new_index = session_tabs.tab_count - 1
+	_set_tab_session(new_index, session)
+	session_tabs.current_tab = new_index
+	session.has_tab = true
+
+func _find_tab_for_session(session: TerminalSession) -> int:
+	for i in range(session_tabs.tab_count):
+		if _get_tab_session(i) == session:
+			return i
+	return -1
+
+func _get_tab_session(tab_index: int) -> TerminalSession:
+	return session_tabs.get_tab_metadata(tab_index)
+
+func _set_tab_session(tab_index: int, session: TerminalSession):
+	session_tabs.set_tab_metadata(tab_index, session)

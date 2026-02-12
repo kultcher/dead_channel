@@ -15,6 +15,7 @@ enum ShapeType { CONE, ARC, CIRCLE }
 	set = _set_vision_segments
 @export var shape_type: ShapeType = ShapeType.CONE:
 	set = _set_shape_type
+@export var delay: float = 0.0
 
 var detection_disabled: bool = false
 
@@ -44,15 +45,17 @@ func apply_detection(active_sig: ActiveSignal, delta: float) -> void:
 	_apply_detection(active_sig, delta)
 
 func build_collision_shape(cell_width_px: float) -> Shape2D:
+
 	match shape_type:
 		ShapeType.CIRCLE:
 			var circle = CircleShape2D.new()
 			circle.radius = max(1.0, vision_length_cells * cell_width_px)
 			return circle
-		_:
+		ShapeType.CONE:
 			var poly = ConvexPolygonShape2D.new()
 			poly.points = _build_polygon_points(cell_width_px)
 			return poly
+	return
 
 func get_visual_polygon(cell_width_px: float) -> PackedVector2Array:
 	return _build_polygon_points(cell_width_px)
@@ -61,6 +64,7 @@ func _build_polygon_points(cell_width_px: float) -> PackedVector2Array:
 	var points := PackedVector2Array()
 	var offset_px = watch_offset_cells * cell_width_px
 	var length_px = max(1.0, vision_length_cells * cell_width_px)
+
 
 	match shape_type:
 		ShapeType.CONE:
@@ -80,8 +84,7 @@ func _build_polygon_points(cell_width_px: float) -> PackedVector2Array:
 				points.append(Vector2(offset_px, 0) + Vector2(cos(theta), sin(theta)) * radius)
 		ShapeType.CIRCLE:
 			var radius = length_px
-			points.append(Vector2(offset_px, 0)) # center
-			for i in range(vision_segments + 1):
+			for i in range(vision_segments):
 				var t = float(i) / float(vision_segments)
 				var theta = lerp(0.0, TAU, t)
 				points.append(Vector2(offset_px, 0) + Vector2(cos(theta), sin(theta)) * radius)
@@ -91,8 +94,7 @@ func _build_polygon_points(cell_width_px: float) -> PackedVector2Array:
 func _apply_detection(active_sig: ActiveSignal, delta):
 	active_sig.instance_node.detection_controller.runner_spotted()
 	if active_sig.data.response:
-		active_sig.data.response.on_detection(active_sig, delta)
-	GlobalEvents.runner_in_vision.emit(active_sig)
+		active_sig.data.response.on_detection(active_sig, delta, delay)
 
 func disable_detection():
 	detection_disabled = true
