@@ -21,7 +21,7 @@ var is_scan_locked: bool = false
 
 var is_disabled: bool = false
 
-var ic_modules = []
+var terminal_session: TerminalSession = null
 
 func setup():
 	# Assign name based on possible obfuscations

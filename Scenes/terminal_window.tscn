@@ -28,12 +28,31 @@ custom_minimum_size = Vector2(0, 35)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_3t686")
 
-[node name="TitleText" type="RichTextLabel" parent="TerminalVBox/TitleBar" unique_id=1173367343]
-custom_minimum_size = Vector2(100, 0)
+[node name="TitleHBox" type="HBoxContainer" parent="TerminalVBox/TitleBar" unique_id=810004652]
+layout_mode = 2
+
+[node name="TitleText" type="RichTextLabel" parent="TerminalVBox/TitleBar/TitleHBox" unique_id=1173367343]
+custom_minimum_size = Vector2(225, 0)
 layout_mode = 2
 theme_override_fonts/normal_font = SubResource("SystemFont_k17vg")
 text = "DC_OS | [/cAl4x/pRk09s]"
 vertical_alignment = 1
+
+[node name="RootTab" type="TabBar" parent="TerminalVBox/TitleBar/TitleHBox" unique_id=1043041703]
+visible = false
+layout_mode = 2
+current_tab = 0
+deselect_enabled = true
+tab_count = 1
+tab_0/title = "root"
+
+[node name="SessionTabs" type="TabBar" parent="TerminalVBox/TitleBar/TitleHBox" unique_id=725126711]
+layout_mode = 2
+size_flags_horizontal = 3
+current_tab = 0
+tab_close_display_policy = 2
+tab_count = 1
+tab_0/title = "root"
 
 [node name="TerminalHistory" type="RichTextLabel" parent="TerminalVBox" unique_id=6905137]
 layout_mode = 2
@@ -60,4 +79,6 @@ theme_override_constants/caret_width = 3
 keep_editing_on_text_submit = true
 caret_blink = true
 
+[connection signal="tab_clicked" from="TerminalVBox/TitleBar/TitleHBox/SessionTabs" to="." method="_on_session_tabs_tab_clicked"]
+[connection signal="tab_close_pressed" from="TerminalVBox/TitleBar/TitleHBox/SessionTabs" to="." method="_on_session_tabs_tab_close_pressed"]
 [connection signal="text_submitted" from="TerminalVBox/CmdLineHBox/CommandLine" to="." method="_on_command_line_text_submitted"]

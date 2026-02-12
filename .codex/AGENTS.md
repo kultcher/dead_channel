@@ -6,6 +6,8 @@ Project Snapshot
 
 Source Docs (Required Reading)
 - DesignNotes/PROJECT Dead Channel.txt is the canonical design reference.
+- DesignNotes/DevProgress.txt: Loose catalogue of game features that have been implemented and are pending/priority.
+- DesignNotes/RunLevelSystemsDetail.txt: A deeper dive into the game systems at the individual run level.
 
 Core Systems (Code Map)
 - Timeline/Signals: Scripts/timeline_manager.gd, Scripts/signal_manager.gd, Scripts/SignalBase/SignalData.gd, Scripts/SignalBase/ActiveSignal.gd, Scripts/SignalBase/signal_entity.gd
@@ -40,3 +42,4 @@ Editing Guardrails
 Known Gaps
 - Run command: not defined yet.
 - Testing workflow: not defined yet.
++
