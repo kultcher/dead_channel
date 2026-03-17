@@ -33,6 +33,14 @@ Workflow Defaults
 - Match existing file style and typing usage.
 - Read relevant scripts before proposing changes.
 - Ask before running heavy tools.
+- Prioritize Godot idioms: Use scene editor for UI/layout, themes for styling, and node composition over procedural generation.
+- Delegate editor tasks: Propose scene structures/themes but leave creation/editing to the user.
+
+Agent Guidelines
+- For UI: Avoid procedural generation (e.g., no StyleBoxFlat.new() in code); use pre-built scenes and Theme resources.
+- For logic: Prefer node-based composition and signals over parallel arrays or God Objects.
+- For timers/animations: Add nodes in editor instead of instantiating in code.
+- Always note when editor action is required (e.g., "Create this scene in the editor").
 
 Editing Guardrails
 - Prefer minimal diffs unless a refactor improves clarity.

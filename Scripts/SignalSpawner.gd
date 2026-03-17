@@ -3,7 +3,6 @@ class_name SignalSpawner extends Resource
 var base_camera_heat: Resource = preload("res://Resources/ResponseEffects/base_camera_heat.tres")
 var door_base: Resource = preload("res://Resources/ResponseEffects/door_base.tres")
 
-
 func create_test_cam(id, lane):
 	var cam = SignalData.new()
 	cam.type = SignalData.Type.CAMERA

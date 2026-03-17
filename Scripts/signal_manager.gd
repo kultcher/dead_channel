@@ -13,16 +13,20 @@ var signal_scene = preload("res://Scenes/signal_entity.tscn")
 var signal_queue: Array[ActiveSignal] = []
 var currently_scanning_signal: ActiveSignal = null
 
+var is_paused: bool = false
+
 func _ready():
 	GlobalEvents.signal_killed.connect(kill_signal)
 	CommandDispatch.signal_manager = self
-
-	spawn_signal_data(spawner.create_test_cam("05", 2), 3.5)
-	spawn_signal_data(spawner.create_test_cam("06", 3), 6.5)
-	spawn_signal_data(spawner.create_test_cam("07", 4), 4.5)
-	spawn_signal_data(spawner.create_test_cam("08", 0), 7.5)
-	spawn_signal_data(spawner.create_test_door("01", 2), 1.5)
-	spawn_signal_data(spawner.create_test_guard("01", 5.0, 1), 5.0)
+	GlobalEvents.tactical_pause.connect(_on_pause)
+	GlobalEvents.tactical_unpause.connect(_on_unpause)
+	
+#	spawn_signal_data(spawner.create_test_cam("05", 2), 3.5)
+#	spawn_signal_data(spawner.create_test_cam("06", 3), 6.5)
+#	spawn_signal_data(spawner.create_test_cam("07", 4), 4.5)
+#	spawn_signal_data(spawner.create_test_cam("08", 0), 7.5)
+#	spawn_signal_data(spawner.create_test_door("01", 2), 1.5)
+#	spawn_signal_data(spawner.create_test_guard("01", 5.0, 1), 5.0)
 
 func get_active_signal(display_name: String):
 	print("Search queue for: ", display_name)
@@ -42,6 +46,7 @@ func spawn_signal_data(data: SignalData, cell_index: float):
 	new_signal.setup()
 	new_signal.generate_scan_layers()
 	signal_queue.append(new_signal)
+	print("Spawn signal: ", new_signal.data.display_name)
 
 func update_signal_position():
 	var cleared_signals = []
@@ -58,7 +63,7 @@ func update_signal_position():
 		# Visual Position = Runner's Screen X + Distance * Pixels/Cell
 		var runner_screen_x = timeline_manager.cells_to_pixels(timeline_manager.runner_screen_offset_cells)
 		var visual_x = runner_screen_x + (dist_from_runner_cells * timeline_manager.cell_width_px)
-		var is_on_screen = visual_x > -100 and visual_x < timeline_manager.screen_width + 100
+		var is_on_screen = visual_x > -200 and visual_x < timeline_manager.screen_width + 200
 		
 		if is_on_screen:
 			if active_sig.instance_node == null:
@@ -154,6 +159,7 @@ func cancel_scan(active_sig: ActiveSignal = null):
 	currently_scanning_signal = null
 
 func _process_active_scan(delta):
+	if is_paused: return
 	var sig = currently_scanning_signal
 
 	if sig.instance_node == null:
@@ -195,3 +201,11 @@ func _cleanup_scan_visuals(sig: ActiveSignal):
 	sig.is_scan_locked = false # Ensure lock is cleared
 	if sig.instance_node:
 		sig.instance_node.set_scan_highlight(false)
+
+# SIGNALLED FUNCTIONS
+
+func _on_pause():
+	is_paused = true
+	
+func _on_unpause():
+	is_paused = false

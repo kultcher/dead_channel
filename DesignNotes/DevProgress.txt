@@ -20,26 +20,40 @@ Development Progress
 - IC: Template built, simple IC crated.
 - ResponseComponent and Response effects: template for discrete effects created.
 
-2/12/2026:
+2/11/2026:
 - Added terminal tabbing
 
-TODO:
-- Fix circle detection display - collision shape but no graphics
-- Implement door stuff
+2/12/2026:
+- Added signal mobility and guard
+
+3/16/2026:
+- Added basic implementation of tactical pause
+- Added basic RunManager (for handling level data and run state) and TutorialManager (for handling tutorial state and progression)
+- Added simple dialogue window for tutorial and story dialogue
+- Initialized Jargonizer class
+
+Short-term TODO:
+- Add scrolling feature to dialogue window for multi-page dialogue
+- 
 
 Not Yet Implemented (priority):
 - Even More robust terminal implementation
 - Robust heat implementation with difficulty scaling
 - Advanced Signal functions/behaviors
+- "Jargonizer" - for generating flavorful but semi-random terminal noise
+- guard alert behaviors
+- guard "combat"
+- distraction terminals
+- fuzz minigame
 - More and more advanced IC
 - Programs and RAM
-- "Jargonizer" - for generating flavorful but semi-random terminal noise
 
 Not Yet Implemented (long-term):
+- credentials
 - Runner stats
 - Distinct corporate identities
 - Management layer
 - Consumables
 - Split Lanes
 - White Hats
-- "Combat" mode
+- expanded "Combat" mode

@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://blc47vyu5os40"]
+
+[ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="1_6yba5"]
+[ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="1_vx140"]
+[ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_qn1mi"]
+[ext_resource type="Script" uid="uid://bpobd0mo01rnd" path="res://Scripts/ICModules/RebootModule.gd" id="3_2b074"]
+[ext_resource type="Script" uid="uid://diftg5rgtn3kr" path="res://Scripts/Components/ICComponent.gd" id="4_30cmg"]
+[ext_resource type="Resource" uid="uid://c43su3v53wrbw" path="res://Resources/ResponseEffects/base_camera_heat.tres" id="5_5wfh6"]
+[ext_resource type="Script" uid="uid://bwfquhgf0ae5f" path="res://Scripts/Components/ResponseComponent.gd" id="6_a2yav"]
+
+[sub_resource type="Resource" id="Resource_qkibr"]
+script = ExtResource("1_6yba5")
+watch_offset_cells = 0.0
+vision_length_cells = 1.0
+metadata/_custom_type_script = "uid://cxtj1fq7mmq1h"
+
+[sub_resource type="Resource" id="Resource_mefw2"]
+script = ExtResource("2_qn1mi")
+metadata/_custom_type_script = "uid://cysj06bgrv1ai"
+
+[sub_resource type="Resource" id="Resource_66sn5"]
+script = ExtResource("3_2b074")
+metadata/_custom_type_script = "uid://bpobd0mo01rnd"
+
+[sub_resource type="Resource" id="Resource_gn3xj"]
+script = ExtResource("4_30cmg")
+modules = Array[Resource]([SubResource("Resource_66sn5")])
+metadata/_custom_type_script = "uid://diftg5rgtn3kr"
+
+[sub_resource type="Resource" id="Resource_hwdih"]
+script = ExtResource("6_a2yav")
+effects = Array[Resource]([ExtResource("5_5wfh6")])
+metadata/_custom_type_script = "uid://bwfquhgf0ae5f"
+
+[resource]
+script = ExtResource("1_vx140")
+type = 1
+system_id = "cam_01"
+display_name = "cam_01"
+hackable = SubResource("Resource_mefw2")
+detection = SubResource("Resource_qkibr")
+response = SubResource("Resource_hwdih")
+ic_modules = SubResource("Resource_gn3xj")
+metadata/_custom_type_script = "uid://bi5xrdfrjowij"

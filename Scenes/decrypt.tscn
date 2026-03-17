@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://7ywwgroqj5h8"]
 
-[ext_resource type="Script" path="res://Scripts/Puzzles/decrypt_puzzle.gd" id="1_6s9ux"]
+[ext_resource type="Script" uid="uid://dfeopap2bkhqw" path="res://Scripts/Puzzles/decrypt_puzzle.gd" id="1_6s9ux"]
 
-[node name="DecryptWindow" type="PanelContainer"]
+[node name="DecryptWindow" type="PanelContainer" unique_id=1226475041]
 script = ExtResource("1_6s9ux")

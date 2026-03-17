@@ -8,8 +8,6 @@ extends Node2D
 @onready var runner_icon = $RunnerTeam/RunnerIcon
 @onready var debug_label = $Debug
 
-
-
 # CONFIGURATION
 var grid_color = Color(1, 0.441, 0.0, 1.0)
 
@@ -30,7 +28,7 @@ func _ready():
 func _process(delta):
 	queue_redraw()
 	time_elapsed += delta
-	var display_string = "Current cell pos:%.1f" % floor(timeline_manager.current_cell_pos) + "Time elapsed: %.1f" % time_elapsed
+	var display_string = "Current cell pos:%.1f" % floor(timeline_manager.current_cell) + "Time elapsed: %.1f" % time_elapsed
 	debug_label.text = display_string
 
 func _draw():

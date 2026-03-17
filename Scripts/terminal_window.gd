@@ -22,6 +22,8 @@ func _ready():
 	CommandDispatch.terminal_window = self
 	CommandDispatch.command_complete.connect(_on_command_complete)
 	CommandDispatch.command_error.connect(_on_command_error)
+	GlobalEvents.tactical_pause.connect(_on_pause)
+	GlobalEvents.tactical_unpause.connect(_on_pause)
 	root_session = TerminalSession.new()
 	# Dummy signal for root session
 	root_signal = ActiveSignal.new()
@@ -60,22 +62,6 @@ func switch_session(new_sig: ActiveSignal):
 		active_session = active_signal.terminal_session
 		restore_session(active_session)
 
-func _on_command_line_text_submitted(new_text: String) -> void:
-	print_to_log("--[ " + new_text)
-	CommandDispatch.process_command(new_text, active_signal)
-	command_line.clear()
-
-func _on_command_complete(cmd_context: CommandContext) -> void:
-	if cmd_context.active_sig != active_signal:		# ensure command signaldata matches terminal signaldata
-		return
-	for s in cmd_context.log_text:
-		print_to_log(s)
-
-func _on_command_error(error_msg: String, signal_context: ActiveSignal = null) -> void:
-	if signal_context != active_signal:
-		return
-	print_to_log("!! ERROR: " + error_msg)
-
 func print_to_log(text: String):
 	active_session.history.append(text)
 	history.append_text(text + "\n")
@@ -104,7 +90,7 @@ func restore_session(session: TerminalSession):
 		prefix.text = "-" + active_session.active_signal.data.system_id + "-["
 
 func set_context():	# add args later
-	history.text = "Connecting"
+	history.text = Jargonizer.get_handshake()
 	for i in 3:
 		await get_tree().create_timer(0.2).timeout
 		history.text += "."
@@ -153,3 +139,30 @@ func _get_tab_session(tab_index: int) -> TerminalSession:
 
 func _set_tab_session(tab_index: int, session: TerminalSession):
 	session_tabs.set_tab_metadata(tab_index, session)
+
+# SIGNALLED FUNCTIONS
+
+func _on_command_line_text_submitted(new_text: String) -> void:
+	print_to_log("--[ " + new_text)
+	CommandDispatch.process_command(new_text, active_signal)
+	command_line.clear()
+
+func _on_command_complete(cmd_context: CommandContext) -> void:
+	if cmd_context.active_sig != active_signal:		# ensure command signaldata matches terminal signaldata
+		return
+	for s in cmd_context.log_text:
+		print_to_log(s)
+
+func _on_command_error(error_msg: String, signal_context: ActiveSignal = null) -> void:
+	if signal_context != active_signal:
+		return
+	print_to_log("!! ERROR: " + error_msg)
+
+func _on_pause():
+	release_focus()
+	command_line.focus_mode = FOCUS_NONE
+	
+func _on_unpause():
+	command_line.focus_mode = FOCUS_ALL
+
+	

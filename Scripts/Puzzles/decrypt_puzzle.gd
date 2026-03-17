@@ -61,7 +61,11 @@ var boost_time_left := 0.0
 var cull_progress_style_normal: StyleBoxFlat
 var cull_progress_style_boost: StyleBoxFlat
 
+var is_paused: bool = false
+
 func _ready():
+	GlobalEvents.tactical_pause.connect(_on_pause)
+	GlobalEvents.tactical_unpause.connect(_on_unpause)
 	_build_ui()
 	_init_puzzle()
 	_start_timers()
@@ -268,6 +272,7 @@ func _alphabet() -> Array[String]:
 	return letters
 
 func _on_cycle_tick():
+	if is_paused: return
 	for i in keyspaces.size():
 		if keyspaces[i].is_empty():
 			continue
@@ -275,6 +280,7 @@ func _on_cycle_tick():
 		anim_labels[i].text = keyspaces[i][cycle_indices[i]]
 
 func _on_cull_tick():
+	if is_paused: return
 	for i in keyspaces.size():
 		if confirmed[i]:
 			continue
@@ -504,6 +510,7 @@ func _update_cull_ui():
 	cull_label.text = "%.1fs" % left
 
 func _process(delta: float):
+	if is_paused: return
 	_update_boost_timer(delta)
 	_update_cull_ui()
 
@@ -578,3 +585,16 @@ func _lockout_then_confirm(index: int):
 				return
 			_confirmed_collapse(index)
 	)
+
+# SIGNALLED FUNCTIONS
+
+func _on_pause():
+	release_focus()
+	focus_mode = FOCUS_NONE
+	cull_timer.paused = true
+	is_paused = true
+	
+func _on_unpause():
+	focus_mode = FOCUS_ALL
+	cull_timer.paused = false
+	is_paused = false

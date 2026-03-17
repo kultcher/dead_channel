@@ -33,6 +33,8 @@ Stray ideas:
 	- ICE concept: one "board" effect and one "puzzle" effect
 	- ICE concept: "ping pong" - rhythm time game, can only act during downtimes
 			(or similar puzzle where you hold a key while marker overlaps target area...?)
+	- IC: "Stasis": Changes to behavior aren't reflected on the timeline
+	- IC: "Blind": No terminal feedback
 	guards "comms pulse" to get brief location hints
 
 

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="RunSpawn" format=3 uid="uid://x5yj7n030emh"]
+
+[ext_resource type="Script" uid="uid://b7eeged22y6lc" path="res://Resources/RunData/RunSpawn.gd" id="1_k67ui"]
+[ext_resource type="Resource" uid="uid://blc47vyu5os40" path="res://Resources/SignalPrefabs/basic_camera.tres" id="2_ayyps"]
+
+[resource]
+script = ExtResource("1_k67ui")
+signal_data = ExtResource("2_ayyps")
+cell_index = 7.5
+lane_override = 0
+metadata/_custom_type_script = "uid://b7eeged22y6lc"

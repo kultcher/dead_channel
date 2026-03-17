@@ -114,6 +114,7 @@ func check_scan_completion(data: SignalData, scan_index: int):
 		return
 	if scan_index >= my_active_sig.scan_layers.size():
 		tooltip_active_scan_text.text = "COMPLETE"
+		GlobalEvents.signal_scan_complete.emit(data)
 
 func hide_scan_progress():
 	scan_radial.visible = false

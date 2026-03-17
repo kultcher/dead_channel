@@ -1,0 +1,614 @@
+{
+  "version": "orpg.3.0",
+  "title": "So I've been working on this hacking the",
+  "characters": {
+    "char-1770936531-qAsGJ9TG4WutZhk4oFdJ": {
+      "id": "char-1770936531-qAsGJ9TG4WutZhk4oFdJ",
+      "model": "jondurbin/bagel-34b",
+      "modelInfo": {
+        "slug": "jondurbin/bagel-34b",
+        "hf_slug": "jondurbin/bagel-34b-v0.2",
+        "updated_at": "2025-11-10T16:00:38.246665+00:00",
+        "created_at": "2024-01-05T00:00:00+00:00",
+        "hf_updated_at": null,
+        "name": "Bagel 34B v0.2",
+        "short_name": "Bagel 34B v0.2",
+        "author": "jondurbin",
+        "description": "An experimental fine-tune of [Yi 34b 200k](/models/01-ai/yi-34b-200k) using [bagel](https://github.com/jondurbin/bagel). This is the version of the fine-tune before direct preference optimization (DPO) has been applied. DPO performs better on benchmarks, but this version is likely better for creative writing, roleplay, etc.",
+        "model_version_group_id": null,
+        "context_length": 200000,
+        "input_modalities": [
+          "text"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "has_text_output": true,
+        "group": "Yi",
+        "instruct_type": "alpaca",
+        "default_system": null,
+        "default_stops": [
+          "###",
+          "</s>"
+        ],
+        "hidden": false,
+        "router": null,
+        "warning_message": null,
+        "promotion_message": null,
+        "routing_error_message": null,
+        "permaslug": "jondurbin/bagel-34b",
+        "supports_reasoning": false,
+        "reasoning_config": null,
+        "features": {},
+        "default_parameters": {},
+        "default_order": [],
+        "quick_start_example_type": null,
+        "is_trainable_text": null,
+        "is_trainable_image": null,
+        "endpoint": null
+      },
+      "description": "",
+      "includeDefaultSystemPrompt": true,
+      "isStreaming": true,
+      "samplingParameters": {},
+      "isDisabled": false,
+      "isRemoved": true,
+      "createdAt": "2026-02-12T22:48:51.815Z",
+      "updatedAt": "2026-02-12T22:49:00.179Z",
+      "plugins": [],
+      "chatMemory": 8
+    },
+    "char-1770936542-EX30kQS9oCJGcVgcNJla": {
+      "id": "char-1770936542-EX30kQS9oCJGcVgcNJla",
+      "model": "anthropic/claude-opus-4.6",
+      "modelInfo": {
+        "slug": "anthropic/claude-opus-4.6",
+        "hf_slug": "",
+        "updated_at": "2026-02-05T17:50:47.549608+00:00",
+        "created_at": "2026-02-04T15:30:50.029498+00:00",
+        "hf_updated_at": null,
+        "name": "Anthropic: Claude Opus 4.6",
+        "short_name": "Claude Opus 4.6",
+        "author": "anthropic",
+        "description": "Opus 4.6 is Anthropic’s strongest model for coding and long-running professional tasks. It is built for agents that operate across entire workflows rather than single prompts, making it especially effective for large codebases, complex refactors, and multi-step debugging that unfolds over time. The model shows deeper contextual understanding, stronger problem decomposition, and greater reliability on hard engineering tasks than prior generations.\n\nBeyond coding, Opus 4.6 excels at sustained knowledge work. It produces near-production-ready documents, plans, and analyses in a single pass, and maintains coherence across very long outputs and extended sessions. This makes it a strong default for tasks that require persistence, judgment, and follow-through, such as technical design, migration planning, and end-to-end project execution.\n\nFor users upgrading from earlier Opus versions, see our [official migration guide here](https://openrouter.ai/docs/guides/guides/model-migrations/claude-4-6-opus)\n",
+        "model_version_group_id": null,
+        "context_length": 1000000,
+        "input_modalities": [
+          "text",
+          "image"
+        ],
+        "output_modalities": [
+          "text"
+        ],
+        "has_text_output": true,
+        "group": "Claude",
+        "instruct_type": null,
+        "default_system": null,
+        "default_stops": [],
+        "hidden": false,
+        "router": null,
+        "warning_message": "",
+        "promotion_message": "",
+        "routing_error_message": "",
+        "permaslug": "anthropic/claude-4.6-opus-20260205",
+        "supports_reasoning": true,
+        "reasoning_config": {
+          "start_token": null,
+          "end_token": null,
+          "is_mandatory_reasoning": false,
+          "supports_reasoning_effort": false,
+          "supports_reasoning_max_tokens": false
+        },
+        "features": {
+          "reasoning_config": {
+            "start_token": null,
+            "end_token": null,
+            "is_mandatory_reasoning": false,
+            "supports_reasoning_effort": false,
+            "supports_reasoning_max_tokens": false
+          },
+          "chat_template_config": {}
+        },
+        "default_parameters": {
+          "temperature": null,
+          "top_p": null,
+          "frequency_penalty": null
+        },
+        "default_order": [
+          "amazon-bedrock",
+          "anthropic"
+        ],
+        "quick_start_example_type": "reasoning",
+        "is_trainable_text": null,
+        "is_trainable_image": null,
+        "endpoint": {
+          "id": "c926c048-563e-44b0-8434-95965bee924c",
+          "name": "Anthropic | anthropic/claude-4.6-opus-20260205",
+          "context_length": 1000000,
+          "model": {
+            "slug": "anthropic/claude-opus-4.6",
+            "hf_slug": "",
+            "updated_at": "2026-02-05T17:50:47.549608+00:00",
+            "created_at": "2026-02-04T15:30:50.029498+00:00",
+            "hf_updated_at": null,
+            "name": "Anthropic: Claude Opus 4.6",
+            "short_name": "Claude Opus 4.6",
+            "author": "anthropic",
+            "description": "Opus 4.6 is Anthropic’s strongest model for coding and long-running professional tasks. It is built for agents that operate across entire workflows rather than single prompts, making it especially effective for large codebases, complex refactors, and multi-step debugging that unfolds over time. The model shows deeper contextual understanding, stronger problem decomposition, and greater reliability on hard engineering tasks than prior generations.\n\nBeyond coding, Opus 4.6 excels at sustained knowledge work. It produces near-production-ready documents, plans, and analyses in a single pass, and maintains coherence across very long outputs and extended sessions. This makes it a strong default for tasks that require persistence, judgment, and follow-through, such as technical design, migration planning, and end-to-end project execution.\n\nFor users upgrading from earlier Opus versions, see our [official migration guide here](https://openrouter.ai/docs/guides/guides/model-migrations/claude-4-6-opus)\n",
+            "model_version_group_id": null,
+            "context_length": 1000000,
+            "input_modalities": [
+              "text",
+              "image"
+            ],
+            "output_modalities": [
+              "text"
+            ],
+            "has_text_output": true,
+            "group": "Claude",
+            "instruct_type": null,
+            "default_system": null,
+            "default_stops": [],
+            "hidden": false,
+            "router": null,
+            "warning_message": "",
+            "promotion_message": "",
+            "routing_error_message": "",
+            "permaslug": "anthropic/claude-4.6-opus-20260205",
+            "supports_reasoning": true,
+            "reasoning_config": {
+              "start_token": null,
+              "end_token": null,
+              "is_mandatory_reasoning": false,
+              "supports_reasoning_effort": false,
+              "supports_reasoning_max_tokens": false
+            },
+            "features": {
+              "reasoning_config": {
+                "start_token": null,
+                "end_token": null,
+                "is_mandatory_reasoning": false,
+                "supports_reasoning_effort": false,
+                "supports_reasoning_max_tokens": false
+              },
+              "chat_template_config": {}
+            },
+            "default_parameters": {
+              "temperature": null,
+              "top_p": null,
+              "frequency_penalty": null
+            },
+            "default_order": [
+              "amazon-bedrock",
+              "anthropic"
+            ],
+            "quick_start_example_type": "reasoning",
+            "is_trainable_text": null,
+            "is_trainable_image": null
+          },
+          "model_variant_slug": "anthropic/claude-opus-4.6",
+          "model_variant_permaslug": "anthropic/claude-4.6-opus-20260205",
+          "adapter_name": "AnthropicMessageAdapter",
+          "provider_name": "Anthropic",
+          "provider_info": {
+            "name": "Anthropic",
+            "displayName": "Anthropic",
+            "slug": "anthropic",
+            "baseUrl": "https://api.anthropic.com/v1",
+            "dataPolicy": {
+              "training": false,
+              "trainingOpenRouter": false,
+              "retainsPrompts": true,
+              "retentionDays": 30,
+              "canPublish": false,
+              "termsOfServiceURL": "https://www.anthropic.com/legal/commercial-terms",
+              "privacyPolicyURL": "https://www.anthropic.com/legal/privacy",
+              "requiresUserIDs": true
+            },
+            "headquarters": "US",
+            "regionOverrides": {},
+            "hasChatCompletions": true,
+            "hasCompletions": true,
+            "isAbortable": true,
+            "moderationRequired": true,
+            "editors": [
+              "{}"
+            ],
+            "owners": [
+              "{}"
+            ],
+            "adapterName": "AnthropicMessageAdapter",
+            "isMultipartSupported": true,
+            "statusPageUrl": "https://status.anthropic.com/",
+            "byokEnabled": true,
+            "icon": {
+              "url": "/images/icons/Anthropic.svg"
+            },
+            "ignoredProviderModels": [],
+            "sendClientIp": false,
+            "pricingStrategy": "anthropic"
+          },
+          "provider_display_name": "Anthropic",
+          "provider_slug": "anthropic",
+          "provider_model_id": "claude-opus-4-6",
+          "quantization": "unknown",
+          "variant": "standard",
+          "is_free": false,
+          "can_abort": true,
+          "max_prompt_tokens": null,
+          "max_completion_tokens": 128000,
+          "max_tokens_per_image": null,
+          "supported_parameters": [
+            "max_tokens",
+            "top_p",
+            "temperature",
+            "stop",
+            "reasoning",
+            "include_reasoning",
+            "tool_choice",
+            "tools",
+            "structured_outputs",
+            "response_format",
+            "verbosity"
+          ],
+          "is_byok": false,
+          "moderation_required": true,
+          "data_policy": {
+            "training": false,
+            "trainingOpenRouter": false,
+            "retainsPrompts": true,
+            "retentionDays": 30,
+            "canPublish": false,
+            "termsOfServiceURL": "https://www.anthropic.com/legal/commercial-terms",
+            "privacyPolicyURL": "https://www.anthropic.com/legal/privacy",
+            "requiresUserIDs": true
+          },
+          "pricing": {
+            "prompt": "0.000005",
+            "completion": "0.000025",
+            "input_cache_read": "0.0000005",
+            "input_cache_write": "0.00000625",
+            "web_search": "0.01",
+            "discount": 0,
+            "line_items": [
+              {
+                "type": "long_context_threshold",
+                "value": "200000"
+              },
+              {
+                "type": "input_tokens_above_threshold",
+                "value": "10e-6"
+              },
+              {
+                "type": "output_tokens_above_threshold",
+                "value": "37.50e-6"
+              },
+              {
+                "type": "input_cache_read_tokens_above_threshold",
+                "value": "1e-6"
+              },
+              {
+                "type": "input_cache_write_tokens_above_threshold",
+                "value": "12.5e-6"
+              }
+            ]
+          },
+          "variable_pricings": [
+            {
+              "type": "prompt-threshold",
+              "threshold": 200000,
+              "prompt": "0.00001",
+              "completions": "0.0000375",
+              "input_cache_read": "0.000001",
+              "input_cache_write": "0.0000125"
+            }
+          ],
+          "line_items": [
+            {
+              "type": "long_context_threshold",
+              "value": "200000"
+            },
+            {
+              "type": "input_tokens_above_threshold",
+              "value": "10e-6"
+            },
+            {
+              "type": "output_tokens_above_threshold",
+              "value": "37.50e-6"
+            },
+            {
+              "type": "input_cache_read_tokens_above_threshold",
+              "value": "1e-6"
+            },
+            {
+              "type": "input_cache_write_tokens_above_threshold",
+              "value": "12.5e-6"
+            }
+          ],
+          "pricing_json": {
+            "anthropic:prompt_tokens": "5e-6",
+            "anthropic:web_search_calls": ".01",
+            "anthropic:cache_read_tokens": "0.50e-6",
+            "anthropic:completion_tokens": "25e-6",
+            "anthropic:cache_write_1h_tokens": "10e-6",
+            "anthropic:cache_write_5m_tokens": "6.25e-6",
+            "anthropic:long_context_threshold": "200000",
+            "anthropic:prompt_tokens_long_context": "10e-6",
+            "anthropic:cache_read_tokens_long_context": "1e-6",
+            "anthropic:completion_tokens_long_context": "37.50e-6",
+            "anthropic:cache_write_1h_tokens_long_context": "20e-6",
+            "anthropic:cache_write_5m_tokens_long_context": "12.5e-6"
+          },
+          "pricing_version_id": "c4ab9aec-0087-40a2-9300-32ff75a3399f",
+          "is_hidden": false,
+          "is_deranked": false,
+          "is_disabled": false,
+          "supports_tool_parameters": true,
+          "supports_reasoning": true,
+          "supports_multipart": true,
+          "limit_rpm": null,
+          "limit_rpd": null,
+          "limit_rpm_cf": null,
+          "has_completions": true,
+          "has_chat_completions": true,
+          "features": {
+            "supports_native_web_search": false,
+            "supports_tool_choice": {
+              "literal_none": true,
+              "literal_auto": true,
+              "literal_required": true,
+              "type_function": true
+            }
+          },
+          "provider_region": null,
+          "deprecation_date": null
+        },
+        "searchKeywords": [
+          "anthropic",
+          "claude",
+          "opus",
+          "4.6"
+        ]
+      },
+      "description": "",
+      "includeDefaultSystemPrompt": true,
+      "isStreaming": true,
+      "samplingParameters": {},
+      "isDisabled": false,
+      "isRemoved": false,
+      "createdAt": "2026-02-12T22:49:02.619Z",
+      "updatedAt": "2026-02-12T22:49:02.619Z",
+      "plugins": [],
+      "chatMemory": 8
+    }
+  },
+  "messages": {
+    "msg-1770936531-Q9sR2F2HqGsFqHI4EUNV": {
+      "id": "msg-1770936531-Q9sR2F2HqGsFqHI4EUNV",
+      "context": "main-chat",
+      "contentType": "text",
+      "characterId": "USER",
+      "createdAt": "2026-02-12T22:48:51.899Z",
+      "updatedAt": "2026-02-12T22:48:51.899Z",
+      "isEdited": false,
+      "isRetrying": false,
+      "isCollapsed": false,
+      "type": "user",
+      "items": [
+        {
+          "id": "item-1770936531-43EungAryUBOetjsbcmw",
+          "type": "message"
+        }
+      ]
+    },
+    "msg-1770936574-IDsZyuLsHNXbsDpFFQLa": {
+      "id": "msg-1770936574-IDsZyuLsHNXbsDpFFQLa",
+      "context": "main-chat",
+      "contentType": "text",
+      "characterId": "USER",
+      "createdAt": "2026-02-12T22:49:34.444Z",
+      "updatedAt": "2026-02-12T22:49:34.445Z",
+      "isEdited": false,
+      "isRetrying": false,
+      "isCollapsed": false,
+      "type": "user",
+      "items": [
+        {
+          "id": "item-1770936574-5Vmtc3V3fHSRIJzJEOsV",
+          "type": "message"
+        }
+      ]
+    },
+    "msg-1770936574-ce5eNs0dbYA69tDfNMFT": {
+      "id": "msg-1770936574-ce5eNs0dbYA69tDfNMFT",
+      "parentMessageId": "msg-1770936574-IDsZyuLsHNXbsDpFFQLa",
+      "context": "main-chat",
+      "contentType": "text",
+      "characterId": "char-1770936542-EX30kQS9oCJGcVgcNJla",
+      "createdAt": "2026-02-12T22:49:34.445Z",
+      "updatedAt": "2026-03-14T03:12:25.616Z",
+      "isEdited": false,
+      "isRetrying": true,
+      "isCollapsed": false,
+      "type": "assistant",
+      "isGenerating": false,
+      "metadata": {
+        "plugins": [],
+        "variantSlug": "anthropic/claude-opus-4.6",
+        "generationId": "gen-1770936604-7Cuh9gAkjmEtSqVigiI5"
+      },
+      "items": [
+        {
+          "id": "msg_tmp_e0wi9ud267w",
+          "type": "message",
+          "outputIndex": 0
+        }
+      ]
+    },
+    "msg-1770937027-RDAn8TLxhnOAMOISG7l7": {
+      "id": "msg-1770937027-RDAn8TLxhnOAMOISG7l7",
+      "context": "main-chat",
+      "contentType": "text",
+      "characterId": "USER",
+      "createdAt": "2026-02-12T22:57:07.863Z",
+      "updatedAt": "2026-02-12T22:57:07.863Z",
+      "isEdited": false,
+      "isRetrying": false,
+      "isCollapsed": false,
+      "type": "user",
+      "items": [
+        {
+          "id": "item-1770937027-GG7aLeXB8q2kZHvwWnGL",
+          "type": "message"
+        }
+      ]
+    },
+    "msg-1770937027-Ao8w1W1LjFMhbOM6vIrs": {
+      "id": "msg-1770937027-Ao8w1W1LjFMhbOM6vIrs",
+      "parentMessageId": "msg-1770937027-RDAn8TLxhnOAMOISG7l7",
+      "context": "main-chat",
+      "contentType": "text",
+      "characterId": "char-1770936542-EX30kQS9oCJGcVgcNJla",
+      "createdAt": "2026-02-12T22:57:07.864Z",
+      "updatedAt": "2026-02-12T22:58:38.701Z",
+      "isEdited": false,
+      "isRetrying": false,
+      "isCollapsed": false,
+      "type": "assistant",
+      "isGenerating": false,
+      "metadata": {
+        "plugins": [],
+        "tokensCount": 3273,
+        "variantSlug": "anthropic/claude-opus-4.6",
+        "cost": "0.1181367",
+        "generationId": "gen-1770937028-phxUPvi5H04zGDF3zh9f"
+      },
+      "items": [
+        {
+          "id": "msg_tmp_41ze6fylxs6",
+          "type": "message",
+          "outputIndex": 0
+        }
+      ]
+    },
+    "msg-1770937689-WesLLIPgZAQXAUuAWb7d": {
+      "id": "msg-1770937689-WesLLIPgZAQXAUuAWb7d",
+      "context": "main-chat",
+      "contentType": "text",
+      "characterId": "USER",
+      "createdAt": "2026-02-12T23:08:09.291Z",
+      "updatedAt": "2026-02-12T23:09:29.594Z",
+      "isEdited": true,
+      "isRetrying": false,
+      "isCollapsed": false,
+      "type": "user",
+      "items": [
+        {
+          "id": "item-1770937689-kEkvxb1NEdcRVn2HeVHF",
+          "type": "message"
+        }
+      ]
+    }
+  },
+  "items": {
+    "item-1770936531-43EungAryUBOetjsbcmw": {
+      "id": "item-1770936531-43EungAryUBOetjsbcmw",
+      "messageId": "msg-1770936531-Q9sR2F2HqGsFqHI4EUNV",
+      "data": {
+        "type": "message",
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "So I've been working on this hacking themed minigame. See attached design doc.\n\nI've got working prototypes of several of the core systems, and want to do a deep design dive before I start finalizing things.\n\nLet's tackle these one at a time, this session will be focused on IC. Basically, anything at all that makes the players job harder. I'll share a bunch of my ideas and get your feedback, and then you can give me your pitches.\n\nEverything here is subject to change, so feel free to blue-sky. Don't worry about difficulty for now, let's just nail things down conceptually.\n\nHere's some ideas I'm bouncing around and why I think they could create interesting gameplay.\n\n- Reboot: If signal is disabled, it automatically reenables after X seconds. Forces the player to time carefully, they can't just immediately disable an obstacle as soon as it comes on screen.\n- Trace: Starts a timer (variable length) when the player connects to a signal in the terminal. If player still is connected when it runs out, large heat spike. Forces player to execute quickly, or have to carefully manage their terminsl sessions.\n- Lockout: Locks player out of terminal for X seconds after each command. Forces efficient terminal usage, and/or turns thst terminal windows into a repeated attention check.\n- Leech: Allocates X amount of the players RAM for a long duration, forcing them to reallocate programs or just limiting their ability to use them freely.\n- Lag: Adds a notable delay to terminal text input. Commands will execute as normal if typed correctly, but you don't get immediate feedback, dividing attention.\n- UI Disruptors: Broad category of \"rhythm doctor esqe\" UI manipulation: floating windows, flipped or mirrored visuals, visual glitches, etc.\n- Puzzle Disruptors: Another wide open area, just tweaks to any number if ways that info is presented/processed in puzzles.\n- Cloak: Signal doesn't show up until closer to runners than normal.\n- Spoof: Disguises a signal as something else until scanned.\n- Glitch: A signal periodically appears to change position, but it's effect area remains static. (Maybe it shows a slight effect to illustrate which position is real)\n- Mirror Image: like the D&D spell, creates multiple decoys of a signal.\n\nThat's all I've got for now. Let me know your thoughts and any pitches you might have. IC should be able to reach into almost any other system or layer in the game, so feel free to get creative (though I could also use some more \"lower impact\" options like reboot.)"
+          }
+        ]
+      }
+    },
+    "item-1770936574-5Vmtc3V3fHSRIJzJEOsV": {
+      "id": "item-1770936574-5Vmtc3V3fHSRIJzJEOsV",
+      "messageId": "msg-1770936574-IDsZyuLsHNXbsDpFFQLa",
+      "data": {
+        "type": "message",
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "See design doc, attached."
+          },
+          {
+            "type": "input_text",
+            "text": "```plaintext\n\n4\n\nAutomatic Zoom\nPROJECT: Dead Channel \nVERSION: v.01 \nLAST UPDATED: 1/31/2026 \n \nTABLE OF CONTENTS \n1. Vision \n \nYou’re a mercenary hacker in a gritty cyberpunk world. Your job is to \nassemble a team and support them remotely while they complete their \nobjectives. You’re the invisible hand that makes impossible heists \npossible... but only barely. \n \nElevator Pitch: 2 parts “plate spinning” time management + 1 part \nhacking simulation + 1 part roster management + a dash of autobattler \n \nInspirations: \n> Shadowrun (particularly the Genesis game - gritty “independent \ncontractor” vibe) \n> Invisible Inc. (high tension, escalating difficulty, narrow margins \nfor error) \n> XCOM (always on the backfoot, outgunned and out numbered) \n> Darkest Dungeon (quirks and roster management) \n> Papers Please (subtle attention checks) \n> Rhythm Doctor (meta-mechanics that affect the interface) \n \n2. Core Loop \n \nThe game has 2 primary layers: the Run layer (individual missions, \ncore moment-to-moment gameplay) and a Management layer (building and \nadvancing your team and your personal tech). Primary focus at this \npoint is the Run layer. \n \nRun Layer: The screen is divided in two parts. On the top is a \nhorizontal track that abstractly represents the runner team and their \npath toward their objective(s). The runner team is represented on the \nleft, and obstacles and other interactables will scroll toward them \nfrom the right. The player can interact with objects on the track to \nhack them, which usually will involve one of several kinds of short \npuzzles, which will appear as moveable popup windows. Once hacked, \nobstacles can be temporarily disabled or altered to protect your team \nfrom them. Often there will be too many obstacles to completely handle \nthem all, meaning the player has to perform rapid threat assessment \nand triage under pressure. The player has access to a suite of \nsoftware that can help them deal with various challenges, but may also \nface hostile countermeasures that can disrupt them. Various actions \nboth on the runner’s level and the players can contribute to (or \nsometimes detract from) a global “heat” gauge that escalates the run’s \ndifficulty. \n \nManagement Layer: Using the money gained from their runs, the player \nwill be able to hire and develop a permanent team of runners, each of \nwhich may have their own unique skills, strengths, weaknesses and \nquirks. The player will also be able to upgrade their cyberdeck with \nnew programs and other enhancements. \n \n3. Design Pillars \n \nTriage over mastery. The player should never clear everything perfectly. \nSuccess is smart prioritization and keeping cool under pressure. \nAttention as resource. Complexity (mostly) comes from competing demands, \nnot mechanical difficulty. \nIndirect control. The player influences but never commands. The runners \nare people, not units. \n4. Mechanics \n   4.1 Progress Track / Signal Timeline \n   \nThe core mechanic. Appears as a horizontal bar stretching across \nthe screen, split into 5 horizontal sections, like a music staff. The \nrunner team is represented by an icon on the left side in the middle \ntrack. Obstacles (such as doors, cameras and guards), objectives and \nother interactables (collectively called Signals) will usually appear \non the left side and scroll toward the runner team’s icon. \n \nThe horizontal distance of the track represents the runners’ parallel \ndistance from the Signal, while the vertical distance represents their \nperpendicular distance. A Signal that is on the same middle track as \nthe runner team is something that can interact with the runner team \nonce it has scrolled down the track to them. Most of the time, these \nare obstacles like cameras or doors and the runner team hitting them \nwill lead to some negative effect if the player hasn’t disabled the \nSignal. \n \nWhile the track is a straight path, it is meant to represent the \noverall path across many rooms and hallways that the team has to \nnavigate, while the vertical separations represent side areas that can \nstill potentially impact the run. For example, guards and drones are \nmobile obstacles that patrol. If they are in one of the upper or lower \nseparations when they cross the team, then the team can pass by them \nwithout any negative effects. However, many things can affect the \npathing of such obstacles, such as guards responding to alerts or the \nplayer using other signals to trigger a distraction. \n \nSome Signals (usually doors) that appear in the perpendicular sections \nmay offer boons such as alternate paths or paydata that increases \ntheir reward for the mission. The player must decide if it’s worth \nrisking the extra time and heat to pursue these side objectives. \n \nBy default, objects scrolling onto the timeline from the right will be \nabout 30 seconds away from crossing paths with the runner team, though \nmany things can affect this speed. \n \n   4.2 Mission Arcs \n  Most missions are divided up into smaller sections, such as: 1. \nInfiltration, 2. Objective, 3. Extraction. Each one has its own Signal \nTimeline, which may have special characteristics based on that \nsection’s framing. For example, an extraction section might have a \nfaster scrolling timeline representing the runners having to move fast \nand the player having less time to respond to threats. Downtime \nbetween sections may allow the player to regroup and possibly allow \nthe runners to use “camp” abilities a la Darkest Dungeon. \n \n   4.3 Heat \n  Heat represents how much attention the runner team and the player \nhave drawn from corporate security. It grows at a steady rate, with \nmany interactions raising or lowering it more. As it grows, difficulty \nscales higher across multiple vectors: additional obstacles spawn, \nmobile obstacles are more likely to cross paths with the runners, and \nhacking becomes harder. Since most player actions have at least a \nsmall heat cost, many decisions the player makes will revolve around \nthe heat cost versus the in-the-moment benefit.  \n \n   4.4 Signal Scanning \n  It’s not always immediately clear what a Signal represents or \nwhat its behavior might be. For a small time investment, the player \ncan scan a signal continuously to gain more information about the \nsignal. Information gained can include things like: what the Signal is \n(if not already revealed), hacking difficulty, patrol routes for some \nmobile Signals, any Intrusion Countermeasures (IC), which are software \nprotections that interfere with the player in a variety of ways. \n \n   4.5 Hacking Minigames \n  To interact with a Signal, for example to disable a camera, the \nplayer will often have to complete a hacking minigame of various types \n(described in more detail in the Content section). These minigames are \nshort puzzles that are meant to require attention without being too \nintellectually demanding. These minigames have several ‘cadences’ that \naffect how much and how often the player needs to interact with them. \nSome are simply “one and done” and once solved, the player is free to \nuse any contextually available effects of that signal (Opening/Closing \na door, triggering a distraction, etc.) Others have built in “process \ndelays” that incentivize the player to deal with other things while \nwaiting for the next part of the puzzle. Some minigames will be \npersistent, so the player’s progress will be intact with each \ninteraction, while others might “decay” or reset entirely if not \nsolved in one session. \n \n   4.6 The Runner Team and Obstacles \n  The runner team are not simple lemmings and can solve most \nproblems on their own -- but their solutions are by necessity often \nmessier and riskier. Each obstacle has a range of effect, represented \nby a highlighted area projected from their Signal icon. When the \nrunner team enters that range, there’s an immediate and often scaling \neffect. For example, while the team is in a camera’s range, extra heat \nis generated every tick. Once the runner team icon makes contact with \nthe signal, the runners have to take matters into their own hands to \ndeal with the obstacle, which usually comes with a spike of heat gain, \nor some cost to the runners’ health or stamina. The exact impact will \nbe determined by behind-the-scenes dice rolls based on the runner’s \nstats vs. the obstacles. The player’s goal is not to disable every \nobstacle, but rather to minimize damage to the runner team so they can \ncomplete their objective and extract. \n  While the player has limited ability to command the team, they \ncan ask the team to briefly slow down or speed up. This costs a small \namount of heat per tick, but may allow the team to slip past guards or \npanning cameras without needing to hack them. \n \n   4.7 Software, RAM and Overclocking \n  The player’s cyberdeck has access to several programs that can \nhelp them achieve their goals. Some of these programs are locked-in, \nwhile there are several (4-5?) open slots that allow the player some \nflexibility. Software programs take time to load and unload. While \nloading, unloading or active, they use up some amount of the player’s \nRAM pool. When the RAM pool is depleted, the player can’t deploy any \nmore programs until they finish unloading some of the active programs. \n  The player can overclock their deck for brief periods to gain \nextra RAM, but doing so for more than a handful of seconds at a time \nwill cause the system to reboot, cutting the player off from seeing or \ninteracting with the Signal timeline. \n  Base programs include things like scanning Signals, expanding the \nSignal Timeline’s horizon, or reducing heat. Other programs may have \nmore specific niches, like making one specific type of puzzle easier, \nor causing some malus to a specific class of obstacle. \n \n   4.8 IC and White Hats \n  After the first few levels, the player begins to encounter \nintrusion countermeasures (IC or ICE). These are software programs \nthat either passively improve an Obstacle, or trigger when the player \nattempts to hack it. They can cause a variety of disruptive effects to \nthe player. These can include direct mechanical effects like adding \nmodifiers to hacking minigames or causing Signals to be hidden until \nthey are closer to the team, as well as meta-mechanical effects such \nas temporarily disrupting the players viewport, reversing their \ncontrols, etc. \n  Further on, the player can also encounter corporate White Hat \nhackers, which act similarly but are not attached to specific Signals \nand can instead disrupt the player at any point. (Concept to be \nfurther defined and expanded.) \n \n   4.9 Split Tracks and Set Pieces \n  On some missions, the runner team will be forced to split up to \ntackle separate objectives simultaneously. For example, the team’s \ninfiltrator may need to sneak his way through vents to open an \nunhackable door from the other side. This will result in brief \nsections where a second Signal Track appears and the player must split \ntheir time and attention between both. Some of these split tracks may \nhave special mechanics based on the type of task. For example, there \nmay be a “hold the line” sequence where one runner has to hold off \nenemies while the others continue toward the objective. That runner \nwould split off on a second track where their icon is in the middle of \nthe track and threats are approaching from both sides instead of the \nusual right-to-left flow. \n  There may also be “set-piece” encounters that offer slight twists \non the usual mechanics and flow. For example, the runners may get in \nan extended fight with some corpo battle robot, and the player has to \nhack different subsystems through the fight. Or the runners are in an \nabandoned bio-lab, the lights went out and some genetically engineered \ncreature is hunting them. The player has to hack doors and lights to \nblock the creature and help the team navigate to an exit. \n \n   4.10 Management Layer \nTo be expanded. For now, consider a very stripped down version of \nDarkest Dungeon’s roster management. The player can upgrade their \nrunners’ gear, buy consumables, improve their cyberdeck, buy new \nprograms, and so on. \n \n5. Content \n   5.1 Obstacle Types \nObstacles have two broad, binary classifications: they are either \nstationary or mobile, and they are either mechanical or biological \n(mech or meat, for short). \nStationary obstacles, such as doors and cameras, always stay in \nthe same space in the Signal Timeline and always move toward the \nrunner team at a fixed speed based on the speed the runner team is \nmoving at. \nMobile obstacles, such as guards and drones, can move along the \nperpendicular axis, and can also sometimes move faster or slow toward \nthe runner team depending on their patrol route or if they are \nresponding to an alert or distraction. \nMechanical obstacles (cameras, doors, drones) can usually be seen \ndirectly interacted with by the player via the Signal timeline. \nBiological obstacles (guards, mostly) are usually invisible to \nthe player unless the player has hacked a nearby camera, or the runner \nteam has spotted them. They cannot be interacted with directly, but \nthey can be distracted or disabled by other nearby hackable objects. \n \n   5.1.1 Specific Obstacle Mechanics \n  Obstacle: Door [Stationary, Mechanical] \n  Description: The simplest obstacle. If locked and on the central \npath, the runner team will take time and gain heat as they find \nanother way to pass it. Most likely to contain a time-intensive and/or \nmulti-stage minigame. \nPlayer Hacking Interactions: Open, Close, Lock, Unlock. \n \n  Obstacle: Trap [Stationary, Mechanical] \n  Description: Similar to doors, but have more dangerous effects if \nthe runner team makes contact, often costing health or stamina. \nPlayer Hacking Interactions: Disable, Enable, Overload (only on \nsome traps; heat-intensive but can disable other nearby obstacles) \n \nObstacle: Camera [Stationary, Mechanical] \nDescription: A simple obstacle that can cause significant heat \ngain if the runner team enters its range. Usually has short and simple \npuzzles. Hacking a camera automatically reveals any nearby biological \nSignals (guards). \nPlayer Hacking Interactions: Blind (quickly and easily disables \ncamera, but at a higher base heat cost), Spoof (tougher minigame to \nhack, but no heat gain). \nPossible Variations: Some cameras pan, and their line of effect \nshifts into perpendicular areas. With timing and luck, the runner team \nmay be able to bypass them without needing to hack them. Some cameras, \nonce disabled, will reboot themselves after a delay. \n \nObstacle: Drone [Mobile, Mechanical] \nDescription: Similar to cameras, but move along patrol routes \nthat make it harder to predict if/when they the runner team will cross \ntheir path. Longer scans can reveal some information about their \npatrol route, such as how long until the move and which direction. \n  Player Hacking Interactions: Same as camera, plus Reroute (alters \npatrol pattern). \n  Possible Variations: Combat Drones that are more likely to damage \nthe runners. Disruptor or Cloaker drones that hide nearby signals or \ndisrupt the player’s ability to hack. \n \nObstacle: Guard [Mobile, Biological] \nDescription: Similar to drones, but more reactive to alerts or \nsuspicious activity. Invisible to the player unless near a hacked \ncamera or very close to the runner team. Very likely to cost runner \nhealth or stamina if the team has to deal with them directly. \n  Player Hacking Interactions: None, but see Other Signals, below. \n \n   5.2 Other Signals \n  The signal timeline will have several other “internet of things” \nsignals, representing a variety of connected objects. Many of these \nwill be useless and only there to add visual interest and noise. \nOthers can be hacked for a variety of effects, such as distracting or \neven disabling guards or drones. For example, the player might be able \nto hack a terminal near a guard to generate a false alert that the \nguard spends time investigating, allowing the runner team to slip by. \n \n   5.2 Minigame/Puzzle Types \n  Minigames trigger when the player tries to hack most things, and \nmust be solved in order to access the contextual functions of that \nSignal. They present as movable popup windows, and organizing the \nplayer’s interface will be a subtle part of gameplay. There will be \nseveral types, with different types of Signals tending to have a \nspecific minigame type, though this is not universal. \nNOTE: This list is in “blue sky ideation” mode. Will likely be cut \ndown to 3 or 4 minigames at base. \n   \n  CORE Minigame: Terminal \n  Description: Less of a minigame and more of a systemic glue that \nhelps sell the fantasy while requiring some level of skill and detail \norientation. This is the front-end of every hacking interaction in the \ngame -- when the player clicks on a Signal, it’ll pop up a terminal \nwindow and the player will usually have to do at least one small task \nbefore getting to the hacking proper. \nInvolves a simplistic shell command language with 4-5 commands, a \nfew flags/modifiers, and some interaction with variables. It would \nplay out as a simple call-and-response where the terminal presents \nsome data and asks for input and you have to respond with the correct \ncommand to bypass it. \n-  Layer 1 would be matching the correct command.  \n-  Layer 2 would be incorporating a variable (like some terminals \nmight require you to run [ACCESS] <filename>, where <filename> is \nsomething you have to quickly scan the terminal output for. Maybe \nsometimes it’s [ACCESS] core.sys and sometimes it’s [ACCESS] \nsystem.dat or whatever) \n-  Layer 3 would be adding flags to respond to small details. Like \nsome terminals maybe have a specific protection type and you have \nto do [ACCESS] core.sys -b to bypass it. \nShould be just enough complexity that it feels pretty easy to \nremember but satisfying once you’ve internalized it. \nMight also serve as a sort of core mini-mini game that interacts with \nother puzzle types (see example below). \n \n  Minigame: Decryption \n  Description: Longest type of puzzle by default, most common on \ndoors. The player would be presented with a very simple cipher to \ndecode, but the full key would not be immediately available. The \nplayer might be able to hurry the decryption with some terminal \ncommands, or brute force it based on deduction. \n  For example, let’s say the cipher is ABCD=FGHI. The game shows \nyou three pieces of info: 1) the cipher: ABCD, 2) the set of possible \nanswers [E,F,G,H,I], and 3) two parts of the key: A = F, C = H. The \nplayer can wait for the rest of the key to complete, or can try and \nintuit the answer. Obviously this is a very simple version and there’s \ninfinite room to scale complexity. \n \n  Minigame: Matrix-style Search \n  Description: You see a grid of shifting hexadecimal numbers. One \nstatic sequence is highlighted on the left (e.g., E9). You have to \nspot E9 in the shifting grid on the right and click it before it \nmoves. Could be expanded to require some basic Hex math (which is \npretty easy to learn by repetition, IMO), like you have to match two \nsymbols that add up to a value, or you’re given one value and have to \nfind the complementary symbol that adds up to a value. \n \n   \n  Minigame: Connections \n  Description: Classic “draw a line from point A to point B without \nintersecting or crossing the danger zones.” Alternatively, a system \nwhere you have n inputs and n outputs. Signals fire from inputs in \nsequence. You're placing/rotating nodes in real-time to route each \nsignal to its correct output before the next one fires. Complexity \nscales via speed, grid size, and obstacle nodes that block or \nredirect. \n \n  Minigame?: Background “Twister” \n  Description: A special type of minigame (or possibly an IC \ndisruption) that requires the player to hold down one or more keys for \nan extended duration while continuing to manage other tasks. \nAlternatively, could be framed as a “timeout” where the player has to \nrevisit a specific window and do some simple task to keep the \nconnection from timing out, which might lead to heat gain or having to \ndo a more complicated task to reestablish the connection. \n   \n \n   5.3 Runner Archetypes \n  Protoype development will rely on generic runners without any \nspecial skills or features. To be developed, possibly to include \nspecific classes that can fulfill different functions, especially with \nregard to split track sections (section 4.9). \n \n   5.4 Mission Types \n  To be developed. For now, consider standard Shadowrun/cyberpunk \ncorporate espionage-type stuff. Sabotage, technology theft, \nheadhunting, etc. Different missions will have different threat \ndistributions, different mission arcs, etc. \n \n6. Aesthetic Direction \n \nVisual: Clean UI, high contrast, information-dense but readable. Think \nHacknet meets Into the Breach. Most information can be communicated by \nsimple shapes, colors and icons. \nAudio: Synth tension, radio chatter, mechanical keyboard sounds, alert \nbeeps. Audio cues for each obstacle type to help with information \nprocessing. \nTone: Cyberpunk noir with gallows humor. Corpo dystopia played straight \nbut not grimdark. \n \n7. Scope & Milestones \n \n \nPriority  Features \nMust have  Single track, 3-4 puzzle types, 5-6 obstacle types, core runner archetypes, \nbasic resource system \nShould have  Split track sections (one type), runner abilities, heat system \nNice to have  Multiple split types, crew management and characterization, procedural \ngeneration, “set piece” combat breakout system \nLater  Full campaign, multiple corps, roguelike modifiers \n \n8. Open Questions \n \n- How does difficulty scale across a campaign? \n- What happens when a runner dies? Is there permadeath? \n- How much narrative framing does each mission need? \n- How do players learn new puzzle types? \n```"
+          }
+        ]
+      }
+    },
+    "msg_tmp_e0wi9ud267w": {
+      "id": "msg_tmp_e0wi9ud267w",
+      "messageId": "msg-1770936574-ce5eNs0dbYA69tDfNMFT",
+      "data": {
+        "id": "msg_tmp_e0wi9ud267w",
+        "role": "assistant",
+        "type": "message",
+        "status": "in_progress",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "\n\n# IC Deep Dive — Feedback & Pitches\n\nThis is a really strong starting list. You've got good coverage across several \"disruption domains\" — timing, information, attention, and resources. Let me go through your ideas first, then pitch some new ones.\n\n---\n\n## Feedback on Your Ideas\n\n### Reboot\n**Love it.** This is your bread-and-butter low-impact IC and it's doing a ton of work for how simple it is. It transforms every disable from a \"solved it, move on\" into a timing problem — *when* do I disable this, not just *can* I. It also creates beautiful interactions with multi-obstacle sequences: if two cameras are staggered, the player has to calculate whether the first one will reboot before the runners clear it. Reboot duration is a great tuning knob too.\n\nOne thought: consider whether Reboot should be visible information (a countdown on the signal) or hidden until scanned. Both are valid but create very different pressure. Visible = planning puzzle. Hidden = risk assessment.\n\n### Trace\n**Strong.** This is your \"the clock is ticking while you're inside\" mechanic. It naturally creates the tension of \"do I rush and risk mistakes, or take my time and risk the trace?\" The variable timer length is key — if the player can't always predict how long they have, they have to build in safety margins or gamble.\n\nOne concern: how does this interact with multi-stage puzzles like Decryption? If the trace timer is running across a puzzle that *requires* waiting for key fragments, that could feel punishing in a \"nothing I can do\" way rather than a \"I need to be smarter\" way. You might want Trace to pause when the puzzle is in a forced-wait state, or have the trace only count active input time. Or — and this might be more interesting — **let the player disconnect and reconnect to reset the trace**, but at the cost of resetting puzzle progress on non-persistent puzzles. Now it's a real decision.\n\n### Lockout\n**Interesting but needs care.** The idea of throttling terminal speed is good — it makes every command feel weighty. But a flat \"locked out for X seconds\" could feel like dead time where you're just... waiting. The key question is: is there always something else to do during the lockout? If yes, this is great — it turns terminal interaction into a rhythm of \"type command, go manage something else, come back.\" If the lockout catches you during a moment where the terminal is the only thing that matters, it could feel like artificial friction.\n\nSuggestion: what if Lockout doesn't lock you out of the *terminal* entirely, but locks you out of *that specific terminal*? So you can still interact with other signals, but you can't rapid-fire commands into the same one. This keeps it as an efficiency tax without creating dead air.\n\n### Leech\n**Solid resource pressure.** This is your \"slow drain\" IC — it doesn't spike you, it squeezes you. It forces interesting decisions about loadout management mid-run. The key design question is: can the player *remove* the leech, and if so, at what cost? If it's permanent for the section, it's a hard modifier. If it can be cleaned up with time/heat investment, it's another triage decision. I'd lean toward the latter — maybe it takes a terminal interaction to purge, meaning you're spending time and possibly triggering other IC to deal with it.\n\nAlso consider: does the Leech tick in? Like, it starts using 1 RAM and grows to its full allocation over time? That creates an escalation where ignoring it gets progressively worse.\n\n### Lag\n**Devious. I love it.** This is a pure attention-divider. You can still *do* everything, but you lose the feedback loop that lets you multitask confidently. You type a command, you don't know if it worked, you have to either stare at the terminal waiting for confirmation or go do something else and trust you didn't typo. This is going to feel *incredible* when it works — very \"hacking through hostile ICE\" fantasy.\n\nDesign consideration: make sure the delay is long enough to matter but short enough that it doesn't feel like actual input lag / a bug. You want the player to *feel* the delay as a game mechanic, not wonder if their keyboard is broken. A visual indicator that lag is active (maybe the terminal text renders character by character with a slight stutter, or there's a processing spinner) would help sell it.\n\n### UI Disruptors\n**High-impact, use sparingly.** These are your spectacle IC — they're memorable, they're funny, they make for great stream moments. But they can also feel cheap if overused. I'd treat these as rare, escalation-tier IC that show up at high heat or on critical signals. The Rhythm Doctor comparison is apt — those moments work because they're *surprises* in a game you've otherwise internalized.\n\nSpecific sub-idea worth calling out: **floating popup windows that obscure parts of the signal track.** Since your puzzles already present as movable popups, having an IC spawn a fake",
+            "annotations": []
+          }
+        ]
+      }
+    },
+    "item-1770937027-GG7aLeXB8q2kZHvwWnGL": {
+      "id": "item-1770937027-GG7aLeXB8q2kZHvwWnGL",
+      "messageId": "msg-1770937027-RDAn8TLxhnOAMOISG7l7",
+      "data": {
+        "type": "message",
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "Looks you got cut off, continue."
+          }
+        ]
+      }
+    },
+    "msg_tmp_41ze6fylxs6": {
+      "id": "msg_tmp_41ze6fylxs6",
+      "messageId": "msg-1770937027-Ao8w1W1LjFMhbOM6vIrs",
+      "data": {
+        "id": "msg_tmp_41ze6fylxs6",
+        "role": "assistant",
+        "type": "message",
+        "status": "completed",
+        "content": [
+          {
+            "type": "output_text",
+            "text": "Right, picking up where I left off —\n\n---\n\n### UI Disruptors (continued)\n\nSpecific sub-idea worth calling out: **floating popup windows that obscure parts of the signal track.** Since your puzzles already present as movable popups, having an IC spawn a fake/junk popup window that the player has to close or drag out of the way is brilliant because it's using your own UI language against the player. It feels diegetic — like actual malware — and it forces the player to manage their screen real estate, which you already identified as a subtle part of gameplay. The first time a fake error window pops up and blocks the player's view of an incoming guard, that's going to be a *moment*.\n\nA few more sub-categories worth considering under this umbrella:\n- **Visual noise:** Static, scanlines, color shifts that make it harder to parse information at a glance. Low-impact but persistent.\n- **HUD disruption:** Temporarily hiding or scrambling specific UI elements — heat gauge goes fuzzy, the signal timeline's distance markers disappear, etc. Forces the player to estimate instead of calculate.\n- **Input disruption:** The mirrored/flipped controls you mentioned. Extremely disorienting, should probably be very short-duration.\n\n### Puzzle Disruptors\n**Agreed this is a wide-open space, and wisely so.** Every puzzle type you add is a new surface for IC to modify. A few framings that might help organize this category:\n\n- **Additive:** The puzzle works the same but there's *more* of it. Extra cipher characters, bigger hex grid, more connection nodes.\n- **Subtractive:** The puzzle works the same but you have *less* information. Key fragments in Decryption arrive slower, the hex grid refreshes faster, connection paths are partially hidden.\n- **Mutative:** The puzzle's rules shift. The cipher uses a different encoding. The hex grid requires subtraction instead of addition. Connection nodes rotate on their own.\n\nThis taxonomy might help you systematically generate puzzle IC rather than designing each one bespoke.\n\n### Cloak\n**Good, clean, low-impact.** This is a pure information-denial mechanic. It compresses the player's reaction window, which means they have less time to scan, less time to plan, and are more likely to have to deal with something reactively rather than proactively. Pairs beautifully with complex or multi-stage puzzles — a cloaked door with a Decryption minigame is a nasty combination because you've lost the time you'd normally use to let the key fragments trickle in.\n\nOne thought: does Cloak affect scanning? Can the player scan a region and detect that *something* is there even if they can't see what it is? That would make scanning programs even more valuable and create a nice interaction between software loadout and IC.\n\n### Spoof\n**Great information-warfare IC.** This one is doing something subtly different from Cloak — Cloak denies information, Spoof provides *wrong* information. That's nastier in some ways because the player might commit resources to dealing with what they think is a camera only to find it's a locked door with a much longer minigame. The scan interaction is critical here — scanning should be the counter, but maybe Spoof'd signals require *longer* scans to see through, so there's still a cost.\n\nQuestion to think about: what does a Spoof'd signal disguise *as*? Is it always a lower-threat signal (guard disguised as camera, door disguised as junk signal)? Or could it go the other way — a harmless signal that looks threatening, wasting the player's time and attention on a decoy? Both are interesting, but they create different kinds of pressure.\n\n### Glitch\n**Clever, but might be hard to read.** The idea of a signal that visually jumps around while its actual effect zone stays put is cool conceptually — it's another form of misinformation. My concern is that on a scrolling timeline, positional deception might be confusing in a way that feels unfair rather than challenging. The player needs *some* reliable way to determine the real position, and you hint at that with the \"slight effect\" tell.\n\nSuggestion: what if the Glitch effect is more rhythmic and predictable? The signal snaps between positions on a visible cycle — real, fake, real, fake — and the player has to read the rhythm to know which position is true. This gives skilled players a way to \"solve\" it at a glance while still being disorienting under pressure.\n\n### Mirror Image\n**Fun, but similar to Glitch in design challenge.** Multiple decoys on the timeline means the player has to figure out which one is real. The question is how: scanning each one individually (time cost), looking for a visual tell (attention cost), or just guessing and accepting the risk?\n\nI'd lean toward making this a *scan tax* — each Mirror Image copy requires a scan to confirm or dismiss, and scanning a fake copy still costs time. This makes it a multiplier on the existing scanning system rather than a totally new mechanic to teach. And it pairs meanly with Cloak — a cloaked signal that, once revealed, turns out to have Mirror Image? The player just spent extra time scanning and now has to spend *more* time figuring out which copy is real.\n\n---\n\n## My Pitches\n\n### Lower-Impact / Systemic IC\n\n<details>\n<summary><strong>Encrypt</strong> — Adds an extra terminal step before the main minigame.</summary>\n\nThe simplest possible IC. When you connect to a signal with Encrypt, you have to do an additional terminal call-and-response before the actual puzzle loads. Maybe it's an extra `DECRYPT -key` command, maybe it's a short passphrase you have to parse from the terminal output. Small time cost, small attention cost, but it *adds up* when multiple signals have it. This is your \"common enemy\" IC — shows up frequently, never a big deal on its own, but contributes to the general pressure of too many things demanding attention at once.\n</details>\n\n<details>\n<summary><strong>Firewall</strong> — Requires multiple connection attempts to breach.</summary>\n\nYou connect to the signal and get bounced after a short delay. You have to reconnect 2-3 times before you get through to the actual minigame. Each connection attempt has a small heat cost. Simple, but it stretches out the interaction timeline and pairs brutally with Trace (each reconnection restarts the trace timer — or does it? That's a tuning question). Thematically clear. Everyone knows what a firewall is.\n</details>\n\n<details>\n<summary><strong>Throttle</strong> — Slows down progress within a specific minigame.</summary>\n\nWhere Lag affects terminal input globally, Throttle is local to one signal's puzzle. Cipher keys in Decryption arrive slower. The hex grid in Matrix Search refreshes at half speed (sounds helpful, but means targets are visible for less time per cycle). Connection nodes take longer to rotate. It doesn't change what you *do*, it just means you're parked on this puzzle longer, which means you're not looking at the signal track. Clean, tunable, and the player immediately understands what's happening.\n</details>\n\n<details>\n<summary><strong>Deadbolt</strong> — Signal can't be hacked until it's within a certain range of the runners.</summary>\n\nThe inverse of Cloak. You can *see* the signal just fine, you can scan it, you can plan for it — but you can't actually start hacking it until it's dangerously close. This creates a very specific kind of tension: you know exactly what's coming and you can't do anything about it yet. Pairs well with complex puzzles because you know you'll have limited time. Also creates interesting decisions around runner speed — do you slow the runners down to buy more hacking time once the signal enters range?\n</details>\n\n<details>\n<summary><strong>Feedback</strong> — Failing or disconnecting from a hack causes a small heat spike.</summary>\n\nNormally, abandoning a hack mid-puzzle is a safe option — you just lose the time invested. Feedback punishes that escape route. If you start a hack and disconnect (whether voluntarily or because of Trace), you eat a heat cost. This makes commitment to a hack weightier and pairs *extremely* nastily with Trace: stay connected and risk the trace, or disconnect and eat the heat. Beautiful triage decision.\n</details>\n\n### Mid-Impact / Tactical IC\n\n<details>\n<summary><strong>Honeypot</strong> — Hacking this signal triggers a negative effect elsewhere.</summary>\n\nYou hack a camera successfully, feel good about it — and a door further up the timeline locks, or a dormant drone activates, or a guard changes patrol route. The player won't know this will happen unless they scan thoroughly. This creates paranoia, which is its own form of difficulty. It also makes scanning feel even more essential, which reinforces that system's importance. The key is that the triggered effect should be something the player can still *deal with*, just at a cost. It's a trap, not an instakill.\n</details>\n\n<details>\n<summary><strong>Daemon</strong> — After hacking, installs a persistent negative effect on the player.</summary>\n\nThink of it like a sticky debuff. You hack the signal successfully and get full access, but now you've got a Daemon running on your deck. Maybe it slowly drains RAM like a mini-Leech. Maybe it periodically injects fake input into your terminal. Maybe it acts as a persistent, low-grade UI disruptor — slight static, occasional flicker. The player has to decide: do I spend time purging this daemon (terminal commands, heat cost), or do I just live with the penalty? Thematically excellent — this is the cyberpunk equivalent of picking up malware.\n</details>\n\n<details>\n<summary><strong>Tripwire</strong> — Scanning this signal raises an alert.</summary>\n\nDirect counter to the player's natural instinct to scan everything. The signal looks suspicious, you scan it to learn more, and — heat spike. Maybe it triggers a guard alert. Maybe it activates IC on *other* nearby signals. This teaches the player that information isn't free, and creates a risk/reward calculation around scanning that doesn't currently exist. Notably, this is IC that triggers on *scan*, not on *hack*, which means it's punishing a different part of the player's workflow.\n</details>\n\n<details>\n<summary><strong>Adaptive</strong> — Minigame difficulty increases with each failed attempt or reconnection.</summary>\n\nFirst attempt: standard difficulty. Disconnect and come back? Harder. Fail a step? Harder. This creates escalating commitment — you *really* want to get it right the first time, which increases pressure and makes Trace even scarier. It also punishes the \"peek at the puzzle, go do something else, come back\" strategy that your process-delay puzzles seem to encourage, which means the player has to read the situation to know which approach is safe.\n</details>\n\n### Higher-Impact / Escalation IC\n\n<details>\n<summary><strong>Blackout</strong> — Temporarily disables the signal timeline entirely.</summary>\n\nThe nuclear option. For a few seconds, the player can't see the track at all. They can still interact with open terminal/puzzle windows, but they're flying blind on threat assessment. This should be *very* rare — high heat, late-game, boss-tier IC. But when it hits, it's a moment of genuine panic that forces the player to rely on audio cues (you mentioned distinct audio per obstacle type — this is where that pays off enormously) and memory of what was on the track before the blackout hit.\n</details>\n\n<details>\n<summary><strong>Fork Bomb</strong> — Rapidly fills RAM with junk processes the player has to manually purge.</summary>\n\nSimilar to Leech but acute instead of chronic. A Fork Bomb triggers and suddenly your RAM is filling up fast. You have to open a terminal and start killing processes (`KILL proc_1`, `KILL proc_2`, etc.), but each one takes a command and there might be a Lockout between them. Meanwhile, your active programs are getting crowded out, and if your RAM fills completely... maybe that triggers a forced reboot like overclocking does? This is a great \"drop everything and deal with this\" IC that creates a moment of crisis.\n</details>\n\n<details>\n<summary><strong>White Ice / Black Ice</strong> — IC that can directly damage runners or the player's deck.</summary>\n\nYou touched on this lightly in the doc but I think it's worth formalizing as an IC tier. White Ice causes indirect harm — heat spikes, lockouts, daemons. **Black Ice** causes *direct* harm — runner health damage, deck integrity damage (if that's a system you introduce), or forced program crashes. Black Ice is the reason you scan before you hack. It's the reason you sometimes look at a signal and decide \"not worth it.\" It reinforces your triage pillar by making some hacks genuinely dangerous to attempt.\n</details>\n\n---\n\n## Organizational Thought\n\nYou might find it useful to categorize IC along two axes:\n\n| | **Passive** (always active) | **Triggered** (activates on scan/hack/fail) |\n|---|---|---|\n| **Information** | Cloak, Glitch, Mirror Image | Spoof, Tripwire |\n| **Time/Tempo** | Reboot, Throttle, Deadbolt | Trace, Lockout, Firewall |\n| **Resources** | Leech | Fork Bomb, Daemon |\n| **Interface** | Lag, UI Disruptors | Blackout, Puzzle Disruptors |\n| **Tactical** | Adaptive | Honeypot, Feedback, Black Ice |\n\nThis gives you a way to ensure you're covering all the disruption vectors and also helps with signal scanning — when a player scans and sees \"this signal has a triggered resource IC,\" they can narrow down what they're dealing with even before fully identifying it.\n\nLet me know where you want to go deeper — happy to drill into any of these, talk about specific IC + puzzle type interactions, or start thinking about how IC scales with heat.",
+            "annotations": [],
+            "logprobs": []
+          }
+        ]
+      }
+    },
+    "item-1770937689-kEkvxb1NEdcRVn2HeVHF": {
+      "id": "item-1770937689-kEkvxb1NEdcRVn2HeVHF",
+      "messageId": "msg-1770937689-WesLLIPgZAQXAUuAWb7d",
+      "data": {
+        "type": "message",
+        "role": "user",
+        "content": [
+          {
+            "type": "input_text",
+            "text": "Fuzzy: Very slow scan\nCaptcha/Checksum\nFaraday: No access until close\nTripwire\nHoneypot\n"
+          }
+        ]
+      }
+    }
+  },
+  "artifacts": {},
+  "artifactFiles": {},
+  "artifactVersions": {},
+  "artifactFileContents": {}
+}
