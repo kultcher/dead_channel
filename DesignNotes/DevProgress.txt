@@ -32,9 +32,14 @@ Development Progress
 - Added simple dialogue window for tutorial and story dialogue
 - Initialized Jargonizer class
 
+3/17/2026:
+- Added more tutorial stuff
+- Fixed reboot interaction with tactical pause
+
 Short-term TODO:
 - Add scrolling feature to dialogue window for multi-page dialogue
-- 
+- Add a cleaner way to update scan tooltips (array?)
+- Have puzzles actually lock the terminal until solved
 
 Not Yet Implemented (priority):
 - Even More robust terminal implementation
@@ -49,8 +54,12 @@ Not Yet Implemented (priority):
 - Programs and RAM
 
 Not Yet Implemented (long-term):
+- Networked signals
 - credentials
+- guard radio "shadows"
 - Runner stats
+- Runner chatter
+- Runner-initiated events
 - Distinct corporate identities
 - Management layer
 - Consumables

@@ -49,6 +49,7 @@ const COMMAND_SHORTCUTS = {
 }
 
 func switch_terminal_session(active_sig: ActiveSignal):
+	GlobalEvents.signal_connect.emit(active_sig.data)
 	terminal_window.switch_session(active_sig)
 
 # === MAIN ENTRY POINT ===
@@ -57,13 +58,34 @@ func switch_terminal_session(active_sig: ActiveSignal):
 func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 	var parsed = parse_input(input.to_lower())
 	var session_sig = terminal_window.active_signal
-	var target_sig = signal_manager.get_active_signal(parsed.arg)
+
+	# NOTE: Just for invalid command error? Redundant with below?
+	if parsed.has("error"):
+		command_error.emit(parsed.error, active_sig)
+		return
+
+	# if no arg given, set arg to session signal for implicit targeting
+	var target_sig: ActiveSignal
+	if !parsed.arg:
+		parsed.arg = active_sig.data.display_name
+		#TODO: Maybe we also need to check if there's an active session?
+
+	target_sig = signal_manager.get_active_signal(parsed.arg)
+		
+	print("CommandDispatch: Target sig: ", target_sig)
+
+	if active_sig.data.puzzle:
+		if active_sig.data.puzzle.puzzle_locked:
+			command_error.emit("ACCESS DENIED", active_sig)
+			return
+			print(active_sig.data.puzzle.puzzle_type)
+
+
 
 	# syntax error
 	if parsed.has("error"):
 		command_error.emit(parsed.error, active_sig)
 		return
-
 
 	# Signal despawned
 	if !target_sig in signal_manager.signal_queue and parsed.command != "RUN":
@@ -132,8 +154,8 @@ func parse_input(input: String) -> Dictionary:
 			result.arg = part
 	
 	# Validate
-	if VALID_COMMANDS[cmd].requires_arg and result.arg.is_empty():
-		return {"error": cmd + " requires a target"}
+	#if VALID_COMMANDS[cmd].requires_arg and result.arg.is_empty():
+	#	return {"error": cmd + " requires a target"}
 	
 	return result
 

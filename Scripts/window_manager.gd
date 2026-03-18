@@ -34,7 +34,7 @@ func _puzzle_started(active_sig: ActiveSignal, puzzle_type: PuzzleComponent.Type
 
 func _on_puzzle_solved(active_sig: ActiveSignal, puzzle_window: Control) -> void:
 	if active_sig != null and active_sig.data != null and active_sig.data.puzzle != null:
-		active_sig.data.puzzle.solved = true
+		active_sig.data.puzzle.process_solve(active_sig)
 		GlobalEvents.puzzle_solved.emit(active_sig.data)
 	if puzzle_window != null and is_instance_valid(puzzle_window):
 		puzzle_window.queue_free()

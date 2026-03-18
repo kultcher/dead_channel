@@ -11,7 +11,7 @@ func get_desc():
 	for module in modules:
 		module_info.append(module.get_desc())
 	if module_info.size() == 0:
-		return module_info[0]
+		return "None"
 	else:
 		for info in module_info:
 			if info == module_info[-1]:

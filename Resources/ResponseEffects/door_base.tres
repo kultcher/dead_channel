@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_mg7th")
 cadence = 0
+sends_alert = true
 amount = 1000.0
 delay = 3.0
 metadata/_custom_type_script = "uid://d4r370y7ufys"

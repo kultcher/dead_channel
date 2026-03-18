@@ -68,7 +68,6 @@ func update_visuals():
 				set_guard_revealed(_guard_revealed)
 	
 	if my_active_sig.is_disabled:
-		print("is disabled")
 		shape.color = Color.BLACK
 
 func _setup_mobility(signal_wrapper: ActiveSignal) -> void:

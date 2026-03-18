@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="RunSpawn" format=3 uid="uid://bab26hg36f3v4"]
+
+[ext_resource type="Script" uid="uid://b7eeged22y6lc" path="res://Resources/RunData/RunSpawn.gd" id="1_japsd"]
+[ext_resource type="Resource" uid="uid://r0twab0n2prh" path="res://Resources/SignalPrefabs/basic_door.tres" id="2_japsd"]
+
+[resource]
+script = ExtResource("1_japsd")
+signal_data = ExtResource("2_japsd")
+cell_index = 8.5
+metadata/_custom_type_script = "uid://b7eeged22y6lc"

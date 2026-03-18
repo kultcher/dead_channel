@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://r0twab0n2prh"]
+
+[ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="1_w38ew"]
+[ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_invhn"]
+[ext_resource type="Script" uid="uid://diftg5rgtn3kr" path="res://Scripts/Components/ICComponent.gd" id="4_opgy2"]
+[ext_resource type="Script" uid="uid://bigsca4rausyq" path="res://Scripts/Components/PuzzleComponent.gd" id="4_w38ew"]
+[ext_resource type="Resource" uid="uid://dqgu46sunoxjq" path="res://Resources/ResponseEffects/door_base.tres" id="5_w38ew"]
+[ext_resource type="Script" uid="uid://bwfquhgf0ae5f" path="res://Scripts/Components/ResponseComponent.gd" id="6_jk0qq"]
+[ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="7_g6mu4"]
+
+[sub_resource type="Resource" id="Resource_qkibr"]
+script = ExtResource("1_w38ew")
+watch_offset_cells = 0.0
+vision_length_cells = 0.2
+shape_type = 2
+delay = 3.0
+metadata/_custom_type_script = "uid://cxtj1fq7mmq1h"
+
+[sub_resource type="Resource" id="Resource_mefw2"]
+script = ExtResource("2_invhn")
+metadata/_custom_type_script = "uid://cysj06bgrv1ai"
+
+[sub_resource type="Resource" id="Resource_gn3xj"]
+script = ExtResource("4_opgy2")
+metadata/_custom_type_script = "uid://diftg5rgtn3kr"
+
+[sub_resource type="Resource" id="Resource_invhn"]
+script = ExtResource("4_w38ew")
+puzzle_type = 3
+puzzle_locked = true
+metadata/_custom_type_script = "uid://bigsca4rausyq"
+
+[sub_resource type="Resource" id="Resource_hwdih"]
+script = ExtResource("6_jk0qq")
+effects = Array[Resource]([ExtResource("5_w38ew")])
+metadata/_custom_type_script = "uid://bwfquhgf0ae5f"
+
+[resource]
+script = ExtResource("7_g6mu4")
+type = 0
+system_id = "door_01"
+display_name = "door_01"
+hackable = SubResource("Resource_mefw2")
+detection = SubResource("Resource_qkibr")
+response = SubResource("Resource_hwdih")
+puzzle = SubResource("Resource_invhn")
+ic_modules = SubResource("Resource_gn3xj")
+metadata/_custom_type_script = "uid://bi5xrdfrjowij"

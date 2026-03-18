@@ -16,7 +16,6 @@ var currently_scanning_signal: ActiveSignal = null
 var is_paused: bool = false
 
 func _ready():
-	GlobalEvents.signal_killed.connect(kill_signal)
 	CommandDispatch.signal_manager = self
 	GlobalEvents.tactical_pause.connect(_on_pause)
 	GlobalEvents.tactical_unpause.connect(_on_unpause)
@@ -41,7 +40,7 @@ func _process(delta):
 
 func spawn_signal_data(data: SignalData, cell_index: float):
 	var new_signal = ActiveSignal.new()
-	new_signal.data = data
+	new_signal.data = data.duplicate(true)
 	new_signal.start_cell_index = cell_index
 	new_signal.setup()
 	new_signal.generate_scan_layers()
@@ -87,13 +86,6 @@ func update_signal_position():
 	for active_sig in cleared_signals:
 			active_sig.instance_node = null
 			signal_queue.erase(active_sig)
-
-# === KILL SIGNALS ===
-func kill_signal(active_sig: ActiveSignal):
-	if active_sig == currently_scanning_signal:
-		cancel_scan(active_sig)
-	signal_queue.erase(active_sig)
-	active_sig.instance_node.queue_free()
 
 # === SCAN & LOCK LOGIC ===
 

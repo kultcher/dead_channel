@@ -23,7 +23,7 @@ func _ready():
 	CommandDispatch.command_complete.connect(_on_command_complete)
 	CommandDispatch.command_error.connect(_on_command_error)
 	GlobalEvents.tactical_pause.connect(_on_pause)
-	GlobalEvents.tactical_unpause.connect(_on_pause)
+	GlobalEvents.tactical_unpause.connect(_on_unpause)
 	root_session = TerminalSession.new()
 	# Dummy signal for root session
 	root_signal = ActiveSignal.new()

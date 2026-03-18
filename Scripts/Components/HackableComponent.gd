@@ -16,6 +16,7 @@ func _kill(cmd_context):
 	cmd_context.active_sig.disable_signal()
 	var name = cmd_context.active_sig.data.system_id
 	cmd_context.log_text.append("Shutting down " + name + "...")
+	GlobalEvents.signal_killed.emit(cmd_context.active_sig.data)
 	GlobalEvents.heat_increased.emit(250, "Shutting down " + name + ".")
 
 func _run(cmd_context):

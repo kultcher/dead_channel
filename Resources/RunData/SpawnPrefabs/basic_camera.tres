@@ -6,6 +6,6 @@
 [resource]
 script = ExtResource("1_k67ui")
 signal_data = ExtResource("2_ayyps")
-cell_index = 7.5
+cell_index = 6.5
 lane_override = 0
 metadata/_custom_type_script = "uid://b7eeged22y6lc"

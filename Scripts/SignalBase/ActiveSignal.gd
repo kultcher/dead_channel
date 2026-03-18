@@ -37,6 +37,8 @@ func setup():
 		data.display_name = data.spoof_id
 	if !data.display_name:
 		data.display_name = data.system_id
+	if data.puzzle:
+		data.puzzle.ensure_initial_lock_state()
 
 func disable_signal():
 	is_disabled = true

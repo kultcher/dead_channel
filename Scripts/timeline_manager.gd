@@ -6,7 +6,7 @@ extends Node2D
 # SETTINGS
 @export var BASE_CELLS_PER_SECOND: float = 0.15
 @export var slow_speed_modifier: float = 0.5
-@export var fast_speed_modifier: float = 2.0
+@export var fast_speed_modifier: float = 5.0
 @export var runner_screen_offset_cells: float = 1
 
 
@@ -68,7 +68,7 @@ func cells_to_pixels(cells: float):
 	return cells * cell_width_px
 
 func _handle_input():
-	if Input.is_action_just_pressed("ui_accept"):
+	if Input.is_action_just_pressed("tactical_pause"):
 		toggle_pause()
 
 	if is_paused: return
