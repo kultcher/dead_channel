@@ -47,7 +47,7 @@ func _ready():
 	GlobalEvents.runners_resumed.connect(_on_runners_resumed)
 	GlobalEvents.tactical_pause.connect(_on_pause)
 	GlobalEvents.tactical_unpause.connect(_on_unpause)
-	GlobalEvents.tutorial_locked.connect(_tutorial_lock_toggle)
+	GlobalEvents.tutorial_lock_changed.connect(_on_tutorial_lock_changed)
 
 
 func _process(delta):
@@ -96,11 +96,8 @@ func _on_unpause():
 func _on_pause():
 	is_paused = true
 
-func _tutorial_lock_toggle():
-	if tutorial_locked:
-		tutorial_locked = false
-	else:
-		tutorial_locked = true
+func _on_tutorial_lock_changed(locked: bool):
+	tutorial_locked = locked
 
 func _on_runners_stopped():
 	cells_per_second = 0

@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://gms8x710vr6g" path="res://Scripts/window_manager.gd" id="5_wudor"]
 [ext_resource type="Script" uid="uid://biyb8hixpkc42" path="res://Scripts/heat_tracker.gd" id="6_85m8a"]
 [ext_resource type="PackedScene" uid="uid://dbqweh3v2f0bq" path="res://Scenes/terminal_window.tscn" id="7_4qt4q"]
+[ext_resource type="PackedScene" uid="uid://d2nr1ge8ypq88" path="res://Scenes/focus_overlay.tscn" id="8_4ll5g"]
 [ext_resource type="PackedScene" uid="uid://hjsy8naghiwy" path="res://Scenes/sniff.tscn" id="8_jx6wh"]
 [ext_resource type="PackedScene" uid="uid://7ywwgroqj5h8" path="res://Scenes/decrypt.tscn" id="9_wudor"]
 [ext_resource type="Texture2D" uid="uid://bsp50rqqai1yc" path="res://VFX/digital_background.png" id="12_0p2ub"]
@@ -89,6 +90,8 @@ script = ExtResource("4_jx6wh")
 
 [node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
 script = ExtResource("5_wudor")
+
+[node name="FocusOverlay" parent="WindowManager" unique_id=2047983454 instance=ExtResource("8_4ll5g")]
 
 [node name="HeatTracker" type="TextureProgressBar" parent="." unique_id=1028315604]
 offset_top = 824.0

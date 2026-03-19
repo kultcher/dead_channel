@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://d2nr1ge8ypq88"]
+
+[ext_resource type="Script" uid="uid://bjkjo1ivst6ju" path="res://Scenes/focus_overlay.gd" id="1_gf1l5"]
+
+[node name="FocusOverlay" type="Control" unique_id=2047983454]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_gf1l5")
+
+[node name="TopRect" type="ColorRect" parent="." unique_id=496712934]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.46254948, 0.46254948, 0.46254948, 0.5)
+
+[node name="LeftRect" type="ColorRect" parent="." unique_id=2141514525]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.46254948, 0.46254948, 0.46254948, 0.5)
+
+[node name="RightRect" type="ColorRect" parent="." unique_id=1649606921]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.46254948, 0.46254948, 0.46254948, 0.5)
+
+[node name="BottomRect" type="ColorRect" parent="." unique_id=178296285]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.46254948, 0.46254948, 0.46254948, 0.5)
+
+[node name="FocusRect" type="ReferenceRect" parent="." unique_id=576442355]
+z_as_relative = false
+layout_mode = 0
+offset_left = 780.0
+offset_top = 390.0
+offset_right = 1140.0
+offset_bottom = 690.0
+mouse_filter = 2
+border_color = Color(0.8980392, 1, 1, 1)
+editor_only = false

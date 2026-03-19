@@ -33,8 +33,8 @@ Workflow Defaults
 - Match existing file style and typing usage.
 - Read relevant scripts before proposing changes.
 - Ask before running heavy tools.
-- Prioritize Godot idioms: Use scene editor for UI/layout, themes for styling, and node composition over procedural generation.
-- Delegate editor tasks: Propose scene structures/themes but leave creation/editing to the user.
+- Prioritize Godot idioms: Prompt user to use scene editor for UI/layout, themes for styling, and node composition over procedural generation.
+- Delegate editor tasks: Propose scene structures/themes but leave creation/editing to the user. Don't make changes to .tscn files unless explicitly asked to.
 
 Agent Guidelines
 - For UI: Avoid procedural generation (e.g., no StyleBoxFlat.new() in code); use pre-built scenes and Theme resources.

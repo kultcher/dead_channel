@@ -16,9 +16,9 @@ static func build_tutorial_events() -> Array[TutorialEvent]:
 	
 	var e1 = TutorialEvent.new()
 	e1.id = "first_signal"
-	e1.text.append("This is a SIGNAL. Signals represent all the networked devices in the facility.\n
-The shape of the signal can tell you what of device it is, but you can learn more information by SCANNING the signal.\n
-To SCAN a signal, hold the mouse over it. Keep scanning this signal until all it's info is revealed.")
+	e1.text.append("This is a SIGNAL. Signals represent all the networked devices in the facility.")
+	e1.text.append("The shape of the signal can tell you what of device it is, but you can learn more information by SCANNING the signal.")
+	e1.text.append("To SCAN a signal, hold the mouse over it. Keep scanning this signal until all it's info is revealed.")
 	e1.trigger = Trigger.CELL_REACHED
 	e1.value = 1
 	e1.signal_index = 0		# first signal seen
@@ -50,9 +50,9 @@ If you hack it too soon, it might be up and running again in time to spot the te
 
 	var e4 = TutorialEvent.new()
 	e4.id = "heat_intro"
-	e4.text.append("KILL is easy, but it's not subtle. See how your HEAT gauge spiked?
-	Too much HEAT can cause you all kinds of problems down the line, so don't just KILL every signal.
-	Don't worry, soon you'll learn other, quieter ways of disabling Signals.")
+	e4.text.append("KILL is easy, but it's not subtle. See how your HEAT gauge spiked?")
+	e4.text.append("Too much HEAT can cause you all kinds of problems down the line, so don't just KILL every signal.")
+	e4.text.append("Don't worry, soon you'll learn other, quieter ways of disabling Signals.")
 	e4.trigger = Trigger.SIGNAL_KILLED
 	e4.value = -1
 	e4.signal_index = -1

@@ -6,8 +6,7 @@ extends Node
 @onready var signal_manager = $"../SignalTimeline/SignalManager"
 @onready var terminal = $"../TerminalWindow"
 @onready var run_manager = $"../RunManager"
-
-@onready var dialogue_window = preload("res://Scenes/dialogue_window.tscn")
+@onready var window_manager = $"../WindowManager"
 
 var events: Array[TutorialEvent] = []
 
@@ -23,9 +22,9 @@ func _ready():
 	setup_triggers()
 
 func setup_triggers():
-#	GlobalEvents.cell_reached.connect(_check_cell_triggers)
-#	GlobalEvents.signal_scan_complete.connect(_check_scan_triggers)
-#	GlobalEvents.signal_connect.connect(_check_connect_triggers)
+	GlobalEvents.cell_reached.connect(_check_cell_triggers)
+	GlobalEvents.signal_scan_complete.connect(_check_scan_triggers)
+	GlobalEvents.signal_connect.connect(_check_connect_triggers)
 	GlobalEvents.signal_killed.connect(_check_kill_triggers)
 
 func _check_cell_triggers(cell: int):
@@ -63,8 +62,20 @@ func _check_kill_triggers(signal_data: SignalData):
 
 
 func _show_tutorial(event: TutorialEvent):
+	GlobalEvents.tutorial_lock_changed.emit(true)
 	GlobalEvents.tactical_pause.emit()
-	var dialogue = dialogue_window.instantiate()
-	dialogue.setup(event)
-	add_child(dialogue)
+	_focus_tutorial_target(event)
+	window_manager.show_tutorial_dialogue(event)
 	events.erase(event)
+
+func _focus_tutorial_target(event: TutorialEvent) -> void:
+	if event.signal_index < 0:
+		window_manager.clear_focus_overlay()
+		return
+
+	if event.signal_index >= signal_manager.signal_queue.size():
+		window_manager.clear_focus_overlay()
+		return
+
+	var active_sig: ActiveSignal = signal_manager.signal_queue[event.signal_index]
+	window_manager.focus_signal(active_sig)

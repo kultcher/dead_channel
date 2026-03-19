@@ -154,6 +154,16 @@ func _on_detail_tooltip_resized() -> void:
 	if !is_node_ready(): return
 	tooltip_main.position.x = (tooltip_main.size.x / 2) * -1
 
+func get_focus_rect() -> Rect2:
+	var icon_shape: CollisionShape2D = $SignalIcon/IconCollision
+	var rect_shape := icon_shape.shape as RectangleShape2D
+	var local_size := Vector2(64, 64)
+	if rect_shape != null:
+		local_size = rect_shape.size
+
+	var center := get_global_transform_with_canvas().origin
+	return Rect2(center - (local_size * 0.5), local_size)
+
 
 func show_scanning_tooltip():
 	tooltip_active_scan.visible = true

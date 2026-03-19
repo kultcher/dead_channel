@@ -26,7 +26,7 @@ signal guard_comms_ping_started(active_sig: ActiveSignal)
 signal guard_comms_ping_ended(active_sig: ActiveSignal)
 signal tactical_pause()
 signal tactical_unpause()
-signal tutorial_locked()
+signal tutorial_lock_changed(locked: bool)
 
 # PUZZLE EVENTS
 signal puzzle_started(active_signal: ActiveSignal, puzzle_type: PuzzleComponent.Type)
