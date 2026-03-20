@@ -4,17 +4,16 @@
 [ext_resource type="Script" uid="uid://d1t84c52jtssw" path="res://Scripts/timeline_manager.gd" id="1_882wi"]
 [ext_resource type="Script" uid="uid://ccamc7sskx0dd" path="res://Scripts/grid_layer.gd" id="2_85m8a"]
 [ext_resource type="Script" uid="uid://f728aufmncfn" path="res://Scripts/tutorial_manager.gd" id="2_r51ll"]
-[ext_resource type="Texture2D" uid="uid://cqq82un1s3x4" path="res://VFX/icon.svg" id="3_4qt4q"]
+[ext_resource type="Texture2D" uid="uid://cqq82un1s3x4" path="res://Visuals/icon.svg" id="3_4qt4q"]
 [ext_resource type="Script" uid="uid://cu20kah6ku6q3" path="res://Scripts/signal_manager.gd" id="4_jx6wh"]
 [ext_resource type="Script" uid="uid://gms8x710vr6g" path="res://Scripts/window_manager.gd" id="5_wudor"]
 [ext_resource type="Script" uid="uid://biyb8hixpkc42" path="res://Scripts/heat_tracker.gd" id="6_85m8a"]
 [ext_resource type="PackedScene" uid="uid://dbqweh3v2f0bq" path="res://Scenes/terminal_window.tscn" id="7_4qt4q"]
 [ext_resource type="PackedScene" uid="uid://d2nr1ge8ypq88" path="res://Scenes/focus_overlay.tscn" id="8_4ll5g"]
 [ext_resource type="PackedScene" uid="uid://hjsy8naghiwy" path="res://Scenes/sniff.tscn" id="8_jx6wh"]
-[ext_resource type="PackedScene" uid="uid://7ywwgroqj5h8" path="res://Scenes/decrypt.tscn" id="9_wudor"]
-[ext_resource type="Texture2D" uid="uid://bsp50rqqai1yc" path="res://VFX/digital_background.png" id="12_0p2ub"]
+[ext_resource type="Texture2D" uid="uid://bsp50rqqai1yc" path="res://Visuals/digital_background.png" id="12_0p2ub"]
 [ext_resource type="Shader" uid="uid://c16vuww6jgbkf" path="res://Shaders/circuits.gdshader" id="13_d5u5a"]
-[ext_resource type="Texture2D" uid="uid://b77pho6a4a6dm" path="res://VFX/digital_toplayer.png" id="14_d5u5a"]
+[ext_resource type="Texture2D" uid="uid://b77pho6a4a6dm" path="res://Visuals/digital_toplayer.png" id="14_d5u5a"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_wudor"]
 radius = 60.0
@@ -28,6 +27,7 @@ fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0)
 
 [sub_resource type="Gradient" id="Gradient_4qt4q"]
+colors = PackedColorArray(0.7490196, 0.99607843, 0, 1, 1, 0, 0, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_jx6wh"]
 gradient = SubResource("Gradient_4qt4q")
@@ -94,14 +94,14 @@ script = ExtResource("5_wudor")
 [node name="FocusOverlay" parent="WindowManager" unique_id=2047983454 instance=ExtResource("8_4ll5g")]
 
 [node name="HeatTracker" type="TextureProgressBar" parent="." unique_id=1028315604]
-offset_top = 824.0
-offset_right = 64.0
-offset_bottom = 1080.0
+offset_left = 25.0
+offset_top = 775.0
+offset_right = 89.0
+offset_bottom = 1031.0
 max_value = 5000.0
 fill_mode = 3
 texture_under = SubResource("GradientTexture2D_85m8a")
 texture_progress = SubResource("GradientTexture2D_jx6wh")
-tint_progress = Color(1, 0, 0, 1)
 script = ExtResource("6_85m8a")
 
 [node name="HeatDebug" type="Label" parent="HeatTracker" unique_id=1874187724]
@@ -124,13 +124,6 @@ offset_left = 668.0
 offset_top = 365.0
 offset_right = 736.5
 offset_bottom = 396.0
-
-[node name="DecryptWindow" parent="." unique_id=1461035576 instance=ExtResource("9_wudor")]
-visible = false
-offset_left = 25.0
-offset_top = 450.0
-offset_right = 25.0
-offset_bottom = 450.0
 
 [node name="CircuitBackground" type="TextureRect" parent="." unique_id=1366937746]
 modulate = Color(0, 0, 0, 1)

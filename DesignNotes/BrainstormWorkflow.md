@@ -8,6 +8,7 @@ Use the filesystem as the agent's memory:
 
 - `BrainstormInbox/`: immutable raw source material
 - `BrainstormWorking/`: per-source extraction notes
+- `BrainstormResults/`: home for results of synthesized notes, even if WIP, including DesignBible.md
 - `SourceIndex.md`: processing ledger
 - `Contradictions.md`: unresolved conflicts and judgment calls
 - `DesignBible.md`: current canon

@@ -75,7 +75,7 @@ func play_reveal_animation() -> void:
 func reset_overlay() -> void:
 	_set_reveal_progress(0.0)
 
-func set_focus_rect(rect: Rect2, padding: Vector2 = Vector2(24, 24)) -> void:
+func set_focus_rect(rect: Rect2, padding: Vector2 = Vector2(32, 32)) -> void:
 	var padded_rect := rect.grow_individual(padding.x, padding.y, padding.x, padding.y)
 	focus_size = padded_rect.size
 	focus_center = padded_rect.get_center()

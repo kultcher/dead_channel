@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bhnslpgxwdniq" path="res://Scripts/dialogue_window.gd" id="1_gax6d"]
 [ext_resource type="StyleBox" uid="uid://chg2qawtivc2b" path="res://Resources/StyleBox/TitleBarStyleBox.tres" id="1_td3r8"]
 [ext_resource type="Theme" uid="uid://discgqqbkpb5x" path="res://Resources/StyleBox/MainTheme.tres" id="2_gax6d"]
-[ext_resource type="Texture2D" uid="uid://dcyv1i0jnyq7f" path="res://VFX/play-button (1).svg" id="4_63p5y"]
+[ext_resource type="Texture2D" uid="uid://dcyv1i0jnyq7f" path="res://Visuals/play-button (1).svg" id="4_63p5y"]
 
 [sub_resource type="SystemFont" id="SystemFont_63p5y"]
 font_names = PackedStringArray("OCR A")
@@ -64,17 +64,20 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(20, 0)
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 text = "<"
 
 [node name="RightButton" type="Button" parent="TerminalVBox/FooterHBox" unique_id=1752533344]
 custom_minimum_size = Vector2(20, 0)
 layout_mode = 2
 size_flags_horizontal = 3
+focus_mode = 0
 text = ">"
 
 [node name="ContinueButton" type="Button" parent="TerminalVBox/FooterHBox" unique_id=996101178]
 modulate = Color(0.38928655, 0.38928664, 0.38928658, 1)
 layout_mode = 2
+focus_mode = 0
 theme_override_colors/icon_normal_color = Color(0, 2.1168277, 0, 1)
 theme_override_colors/icon_disabled_color = Color(1, 1, 1, 0.4)
 icon = ExtResource("4_63p5y")

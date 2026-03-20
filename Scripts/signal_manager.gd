@@ -40,7 +40,7 @@ func _process(delta):
 
 func spawn_signal_data(data: SignalData, cell_index: float):
 	var new_signal = ActiveSignal.new()
-	new_signal.data = data.duplicate(true)
+	new_signal.data = data
 	new_signal.start_cell_index = cell_index
 	new_signal.setup()
 	new_signal.generate_scan_layers()

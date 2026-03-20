@@ -13,7 +13,7 @@ var page_index: int = 0
 
 signal dismissed
 
-func setup(event: TutorialEvent):
+func setup(event: TutorialEvent, focus_rect: Rect2 = Rect2()):
 	chat = $TerminalVBox/ChatLog
 	page_label = $TerminalVBox/FooterHBox/PageLabel
 	left_button = $TerminalVBox/FooterHBox/LeftButton
@@ -21,7 +21,12 @@ func setup(event: TutorialEvent):
 	continue_button = $TerminalVBox/FooterHBox/ContinueButton
 	pages = event.text.duplicate()
 	page_index = 0
-	position = event.default_position if event.default_position != Vector2.ZERO else Vector2(1400, 300)
+	if event.has_custom_position:
+		position = _clamp_to_viewport(event.default_position, get_viewport_rect().size)
+	elif _has_focus_rect(focus_rect):
+		position = _get_position_from_focus_rect(focus_rect)
+	else:
+		position = _get_default_position()
 	_refresh_page()
 	
 func set_text(text: String):
@@ -67,3 +72,26 @@ func _on_continue_button_pressed() -> void:
 
 	dismissed.emit()
 	queue_free()
+
+func _get_default_position() -> Vector2:
+	var viewport_size := get_viewport_rect().size
+	var target_position := Vector2(viewport_size.x * 0.72, viewport_size.y * 0.28)
+	return _clamp_to_viewport(target_position, viewport_size)
+
+func _get_position_from_focus_rect(focus_rect: Rect2) -> Vector2:
+	var viewport_size := get_viewport_rect().size
+	var target_position := Vector2(
+		focus_rect.position.x - (size.x * 0.4),
+		focus_rect.end.y + 64.0
+	)
+	return _clamp_to_viewport(target_position, viewport_size)
+
+func _clamp_to_viewport(target_position: Vector2, viewport_size: Vector2) -> Vector2:
+	var max_position := viewport_size - size
+	return Vector2(
+		clampf(target_position.x, 0.0, max_position.x),
+		clampf(target_position.y, 0.0, max_position.y)
+	)
+
+func _has_focus_rect(focus_rect: Rect2) -> bool:
+	return focus_rect.size.x > 0.0 and focus_rect.size.y > 0.0

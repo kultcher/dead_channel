@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://c7dyshuacvokg"]
+
+[ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="1_fa4md"]
+[ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="1_u7s33"]
+[ext_resource type="Script" uid="uid://dlkakjbwkeel2" path="res://Scripts/Components/MobilityPatrolPoint.gd" id="2_0e437"]
+[ext_resource type="Script" uid="uid://2orqay7qy0mv" path="res://Scripts/Components/MobilityComponent.gd" id="3_qikkf"]
+[ext_resource type="Resource" uid="uid://c43su3v53wrbw" path="res://Resources/ResponseEffects/base_camera_heat.tres" id="4_2r5pq"]
+[ext_resource type="Script" uid="uid://bwfquhgf0ae5f" path="res://Scripts/Components/ResponseComponent.gd" id="5_mc7au"]
+
+[sub_resource type="Resource" id="Resource_81vm2"]
+script = ExtResource("1_u7s33")
+watch_offset_cells = 0.0
+vision_length_cells = 0.5
+vision_segments = 16
+shape_type = 1
+metadata/_custom_type_script = "uid://cxtj1fq7mmq1h"
+
+[sub_resource type="Resource" id="Resource_lm3xa"]
+script = ExtResource("3_qikkf")
+metadata/_custom_type_script = "uid://2orqay7qy0mv"
+
+[sub_resource type="Resource" id="Resource_u8eff"]
+script = ExtResource("5_mc7au")
+effects = Array[Resource]([ExtResource("4_2r5pq")])
+metadata/_custom_type_script = "uid://bwfquhgf0ae5f"
+
+[resource]
+script = ExtResource("1_fa4md")
+type = 4
+system_id = "guard_01"
+visual_state = 0
+detection = SubResource("Resource_81vm2")
+response = SubResource("Resource_u8eff")
+mobility = SubResource("Resource_lm3xa")
+metadata/_custom_type_script = "uid://bi5xrdfrjowij"

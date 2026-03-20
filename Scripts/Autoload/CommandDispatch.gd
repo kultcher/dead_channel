@@ -64,23 +64,23 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 		command_error.emit(parsed.error, active_sig)
 		return
 
+	# WARNING: This is a temp fix
+	if session_sig == terminal_window.root_signal: return
+
 	# if no arg given, set arg to session signal for implicit targeting
 	var target_sig: ActiveSignal
 	if !parsed.arg:
 		parsed.arg = active_sig.data.display_name
-		#TODO: Maybe we also need to check if there's an active session?
+		#TODO: Maybe we also need to check if there's an active session? YUP
 
 	target_sig = signal_manager.get_active_signal(parsed.arg)
 		
 	print("CommandDispatch: Target sig: ", target_sig)
 
-	if active_sig.data.puzzle:
+	if parsed.command != "RUN" and active_sig.data.puzzle:
 		if active_sig.data.puzzle.puzzle_locked:
 			command_error.emit("ACCESS DENIED", active_sig)
 			return
-			print(active_sig.data.puzzle.puzzle_type)
-
-
 
 	# syntax error
 	if parsed.has("error"):

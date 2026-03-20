@@ -36,10 +36,16 @@ Development Progress
 - Added more tutorial stuff
 - Fixed reboot interaction with tactical pause
 
+3/19/2026:
+- Added a focus overlay for tutorial
+- Added paging and continue-from-pause functionality to tutorial dialogue window
+- Reworked RunDef/RunSpawn system into script-based system for more flexibility and readability
+
+
 Short-term TODO:
-- Add scrolling feature to dialogue window for multi-page dialogue
+- Add signal-builder overrides for mobility and response components
+- Add an objective tracker
 - Add a cleaner way to update scan tooltips (array?)
-- Have puzzles actually lock the terminal until solved
 
 Not Yet Implemented (priority):
 - Even More robust terminal implementation

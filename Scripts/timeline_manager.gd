@@ -4,10 +4,13 @@
 extends Node2D
 
 # SETTINGS
-@export var BASE_CELLS_PER_SECOND: float = 0.15
+@export var BASE_CELLS_PER_SECOND: float = 0.2
 @export var slow_speed_modifier: float = 0.5
-@export var fast_speed_modifier: float = 5.0
+@export var fast_speed_modifier: float = 2.5
 @export var runner_screen_offset_cells: float = 1
+@export var timeline_height_ratio: float = 0.25
+@export var min_timeline_height_px: float = 180.0
+@export var max_timeline_height_px: float = 360.0
 
 
 # TIMELINE DIMENSIONS
@@ -32,16 +35,12 @@ var tutorial_locked: bool = false
 
 # SIGNALS (to update UI later)
 signal speed_changed(new_speed)
+signal layout_changed(viewport_size: Vector2)
 
 func _ready():
 	CommandDispatch.timeline_manager = self
-	
-	var viewport_size = get_viewport().get_visible_rect().size
-	screen_width = viewport_size.x
-	screen_height = viewport_size.y
-	
-	cell_width_px = screen_width / VISIBLE_CELLS
-	lane_height = (screen_height * 0.25) / LANES
+	get_viewport().size_changed.connect(_refresh_layout_metrics)
+	_refresh_layout_metrics()
 
 	GlobalEvents.runners_stopped.connect(_on_runners_stopped)
 	GlobalEvents.runners_resumed.connect(_on_runners_resumed)
@@ -66,6 +65,22 @@ func _process(delta):
 
 func cells_to_pixels(cells: float):
 	return cells * cell_width_px
+
+func get_timeline_height() -> float:
+	return lane_height * LANES
+
+func get_viewport_size() -> Vector2:
+	return Vector2(screen_width, screen_height)
+
+func _refresh_layout_metrics() -> void:
+	var viewport_size := get_viewport().get_visible_rect().size
+	screen_width = viewport_size.x
+	screen_height = viewport_size.y
+
+	cell_width_px = screen_width / VISIBLE_CELLS
+	var timeline_height := clampf(screen_height * timeline_height_ratio, min_timeline_height_px, max_timeline_height_px)
+	lane_height = timeline_height / LANES
+	layout_changed.emit(viewport_size)
 
 func _handle_input():
 	if Input.is_action_just_pressed("tactical_pause"):
