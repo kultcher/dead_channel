@@ -17,6 +17,7 @@ var text: Array[String] = []
 var default_position: Vector2
 var has_custom_position: bool = false
 var focus_rect: Rect2
+var objective_text: String = ""
 var action: Callable
 
 static func _build_event(
@@ -26,7 +27,8 @@ static func _build_event(
 	event_signal_index: int,
 	event_text: Array[String],
 	event_position: Vector2 = Vector2(),
-	event_focus_rect: Rect2 = Rect2()
+	event_focus_rect: Rect2 = Rect2(),
+	event_objective_text: String = ""
 ) -> TutorialEvent:
 	var event := TutorialEvent.new()
 	event.id = event_id
@@ -37,6 +39,7 @@ static func _build_event(
 	event.default_position = event_position
 	event.has_custom_position = event_position != Vector2()
 	event.focus_rect = event_focus_rect
+	event.objective_text = event_objective_text
 	return event
 
 # events for later-game dynamic tutorials

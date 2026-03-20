@@ -1,5 +1,7 @@
 [gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://r0twab0n2prh"]
 
+[ext_resource type="Resource" path="res://Resources/SignalVisuals/door_unlocked_visuals.tres" id="1_alt_visuals"]
+[ext_resource type="Resource" path="res://Resources/SignalVisuals/door_visuals.tres" id="1_visuals"]
 [ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="1_w38ew"]
 [ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_invhn"]
 [ext_resource type="Script" uid="uid://diftg5rgtn3kr" path="res://Scripts/Components/ICComponent.gd" id="4_opgy2"]
@@ -38,6 +40,8 @@ metadata/_custom_type_script = "uid://bwfquhgf0ae5f"
 script = ExtResource("7_g6mu4")
 type = 0
 system_id = "door_01"
+visuals = ExtResource("1_visuals")
+alternate_visuals = ExtResource("1_alt_visuals")
 hackable = SubResource("Resource_mefw2")
 detection = SubResource("Resource_qkibr")
 response = SubResource("Resource_hwdih")

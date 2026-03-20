@@ -76,7 +76,8 @@ func update_signal_position():
 				active_sig.instance_node = new_node
 			
 			var visual_y = (signal_lane * timeline_manager.lane_height) + (timeline_manager.lane_height * 0.5)
-			active_sig.instance_node.position = Vector2(visual_x, visual_y)
+			var render_offset := active_sig.runtime_render_offset
+			active_sig.instance_node.position = Vector2(visual_x, visual_y) + render_offset
 			
 		else:
 			if visual_x < -100 and active_sig.instance_node != null:

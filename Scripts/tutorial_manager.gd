@@ -11,9 +11,9 @@ extends Node
 var events: Array[TutorialEvent] = []
 
 var tutorial_level_flags: Dictionary = {
-	"first_signal": true,
-	"first_scan": true,
-	"terminal_intro": true,
+	"first_signal": false,
+	"first_scan": false,
+	"terminal_intro": false,
 	"heat_intro": false,
 	"minigame_intro": false,
 	"decrypt_intro": false,
@@ -30,6 +30,7 @@ var tutorial_level_flags: Dictionary = {
 
 func _ready():
 	events = run_manager.get_tutorial_events()
+	window_manager.clear_tutorial_objective()
 	setup_triggers()
 
 func setup_triggers():
@@ -87,6 +88,7 @@ func _show_tutorial(event: TutorialEvent, custom_focus_rect: Rect2 = Rect2()):
 	GlobalEvents.tutorial_lock_changed.emit(true)
 	GlobalEvents.tactical_pause.emit()
 	var resolved_focus_rect := _focus_tutorial_target(event, custom_focus_rect)
+	window_manager.set_tutorial_objective(event.objective_text)
 	window_manager.show_tutorial_dialogue(event, resolved_focus_rect)
 	events.erase(event)
 

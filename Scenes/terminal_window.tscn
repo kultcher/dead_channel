@@ -75,10 +75,16 @@ vertical_alignment = 1
 
 [node name="CommandLine" type="LineEdit" parent="TerminalVBox/CmdLineHBox" unique_id=1172740283]
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 0
 theme_override_constants/caret_width = 3
 keep_editing_on_text_submit = true
 caret_blink = true
+
+[node name="Control" type="Control" parent="TerminalVBox/CmdLineHBox" unique_id=907978150]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
 
 [connection signal="tab_clicked" from="TerminalVBox/TitleBar/TitleHBox/SessionTabs" to="." method="_on_session_tabs_tab_clicked"]
 [connection signal="tab_close_pressed" from="TerminalVBox/TitleBar/TitleHBox/SessionTabs" to="." method="_on_session_tabs_tab_close_pressed"]

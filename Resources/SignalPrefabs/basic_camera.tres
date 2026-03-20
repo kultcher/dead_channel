@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://blc47vyu5os40"]
 
 [ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="1_6yba5"]
+[ext_resource type="Resource" path="res://Resources/SignalVisuals/camera_visuals.tres" id="1_visuals"]
 [ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="1_vx140"]
 [ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_qn1mi"]
 [ext_resource type="Script" uid="uid://diftg5rgtn3kr" path="res://Scripts/Components/ICComponent.gd" id="4_30cmg"]
@@ -30,6 +31,7 @@ metadata/_custom_type_script = "uid://bwfquhgf0ae5f"
 script = ExtResource("1_vx140")
 type = 1
 system_id = "cam_01"
+visuals = ExtResource("1_visuals")
 hackable = SubResource("Resource_mefw2")
 detection = SubResource("Resource_qkibr")
 response = SubResource("Resource_hwdih")

@@ -9,6 +9,7 @@ enum Type { NONE, SNIFF, FUZZ, DECRYPT }
 @export var difficulty: int = 1
 @export var encryption_key: String = "" # For decryption puzzles
 @export var puzzle_locked: bool = false
+@export var puzzle_config: Resource
 
 var puzzle_dict = {
 	Type.NONE: "Open",
@@ -23,6 +24,20 @@ func _init():
 func ensure_initial_lock_state():
 	if puzzle_type != Type.NONE:
 		puzzle_locked = true
+	ensure_puzzle_generated()
+
+func ensure_puzzle_generated() -> void:
+	match puzzle_type:
+		Type.DECRYPT:
+			var decrypt_config := get_decrypt_config()
+			if decrypt_config == null:
+				decrypt_config = DecryptPuzzleConfig.new()
+				puzzle_config = decrypt_config
+			decrypt_config.ensure_generated(difficulty)
+			encryption_key = str(decrypt_config.mapping_offset)
+
+func get_decrypt_config() -> DecryptPuzzleConfig:
+	return puzzle_config as DecryptPuzzleConfig
 
 func process_solve(active_sig: ActiveSignal):
 	print("Puzzle Component: Puzzle Solved!")

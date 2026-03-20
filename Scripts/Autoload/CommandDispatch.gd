@@ -18,29 +18,32 @@ signal command_error(error_msg: String, context: ActiveSignal)
 # Easy to expand later
 const VALID_COMMANDS = {
 	"ACCESS": {
-		"requires_arg": true,
 		"valid_flag": ["-bp"],
 		"description": "Access: Access a system"
 	},
 	"PROBE": {
-		"requires_arg": false,
 		"valid_flags": [],
 		"description": "Inspect: Inspect a system"
 	},
 	"SPOOF": {
-		"requires_arg": true,
 		"valid_flags": [],
 		"description": "Spoof: Deceive a system"
 	},
 	"KILL": {
-		"requires_arg": true,
 		"valid_flags": [],
 		"description": "Kill: Disable a system"
 	},
 	"RUN": {
-		"requires_arg": true,
 		"valid_flags": ["-dc", "-ms", "-nl"],
 		"description": "Run: Run a local program"
+	},
+	"OP": {
+		"valid_flags": [],
+		"description": "Operate: Do the thing."
+	},
+	"HELP": {
+		"valid_flags": [],
+		"description": "Help: Display help panel."
 	}
 }
 
@@ -62,6 +65,10 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 	# NOTE: Just for invalid command error? Redundant with below?
 	if parsed.has("error"):
 		command_error.emit(parsed.error, active_sig)
+		return
+
+	if parsed.command == "HELP":
+		_cmd_help(active_sig)
 		return
 
 	# WARNING: This is a temp fix
@@ -153,10 +160,6 @@ func parse_input(input: String) -> Dictionary:
 		else:
 			result.arg = part
 	
-	# Validate
-	#if VALID_COMMANDS[cmd].requires_arg and result.arg.is_empty():
-	#	return {"error": cmd + " requires a target"}
-	
 	return result
 
 
@@ -165,6 +168,16 @@ func parse_input(input: String) -> Dictionary:
 func _cmd_access(cmd_context: CommandContext) -> void:
 	cmd_context.log_text.append("ACCESS GRANTED")
 	terminal_window.switch_session(cmd_context.active_sig)
+	_finalize_command(cmd_context)
+
+func _cmd_help(active_sig: ActiveSignal) -> void:
+	if window_manager != null:
+		window_manager.show_help_overlay()
+
+	var cmd_context = CommandContext.new()
+	cmd_context.active_sig = active_sig
+	cmd_context.command = "HELP"
+	cmd_context.log_text.append("Opening terminal reference.")
 	_finalize_command(cmd_context)
 		
 func _try_command(cmd_context: CommandContext) -> void:

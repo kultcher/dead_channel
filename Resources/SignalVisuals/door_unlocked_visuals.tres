@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SignalVisuals" format=3 uid="uid://184rjgy83kh1"]
+
+[ext_resource type="Script" uid="uid://3hqgdmtq7xap" path="res://Scripts/SignalBase/SignalVisuals.gd" id="1_visuals"]
+
+[resource]
+script = ExtResource("1_visuals")
+fill_color = Color(0.756863, 0.588235, 0.356863, 1)
+polygon = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25, -25, 15, 15, 15, 15, -15, -25, -15)

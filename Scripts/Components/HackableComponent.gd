@@ -8,6 +8,7 @@ func try_command(cmd_context):
 	match cmd_context.command:
 		"KILL": _kill(cmd_context)
 		"RUN": _run(cmd_context)
+		"OP": _op(cmd_context)
 		"SPOOF": _spoof(cmd_context)
 		"PROBE": _probe(cmd_context)
 		"LINK": _link(cmd_context)
@@ -65,3 +66,78 @@ func _probe(_cmd_context):
 
 func _link(_cmd_context):
 	pass
+
+func _op(cmd_context):
+	if cmd_context.active_sig == null or cmd_context.active_sig.data == null:
+		cmd_context.log_text.append("OP failed. No active signal context.")
+		return
+
+	var signal_data = cmd_context.active_sig.data
+	match signal_data.type:
+		SignalData.Type.DISRUPTOR:
+			_op_disruptor(cmd_context)
+		SignalData.Type.DOOR:
+			var new_locked = not signal_data.door_locked
+			cmd_context.active_sig.set_door_locked(new_locked)
+			if new_locked:
+				cmd_context.log_text.append(signal_data.display_name + " locked.")
+			else:
+				cmd_context.log_text.append(signal_data.display_name + " unlocked.")
+		_:
+			cmd_context.log_text.append("OP failed. No contextual operation available for " + signal_data.display_name + ".")
+
+func _op_disruptor(cmd_context) -> void:
+	var signal_data = cmd_context.active_sig.data
+	if signal_data.disruptor == null or not signal_data.disruptor.enabled:
+		cmd_context.log_text.append("OP failed. " + signal_data.display_name + " has no active disruption profile.")
+		return
+	if signal_data.disruptor.used:
+		cmd_context.log_text.append("OP failed. " + signal_data.display_name + " can only be activated once.")
+		return
+	if CommandDispatch.signal_manager == null:
+		cmd_context.log_text.append("OP failed. Signal manager unavailable.")
+		return
+
+	var source_cell = cmd_context.active_sig.start_cell_index
+	if cmd_context.active_sig.runtime_position_initialized:
+		source_cell = cmd_context.active_sig.runtime_cell_x
+	var source_lane = signal_data.lane
+	if cmd_context.active_sig.runtime_position_initialized:
+		source_lane = cmd_context.active_sig.runtime_lane
+
+	var range_cells := maxi(0, signal_data.disruptor.horizontal_range_cells)
+	var matched_guards: int = 0
+	for other_sig in CommandDispatch.signal_manager.signal_queue:
+		if other_sig == null or other_sig.data == null:
+			continue
+		if other_sig.is_disabled:
+			continue
+		if other_sig.data.type != SignalData.Type.GUARD:
+			continue
+
+		var guard_cell = other_sig.start_cell_index
+		if other_sig.runtime_position_initialized:
+			guard_cell = other_sig.runtime_cell_x
+		if absf(guard_cell - source_cell) > float(range_cells):
+			continue
+
+		var alert := GuardAlertData.new()
+		alert.source_type = GuardAlertData.SourceType.DISTRACTION
+		alert.target_signal_id = other_sig.data.system_id
+		alert.target_cell_x = source_cell
+		alert.target_lane = source_lane
+		alert.priority = signal_data.disruptor.severity
+		alert.ttl_sec = signal_data.disruptor.ttl_sec
+		alert.investigate_sec_override = signal_data.disruptor.investigate_duration_sec
+		alert.source_id = signal_data.system_id
+		alert.emitted_time_sec = Time.get_ticks_msec() / 1000.0
+		GlobalEvents.guard_alert_raised.emit(alert)
+		matched_guards += 1
+
+	if matched_guards <= 0:
+		signal_data.disruptor.used = true
+		cmd_context.log_text.append(signal_data.display_name + " activated. No guards in range.")
+		return
+
+	signal_data.disruptor.used = true
+	cmd_context.log_text.append(signal_data.display_name + " activated. Alerted " + str(matched_guards) + " guard(s).")

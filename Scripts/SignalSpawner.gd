@@ -2,12 +2,18 @@ class_name SignalSpawner extends Resource
 
 var base_camera_heat: Resource = preload("res://Resources/ResponseEffects/base_camera_heat.tres")
 var door_base: Resource = preload("res://Resources/ResponseEffects/door_base.tres")
+var camera_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/camera_visuals.tres")
+var door_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/door_visuals.tres")
+var door_unlocked_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/door_unlocked_visuals.tres")
+var guard_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/guard_visuals.tres")
+var disruptor_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/disruptor_visuals.tres")
 
 func create_test_cam(id, lane):
 	var cam = SignalData.new()
 	cam.type = SignalData.Type.CAMERA
 	cam.lane = lane
 	cam.system_id = "cam_" + id
+	cam.visuals = camera_visuals
 
 	var detection = DetectionComponent.new()
 	detection.watch_offset_cells = 0.0
@@ -35,6 +41,9 @@ func create_test_door(id, lane):
 	door.type = SignalData.Type.DOOR
 	door.lane = lane
 	door.system_id = "door_" + id
+	door.visuals = door_visuals
+	door.alternate_visuals = door_unlocked_visuals
+	door.door_locked = true
 
 	var detection = DetectionComponent.new()
 	detection.watch_offset_cells = 0.0
@@ -62,6 +71,7 @@ func create_test_guard(id: String, start_cell: float, lane: int) -> SignalData:
 	guard.lane = lane
 	guard.system_id = "guard_" + id
 	guard.visual_state = SignalData.VisualState.HIDDEN
+	guard.visuals = guard_visuals
 
 	var detection := DetectionComponent.new()
 	detection.shape_type = DetectionComponent.ShapeType.ARC
@@ -105,3 +115,18 @@ func create_test_guard(id: String, start_cell: float, lane: int) -> SignalData:
 	guard.mobility = mobility
 
 	return guard
+
+func create_test_disruptor(id: String, lane: int) -> SignalData:
+	var disruptor := SignalData.new()
+	disruptor.type = SignalData.Type.DISRUPTOR
+	disruptor.lane = lane
+	disruptor.system_id = "disruptor_" + id
+	disruptor.visuals = disruptor_visuals
+
+	var hackable := HackableComponent.new()
+	disruptor.hackable = hackable
+
+	var disruptor_component := DisruptorComponent.new()
+	disruptor.disruptor = disruptor_component
+
+	return disruptor

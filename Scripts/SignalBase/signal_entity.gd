@@ -15,6 +15,7 @@ extends Node2D
 @onready var detection_controller = $DetectionController
 var mobility_controller: MobilityController = null
 var _guard_revealed: bool = true
+var _alert_visual_t: float = 0.0
 
 var my_data: SignalData
 var my_active_sig: ActiveSignal
@@ -29,6 +30,7 @@ signal scan_lock_requested(scanning_signal: ActiveSignal)
 
 func _ready():
 	scan_radial.visible = false
+	set_process(true)
 
 func setup(signal_wrapper: ActiveSignal):
 	my_data = signal_wrapper.data
@@ -48,27 +50,37 @@ func setup(signal_wrapper: ActiveSignal):
 	
 	
 func update_visuals():
-	match my_data.type:
-		SignalData.Type.CAMERA:
-			# Yellow Triangle
-			shape.color = Color.YELLOW
-			shape.polygon = PackedVector2Array([Vector2(-25, 25), Vector2(-25, -25), Vector2(25, 0)])
-			
-		SignalData.Type.DOOR:
-			# Brown Square
-			shape.color = Color.SADDLE_BROWN
-			shape.polygon = PackedVector2Array([Vector2(-25, -25), Vector2(25, -25), Vector2(25, 25), Vector2(-25, 25)])
-			
-		SignalData.Type.GUARD:
-			# Blue Circle (Approximated)
-			shape.color = Color.BLUE
-			# Draw a simple hexagon as a circle approximation
-			shape.polygon = PackedVector2Array([Vector2(-20,-25), Vector2(20,-25), Vector2(25,0), Vector2(20,25), Vector2(-20,25), Vector2(-25,0)])
-			if my_data.mobility != null:
-				set_guard_revealed(_guard_revealed)
+	var visual_source: SignalVisuals = my_data.visuals
+	if my_data.use_alternate_visuals and my_data.alternate_visuals != null:
+		visual_source = my_data.alternate_visuals
+
+	if visual_source != null:
+		shape.color = visual_source.fill_color
+		shape.polygon = visual_source.polygon
+	else:
+		shape.color = Color.WHITE
+		shape.polygon = PackedVector2Array([Vector2(-25, -25), Vector2(25, -25), Vector2(25, 25), Vector2(-25, 25)])
+
+	if my_data.type == SignalData.Type.GUARD and my_data.mobility != null:
+		set_guard_revealed(_guard_revealed)
 	
 	if my_active_sig.is_disabled:
-		shape.color = Color.BLACK
+		shape.color = Color.DIM_GRAY
+
+func _process(delta: float) -> void:
+	if my_data == null or my_data.type != SignalData.Type.GUARD or mobility_controller == null:
+		return
+	if not _guard_revealed:
+		return
+
+	if mobility_controller.is_in_alert_state():
+		_alert_visual_t += delta * 8.0
+		var pulse := 0.5 + (sin(_alert_visual_t) * 0.5)
+		shape.self_modulate = Color(1.0, lerpf(0.45, 1.0, pulse), lerpf(0.45, 1.0, pulse))
+		return
+
+	_alert_visual_t = 0.0
+	shape.self_modulate = Color.WHITE
 
 func _setup_mobility(signal_wrapper: ActiveSignal) -> void:
 	if signal_wrapper == null:
@@ -97,7 +109,10 @@ func set_scan_highlight(active: bool):
 		shape.self_modulate = Color(0.5, 1.0, 0.5) # Turn Greenish
 		tooltip_body.show()
 	else:
-		shape.self_modulate = Color.WHITE
+		if my_data != null and my_data.type == SignalData.Type.GUARD and mobility_controller != null and mobility_controller.is_in_alert_state():
+			_alert_visual_t = 0.0
+		else:
+			shape.self_modulate = Color.WHITE
 		tooltip_body.hide()
 		tooltip_main.size.x = tooltip_main_initial_x
 

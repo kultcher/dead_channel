@@ -12,6 +12,8 @@ var dialogue_window_scene = preload("res://Scenes/dialogue_window.tscn")
 @onready var signal_manager = $"../SignalTimeline/SignalManager"
 @onready var terminal_window = preload("res://Scenes/terminal_window.tscn")
 @onready var focus_overlay = $FocusOverlay
+@onready var objective_tracker = get_node_or_null("ObjectiveTracker")
+@onready var help_overlay = get_node_or_null("HelpOverlay")
 
 @export var default_spawn_offset := Vector2(75, 300)
 @export var puzzle_spawn_position := Vector2(760, 430)
@@ -20,7 +22,17 @@ var dialogue_window_scene = preload("res://Scenes/dialogue_window.tscn")
 var window_count := 0
 
 func _ready():
+	CommandDispatch.window_manager = self
 	GlobalEvents.puzzle_started.connect(_puzzle_started)
+	GlobalEvents.tactical_unpause.connect(_on_tactical_unpause)
+	set_process_input(true)
+	if help_overlay != null:
+		help_overlay.visible = false
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F1:
+		toggle_help_overlay()
+		get_viewport().set_input_as_handled()
 
 func get_signal_focus_rect(active_sig: ActiveSignal) -> Rect2:
 	if active_sig == null or active_sig.instance_node == null:
@@ -48,6 +60,39 @@ func focus_control(control: Control, padding: Vector2 = Vector2(64, 64)) -> void
 
 func clear_focus_overlay() -> void:
 	focus_overlay.clear_focus()
+
+func set_tutorial_objective(text: String) -> void:
+	if objective_tracker == null:
+		return
+	objective_tracker.set_objective(text)
+
+func clear_tutorial_objective() -> void:
+	if objective_tracker == null:
+		return
+	objective_tracker.clear_objective()
+
+func show_help_overlay() -> void:
+	if help_overlay == null:
+		return
+	if not timeline_manager.is_paused:
+		GlobalEvents.tactical_pause.emit()
+	help_overlay.visible = true
+	move_child(help_overlay, get_child_count() - 1)
+
+func hide_help_overlay() -> void:
+	if help_overlay == null:
+		return
+	help_overlay.visible = false
+
+func toggle_help_overlay() -> void:
+	if help_overlay == null:
+		return
+	if help_overlay.visible:
+		hide_help_overlay()
+		if timeline_manager.is_paused:
+			GlobalEvents.tactical_unpause.emit()
+		return
+	show_help_overlay()
 
 func show_tutorial_dialogue(event: TutorialEvent, focus_rect: Rect2 = Rect2()) -> Control:
 	var dialogue = dialogue_window_scene.instantiate()
@@ -93,3 +138,6 @@ func _on_puzzle_solved(active_sig: ActiveSignal, puzzle_window: Control) -> void
 func _on_puzzle_failed(active_sig: ActiveSignal) -> void:
 	if active_sig != null and active_sig.data != null:
 		GlobalEvents.puzzle_failed.emit(active_sig.data)
+
+func _on_tactical_unpause() -> void:
+	hide_help_overlay()

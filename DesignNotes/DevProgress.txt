@@ -43,9 +43,9 @@ Development Progress
 
 
 Short-term TODO:
-- Add signal-builder overrides for mobility and response components
 - Add an objective tracker
 - Add a cleaner way to update scan tooltips (array?)
+- Fix guard facing override
 
 Not Yet Implemented (priority):
 - Even More robust terminal implementation

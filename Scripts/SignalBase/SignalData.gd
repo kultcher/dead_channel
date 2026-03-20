@@ -10,6 +10,7 @@ var identity_dict = {
 	Type.DOOR: "Door | Mech",
 	Type.CAMERA: "Camera | Mech",
 	Type.GUARD: "Guard | Bio",
+	Type.DISRUPTOR: "Disruptor | Mech",
  }
 
 # IDENTIFIERS
@@ -22,6 +23,10 @@ var identity_dict = {
 # STATE
 @export var visual_state: VisualState = VisualState.REVEALED
 @export var clearance_level: int = 0
+@export var visuals: SignalVisuals
+@export var alternate_visuals: SignalVisuals
+@export var use_alternate_visuals: bool = false
+@export var door_locked: bool = true
 
 # COMPONENTS
 @export var hackable: HackableComponent
@@ -30,3 +35,4 @@ var identity_dict = {
 @export var puzzle: PuzzleComponent
 @export var ic_modules: ICComponent
 @export var mobility: MobilityComponent
+@export var disruptor: DisruptorComponent

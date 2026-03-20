@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://duxopbxj4qso6"]
+
+[ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="1_signal"]
+[ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_hack"]
+[ext_resource type="Script" uid="uid://5on3avt06jbc" path="res://Scripts/Components/DisruptorComponent.gd" id="3_disruptor"]
+[ext_resource type="Resource" path="res://Resources/SignalVisuals/disruptor_visuals.tres" id="4_visuals"]
+
+[sub_resource type="Resource" id="Resource_disruptor"]
+script = ExtResource("3_disruptor")
+investigate_duration_sec = 15.0
+horizontal_range_cells = 1
+ttl_sec = 10.0
+
+[sub_resource type="Resource" id="Resource_hackable"]
+script = ExtResource("2_hack")
+
+[resource]
+script = ExtResource("1_signal")
+type = 6
+system_id = "disruptor_01"
+visuals = ExtResource("4_visuals")
+hackable = SubResource("Resource_hackable")
+disruptor = SubResource("Resource_disruptor")

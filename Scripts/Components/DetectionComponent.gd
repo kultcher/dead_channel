@@ -110,5 +110,8 @@ func _apply_detection(active_sig: ActiveSignal, delta):
 func disable_detection():
 	detection_disabled = true
 
+func enable_detection():
+	detection_disabled = false
+
 func get_desc():
 	return "Static"

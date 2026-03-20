@@ -23,7 +23,7 @@ var lane_height: float
 
 # STATE
 var cells_per_second: float = BASE_CELLS_PER_SECOND
-var current_cell_pos: float = 0.0
+var current_cell_pos: float = 15.0
 var last_emitted_cell: int = -1
 var current_cell: int
 var current_speed_mult: float = 1.0

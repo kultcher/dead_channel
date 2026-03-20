@@ -25,6 +25,7 @@ func on_detection(active_sig: ActiveSignal, delta: float, delay: float = 0.0) ->
 func _start_delay_window(active_sig: ActiveSignal, delay: float) -> void:
 	var sig_id := active_sig.get_instance_id()
 	_delay_in_progress[sig_id] = true
+	_set_movement_disabled(active_sig, true)
 	GlobalEvents.runners_stopped.emit()
 	_finish_delay_window(active_sig, delay)
 
@@ -34,8 +35,11 @@ func _finish_delay_window(active_sig: ActiveSignal, delay: float) -> void:
 	var check_step := 0.05
 
 	while elapsed < delay:
+		if not _delay_in_progress.get(sig_id, false):
+			return
 		if active_sig.is_disabled:
 			_delay_in_progress.erase(sig_id)
+			_set_movement_disabled(active_sig, false)
 			GlobalEvents.runners_resumed.emit()
 			return
 		var remaining: float = delay - elapsed
@@ -51,6 +55,7 @@ func _finish_delay_window(active_sig: ActiveSignal, delay: float) -> void:
 		if not active_sig.is_disabled:
 			active_sig.disable_signal()
 
+	_set_movement_disabled(active_sig, false)
 	GlobalEvents.runners_resumed.emit()
 
 func _apply_effects(active_sig: ActiveSignal, delta: float) -> void:
@@ -88,3 +93,23 @@ func _apply_effect(effect: ResponseEffect, value: float, _active_sig: ActiveSign
 
 func get_desc():
 	return "Blank"
+
+func _set_movement_disabled(active_sig: ActiveSignal, disabled: bool) -> void:
+	if active_sig == null or active_sig.data == null:
+		return
+	if active_sig.data.mobility == null:
+		return
+	active_sig.data.mobility.movement_disabled = disabled
+
+func reset_delay_state(active_sig: ActiveSignal, resume_runners: bool = false) -> void:
+	if active_sig == null:
+		return
+
+	var sig_id := active_sig.get_instance_id()
+	var had_in_progress = _delay_in_progress.get(sig_id, false)
+	_delay_in_progress.erase(sig_id)
+	_delay_completed.erase(sig_id)
+	_set_movement_disabled(active_sig, false)
+
+	if resume_runners and had_in_progress:
+		GlobalEvents.runners_resumed.emit()

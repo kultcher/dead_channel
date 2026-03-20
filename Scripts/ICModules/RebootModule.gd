@@ -14,19 +14,24 @@ func _init():
 
 func on_disabled(active_sig: ActiveSignal):
 	print("Rebooting signal in %s seconds" % reboot_time)
+	if timer != null and is_instance_valid(timer):
+		timer.queue_free()
 	timer = Timer.new()
 	GlobalEvents.add_child(timer)
 	timer.timeout.connect(_reboot.bind(active_sig))
 	timer.start(reboot_time)
 	
 func _reboot(active_sig: ActiveSignal):
-	active_sig.enable_signal()
-	timer.queue_free()
+	if timer != null and is_instance_valid(timer):
+		timer.queue_free()
+		timer = null
+	if active_sig != null and active_sig.is_disabled:
+		active_sig.enable_signal()
 	
 func _on_pause():
-	if timer:
+	if timer != null and is_instance_valid(timer):
 		timer.set_paused(true)
 	
 func _on_unpause():
-	if timer:
+	if timer != null and is_instance_valid(timer):
 		timer.set_paused(false)

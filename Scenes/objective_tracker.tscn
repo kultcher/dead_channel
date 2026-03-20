@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://cjra5kvci873p"]
+
+[ext_resource type="Script" path="res://Scripts/objective_tracker.gd" id="1_y1gq7"]
+
+[node name="ObjectiveTracker" type="PanelContainer" unique_id=1978519648]
+offset_left = 1440.0
+offset_top = 42.0
+offset_right = 1870.0
+offset_bottom = 156.0
+script = ExtResource("1_y1gq7")
+
+[node name="ObjectiveList" type="RichTextLabel" parent="." unique_id=363487693]
+offset_left = 16.0
+offset_top = 14.0
+offset_right = 414.0
+offset_bottom = 98.0
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 3

@@ -30,6 +30,7 @@ var runtime_cell_x: float = 0.0
 var runtime_lane: int = 2
 var runtime_lane_pos: float = 2.0
 var runtime_facing_deg: float = 180.0
+var runtime_render_offset: Vector2 = Vector2.ZERO
 
 func setup():
 	# Assign name based on possible obfuscations
@@ -39,24 +40,46 @@ func setup():
 		data.display_name = data.system_id
 	if data.puzzle:
 		data.puzzle.ensure_initial_lock_state()
+	if data.type == SignalData.Type.DOOR:
+		set_door_locked(data.door_locked)
 
 func disable_signal():
 	is_disabled = true
-	instance_node.detection_controller.disable_vision()
-	if data.ic_modules: data.ic_modules.notify_disabled(self)
-	instance_node.update_visuals()
+	if instance_node != null:
+		instance_node.detection_controller.disable_vision()
+		instance_node.update_visuals()
+	if data.ic_modules:
+		data.ic_modules.notify_disabled(self)
 
 func enable_signal():
 	is_disabled = false
-	instance_node.detection_controller.enable_vision()
-	data.ic_modules.notify_enabled(self)
-	instance_node.update_visuals()
+	if instance_node != null:
+		instance_node.detection_controller.enable_vision()
+		instance_node.update_visuals()
+	if data.ic_modules:
+		data.ic_modules.notify_enabled(self)
 
 func generate_scan_layers():
 	scan_layers.clear()
 	build_id_layer()
 	build_puzzle_layer()
 	build_ic_layer()
+
+func set_door_locked(locked: bool) -> void:
+	if data == null or data.type != SignalData.Type.DOOR:
+		return
+
+	data.door_locked = locked
+	data.use_alternate_visuals = not locked
+	if data.detection != null:
+		if locked:
+			data.detection.enable_detection()
+		else:
+			data.detection.disable_detection()
+	if data.response != null:
+		data.response.reset_delay_state(self, not locked)
+	if instance_node != null:
+		instance_node.update_visuals()
 		
 func build_id_layer(difficulty_modifier: float = 1.0):
 	var l0 = ScanLayer.new()
