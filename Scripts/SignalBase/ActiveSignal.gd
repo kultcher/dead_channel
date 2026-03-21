@@ -17,7 +17,7 @@ var scan_layers: Array[ScanLayer] = []
 var current_scan_index: int = 0
 var current_layer_progress: float = 0.0
 var is_being_scanned: bool = false
-var is_scan_locked: bool = false
+var is_tooltip_collapsed: bool = false
 
 var is_disabled: bool = false
 
@@ -84,12 +84,12 @@ func set_door_locked(locked: bool) -> void:
 func build_id_layer(difficulty_modifier: float = 1.0):
 	var l0 = ScanLayer.new()
 	l0.name = "IDENTITY"
-	l0.duration = 1.0 * difficulty_modifier
+	l0.duration = 0.25 * difficulty_modifier
 	l0.description = "Type: " + data.identity_dict[data.type]
 	# Check data.visual_state. If it's already REVEALED, mark this true immediately
-	if data.visual_state == SignalData.VisualState.REVEALED:
-		l0.revealed = true
-		current_scan_index = 1 # Skip to next
+	#if data.visual_state == SignalData.VisualState.REVEALED:
+	#	l0.revealed = true
+	#	current_scan_index = 1 # Skip to next
 	scan_layers.append(l0)
 
 func build_puzzle_layer(difficulty_modifier: float = 1.0):

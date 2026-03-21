@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://gms8x710vr6g" path="res://Scripts/window_manager.gd" id="5_wudor"]
 [ext_resource type="Script" uid="uid://biyb8hixpkc42" path="res://Scripts/heat_tracker.gd" id="6_85m8a"]
 [ext_resource type="PackedScene" uid="uid://dbqweh3v2f0bq" path="res://Scenes/terminal_window.tscn" id="7_4qt4q"]
+[ext_resource type="Script" uid="uid://ct7kxs5lwoyyb" path="res://Scenes/scan_controller.gd" id="7_k8c5c"]
 [ext_resource type="PackedScene" uid="uid://d2nr1ge8ypq88" path="res://Scenes/focus_overlay.tscn" id="8_4ll5g"]
 [ext_resource type="PackedScene" uid="uid://hjsy8naghiwy" path="res://Scenes/sniff.tscn" id="8_jx6wh"]
 [ext_resource type="PackedScene" uid="uid://cjra5kvci873p" path="res://Scenes/objective_tracker.tscn" id="9_2sk7x"]
@@ -87,6 +88,9 @@ shape = SubResource("CircleShape2D_wudor")
 
 [node name="SignalManager" type="Node2D" parent="SignalTimeline" unique_id=1320650835]
 script = ExtResource("4_jx6wh")
+
+[node name="ScanController" type="Node2D" parent="SignalTimeline" unique_id=2064755917]
+script = ExtResource("7_k8c5c")
 
 [node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
 script = ExtResource("5_wudor")

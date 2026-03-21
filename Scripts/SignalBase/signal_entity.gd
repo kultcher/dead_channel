@@ -8,11 +8,26 @@ extends Node2D
 @onready var scan_radial = $ScanRadial
 @onready var tooltip_main = $DetailTooltip
 @onready var tooltip_header = $DetailTooltip/TooltipHbox/TooltipVBox/HeaderPanel/MarginContainer/HeaderText
-@onready var tooltip_body = $DetailTooltip/TooltipHbox/BodyText
+@onready var tooltip_body_box = $DetailTooltip/TooltipHbox/BodyBox
+@onready var tooltip_body = $DetailTooltip/TooltipHbox/BodyBox/BodyText
 @onready var tooltip_active_scan = $DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel
 @onready var tooltip_active_scan_text = $DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel/MarginContainer/ActiveScanText
+@onready var tooltip_lock_state = $DetailTooltip/TooltipHbox/TooltipVBox/LockStatePanel
+@onready var tooltip_lock_state_text = $DetailTooltip/TooltipHbox/TooltipVBox/LockStatePanel/MarginContainer/LockStateText
 
 @onready var detection_controller = $DetectionController
+@export var tooltip_gap_y: float = 32.0
+
+const COLOR_STATUS_UNKNOWN := Color("4a2d64")
+const COLOR_STATUS_SCANNING := Color("c56b1f")
+const COLOR_STATUS_COMPLETE := Color("2f8a46")
+const COLOR_STATUS_PARTIAL := Color("c1a126")
+
+const COLOR_LOCK_UNKNOWN := Color("4a2d64")
+const COLOR_LOCK_OPEN := Color("2d66c4")
+const COLOR_LOCK_LOCKED := Color("111111")
+const COLOR_LOCK_HACKED := Color("b3262e")
+
 var mobility_controller: MobilityController = null
 var _guard_revealed: bool = true
 var _alert_visual_t: float = 0.0
@@ -21,6 +36,8 @@ var my_data: SignalData
 var my_active_sig: ActiveSignal
 
 var tooltip_main_initial_x: float
+var tooltip_main_initial_y: float
+
 var is_disabled: bool = false
 
 signal signal_interaction(data: SignalData)
@@ -37,10 +54,12 @@ func setup(signal_wrapper: ActiveSignal):
 	my_active_sig = signal_wrapper
 
 	tooltip_main_initial_x = tooltip_main.size.x
+	tooltip_main_initial_y = tooltip_main.size.y
+
 
 	initialize_tooltip()
-
-	GlobalEvents.signal_scanned.connect(check_scan_completion)
+	refresh_status_panels()
+	set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
 
 	detection_controller.initialize(self)
 	_setup_mobility(signal_wrapper)
@@ -107,13 +126,11 @@ func set_guard_revealed(is_revealed: bool) -> void:
 func set_scan_highlight(active: bool):
 	if active:
 		shape.self_modulate = Color(0.5, 1.0, 0.5) # Turn Greenish
-		tooltip_body.show()
 	else:
 		if my_data != null and my_data.type == SignalData.Type.GUARD and mobility_controller != null and mobility_controller.is_in_alert_state():
 			_alert_visual_t = 0.0
 		else:
 			shape.self_modulate = Color.WHITE
-		tooltip_body.hide()
 		tooltip_main.size.x = tooltip_main_initial_x
 
 func update_scan_progress(current: float, max_duration: float):
@@ -123,21 +140,15 @@ func update_scan_progress(current: float, max_duration: float):
 	scan_radial.max_value = max_duration
 	scan_radial.value = current
 
-func check_scan_completion(data: SignalData, scan_index: int):
-	if data != my_data:
-		return
-	if scan_index >= my_active_sig.scan_layers.size():
-		tooltip_active_scan_text.text = "COMPLETE"
-		GlobalEvents.signal_scan_complete.emit(data)
-
 func hide_scan_progress():
 	scan_radial.visible = false
 
 func scan_cleanup():
 	scan_radial.value = 0
 	scan_radial.visible = false
-	tooltip_active_scan.visible = false
-	tooltip_body.visible = false
+	if my_active_sig != null:
+		refresh_scan_status()
+		set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
 
 func initialize_tooltip():
 	tooltip_header.text = my_data.display_name
@@ -149,6 +160,86 @@ func initialize_tooltip():
 
 func append_tooltip(info: String):
 	tooltip_body.text += info + "\n"
+
+func show_tooltip():
+	tooltip_main.show()
+	refresh_status_panels()
+	set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+
+func set_tooltip_collapsed(collapsed: bool):
+	tooltip_main.show()
+	tooltip_body_box.visible = not collapsed
+	tooltip_body.visible = not collapsed
+	tooltip_active_scan.visible = true
+	tooltip_lock_state.visible = true
+	tooltip_main.size.x = tooltip_main_initial_x
+
+func refresh_status_panels():
+	refresh_scan_status()
+	refresh_lock_status()
+
+func refresh_scan_status():
+	if my_active_sig == null:
+		return
+
+	if my_active_sig.is_being_scanned and my_active_sig.current_scan_index < my_active_sig.scan_layers.size():
+		_set_panel_state(tooltip_active_scan, tooltip_active_scan_text, "SCANNING", COLOR_STATUS_SCANNING)
+		return
+
+	if my_active_sig.scan_layers.is_empty() or my_active_sig.current_scan_index >= my_active_sig.scan_layers.size():
+		_set_panel_state(tooltip_active_scan, tooltip_active_scan_text, "COMPLETE", COLOR_STATUS_COMPLETE)
+		return
+
+	if my_active_sig.current_scan_index > 0:
+		_set_panel_state(tooltip_active_scan, tooltip_active_scan_text, "PARTIAL", COLOR_STATUS_PARTIAL)
+		return
+
+	_set_panel_state(tooltip_active_scan, tooltip_active_scan_text, "UNKNOWN", COLOR_STATUS_UNKNOWN)
+
+func refresh_lock_status():
+	if my_active_sig == null:
+		return
+
+	if not _is_access_layer_revealed():
+		_set_panel_state(tooltip_lock_state, tooltip_lock_state_text, "UNKNOWN", COLOR_LOCK_UNKNOWN)
+		return
+
+	if my_data == null or my_data.puzzle == null:
+		_set_panel_state(tooltip_lock_state, tooltip_lock_state_text, "OPEN", COLOR_LOCK_OPEN)
+		return
+
+	if my_data.puzzle.puzzle_locked:
+		_set_panel_state(tooltip_lock_state, tooltip_lock_state_text, "LOCKED", COLOR_LOCK_LOCKED)
+		return
+
+	_set_panel_state(tooltip_lock_state, tooltip_lock_state_text, "HACKED", COLOR_LOCK_HACKED)
+
+func _is_access_layer_revealed() -> bool:
+	if my_active_sig == null:
+		return false
+	for layer in my_active_sig.scan_layers:
+		if layer.name == "ACCESS":
+			return layer.revealed
+	return false
+
+func _set_panel_state(panel: PanelContainer, label: Label, text: String, color: Color):
+	if panel == null or label == null:
+		return
+	var base_style := panel.get_theme_stylebox("panel")
+	var style: StyleBoxFlat
+	if base_style is StyleBoxFlat:
+		style = (base_style as StyleBoxFlat).duplicate()
+	else:
+		style = StyleBoxFlat.new()
+	style.bg_color = color
+	panel.add_theme_stylebox_override("panel", style)
+	label.text = text
+
+
+func bring_to_front():
+	var parent = get_parent()
+	if parent != null:
+		parent.move_child(self, parent.get_child_count() - 1)
 
 func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton:
@@ -168,6 +259,7 @@ func _on_detail_tooltip_resized() -> void:
 	# reposition tooltip based on new size
 	if !is_node_ready(): return
 	tooltip_main.position.x = (tooltip_main.size.x / 2) * -1
+	tooltip_main.position.y = -tooltip_main.size.y - tooltip_gap_y
 
 func get_focus_rect() -> Rect2:
 	var icon_shape: CollisionShape2D = $SignalIcon/IconCollision
@@ -181,4 +273,11 @@ func get_focus_rect() -> Rect2:
 
 
 func show_scanning_tooltip():
-	tooltip_active_scan.visible = true
+	if my_active_sig != null:
+		refresh_scan_status()
+		set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+
+func show_scan_complete():
+	if my_active_sig != null:
+		refresh_status_panels()
+		set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)

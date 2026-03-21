@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://r0twab0n2prh"]
 
-[ext_resource type="Resource" path="res://Resources/SignalVisuals/door_unlocked_visuals.tres" id="1_alt_visuals"]
+[ext_resource type="Resource" uid="uid://184rjgy83kh1" path="res://Resources/SignalVisuals/door_unlocked_visuals.tres" id="1_alt_visuals"]
 [ext_resource type="Resource" path="res://Resources/SignalVisuals/door_visuals.tres" id="1_visuals"]
 [ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="1_w38ew"]
 [ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_invhn"]

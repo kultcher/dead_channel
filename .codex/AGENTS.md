@@ -5,9 +5,12 @@ Project Snapshot
 - Pitch: A Shadowrun-inspired cyberpunk hacking overwatch game about supporting a runner team under pressure.
 
 Source Docs (Required Reading)
-- DesignNotes/PROJECT Dead Channel.txt is the canonical design reference.
+- DesignNotes/BrainstormResults/DesignBible.md is the canonical design reference
+- DesignNotes/BrainstormResults/ includes other detailed notes on design direction
+- DesignNotes/PROJECT Dead Channel.txt is the original design doc
 - DesignNotes/DevProgress.txt: Loose catalogue of game features that have been implemented and are pending/priority.
 - DesignNotes/RunLevelSystemsDetail.txt: A deeper dive into the game systems at the individual run level.
+- DesignNotes/SystemCommunicationMap.md: Text codemap of how game systems and code communicate with each other
 
 Core Systems (Code Map)
 - Timeline/Signals: Scripts/timeline_manager.gd, Scripts/signal_manager.gd, Scripts/SignalBase/SignalData.gd, Scripts/SignalBase/ActiveSignal.gd, Scripts/SignalBase/signal_entity.gd

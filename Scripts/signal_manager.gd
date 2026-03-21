@@ -6,19 +6,15 @@ extends Node2D
 @onready var timeline_manager = $"../TimelineManager"
 @onready var window_manager = $"../../WindowManager"
 @onready var terminal_window = $"../../TerminalWindow"
+@onready var scan_controller = $"../ScanController"
 @onready var spawner = SignalSpawner.new()
 
 var signal_scene = preload("res://Scenes/signal_entity.tscn")
 
 var signal_queue: Array[ActiveSignal] = []
-var currently_scanning_signal: ActiveSignal = null
-
-var is_paused: bool = false
 
 func _ready():
 	CommandDispatch.signal_manager = self
-	GlobalEvents.tactical_pause.connect(_on_pause)
-	GlobalEvents.tactical_unpause.connect(_on_unpause)
 	
 #	spawn_signal_data(spawner.create_test_cam("05", 2), 3.5)
 #	spawn_signal_data(spawner.create_test_cam("06", 3), 6.5)
@@ -47,8 +43,6 @@ func is_signal_in_range(system_id: String) -> bool:
 	return sig != null and sig.instance_node != null
 	
 func _process(delta):
-	if currently_scanning_signal != null:
-		_process_active_scan(delta)
 	update_signal_position()
 
 func spawn_signal_data(data: SignalData, cell_index: float):
@@ -93,123 +87,24 @@ func update_signal_position():
 			
 		else:
 			if visual_x < -200 and active_sig.instance_node != null:
-				print(terminal_window)
 				if terminal_window != null:
 					terminal_window.hide_tab_for_signal(active_sig)
+				if scan_controller != null:
+					scan_controller.notify_signal_despawned(active_sig)
 				active_sig.instance_node.queue_free()
 				active_sig.instance_node = null
-
-# === SCAN & LOCK LOGIC ===
 
 func _on_signal_left_clicked(active_sig: ActiveSignal):
 	CommandDispatch.switch_terminal_session(active_sig)
 	
 func _on_signal_mouse_enter(signal_entered: ActiveSignal):
-	if currently_scanning_signal != null and currently_scanning_signal.is_scan_locked:
-		return
-	start_signal_scan(signal_entered)
+	if scan_controller != null:
+		scan_controller.begin_hover(signal_entered)
 
 func _on_signal_right_clicked(signal_clicked: ActiveSignal):
-	handle_lock_toggle(signal_clicked)
+	if scan_controller != null:
+		scan_controller.toggle_lock(signal_clicked)
 	
 func _on_signal_mouse_exit(signal_exited: ActiveSignal):
-	cancel_scan(signal_exited)
-	
-func start_signal_scan(target_signal: ActiveSignal):
-	if currently_scanning_signal != null and currently_scanning_signal != target_signal:
-		_cleanup_scan_visuals(currently_scanning_signal)
-			
-	currently_scanning_signal = target_signal
-	target_signal.is_being_scanned = true
-
-	print("Start signal scan called")
-	target_signal.instance_node.tooltip_active_scan.show()
-	target_signal.instance_node.tooltip_main.show()
-	
-	if target_signal.instance_node:
-		target_signal.instance_node.set_scan_highlight(true)
-		
-	print("STARTED SCANNING: " + target_signal.data.display_name)
-
-func handle_lock_toggle(clicked_signal: ActiveSignal):
-	# CASE 1: Right-clicking the signal we are ALREADY scanning
-	if currently_scanning_signal == clicked_signal:
-		clicked_signal.is_scan_locked = !clicked_signal.is_scan_locked
-		print("Lock State Toggled: ", clicked_signal.is_scan_locked)
-		return
-
-	# CASE 2: Right-clicking a NEW signal while another is locked
-	if currently_scanning_signal != null:
-		currently_scanning_signal.is_scan_locked = false
-		_cleanup_scan_visuals(currently_scanning_signal)
-	
-	# Start fresh scan on new target and force lock
-	start_signal_scan(clicked_signal)
-	clicked_signal.is_scan_locked = true
-	print("Override Lock onto: ", clicked_signal.data.display_name)
-
-func cancel_scan(active_sig: ActiveSignal = null):
-	if currently_scanning_signal != active_sig:
-		return
-		
-	if currently_scanning_signal.is_scan_locked:
-		return
-	
-	active_sig.current_layer_progress = 0
-	active_sig.instance_node.scan_cleanup()
-
-	_cleanup_scan_visuals(currently_scanning_signal)
-	
-	currently_scanning_signal = null
-
-func _process_active_scan(delta):
-	if is_paused: return
-	var sig = currently_scanning_signal
-
-	if sig.instance_node == null:
-		_cleanup_scan_visuals(sig)
-		currently_scanning_signal = null
-		return
-		
-	if sig.current_scan_index >= sig.scan_layers.size():
-		return
-		
-	# Advance Progress
-	var current_layer = sig.scan_layers[sig.current_scan_index]
-	sig.current_layer_progress += delta
-
-	# VISUAL UPDATE: RADAR
-
-	if sig.instance_node:
-		sig.instance_node.update_scan_progress(sig.current_layer_progress, current_layer.duration)
-
-	# Check Completion
-	if sig.current_layer_progress >= current_layer.duration:
-		print("Layer complete")
-		_complete_scan_layer(sig, current_layer)
-
-func _complete_scan_layer(sig: ActiveSignal, layer):
-	layer.revealed = true
-	sig.current_layer_progress = 0.0
-	sig.current_scan_index += 1
-	
-	GlobalEvents.signal_scanned.emit(sig.data, sig.current_scan_index)
-	
-	if sig.instance_node:
-		sig.instance_node.append_tooltip(layer.description)
-		sig.instance_node.update_scan_progress(0, 1.0)
-
-			
-func _cleanup_scan_visuals(sig: ActiveSignal):
-	sig.is_being_scanned = false
-	sig.is_scan_locked = false # Ensure lock is cleared
-	if sig.instance_node:
-		sig.instance_node.set_scan_highlight(false)
-
-# SIGNALLED FUNCTIONS
-
-func _on_pause():
-	is_paused = true
-	
-func _on_unpause():
-	is_paused = false
+	if scan_controller != null:
+		scan_controller.end_hover(signal_exited)

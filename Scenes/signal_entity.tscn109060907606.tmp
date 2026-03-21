@@ -2,8 +2,6 @@
 
 [ext_resource type="Script" uid="uid://bu5j0vtniw7no" path="res://Scripts/SignalBase/signal_entity.gd" id="1_syivg"]
 [ext_resource type="Script" uid="uid://bf3h4o3iodo4" path="res://Scripts/SignalBase/DetectionController.gd" id="2_6hws6"]
-[ext_resource type="FontFile" uid="uid://b0472lemon553" path="res://Visuals/Fonts/KodeMono-Bold.ttf" id="2_ea3pi"]
-[ext_resource type="FontFile" uid="uid://g80fed4aap1u" path="res://Visuals/Fonts/FiraCode-SemiBold.ttf" id="3_xq7gi"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_syivg"]
 size = Vector2(50, 50)
@@ -35,7 +33,7 @@ expand_margin_bottom = 5.0
 bg_color = Color(0.22091639, 0.44796598, 0.97496897, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7dtr8"]
-bg_color = Color(0.078431375, 0.011764706, 0.17254902, 1)
+bg_color = Color(0.3491902, 0.8548469, 0.3491902, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -108,11 +106,11 @@ theme_override_constants/margin_right = 5
 [node name="HeaderText" type="Label" parent="DetailTooltip/TooltipHbox/TooltipVBox/HeaderPanel/MarginContainer" unique_id=1976295518]
 layout_mode = 2
 size_flags_vertical = 0
-theme_override_fonts/font = ExtResource("2_ea3pi")
 text = "???"
 horizontal_alignment = 1
 
 [node name="ActiveScanPanel" type="PanelContainer" parent="DetailTooltip/TooltipHbox/TooltipVBox" unique_id=409663200]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_7dtr8")
@@ -125,25 +123,7 @@ theme_override_constants/margin_right = 5
 [node name="ActiveScanText" type="Label" parent="DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel/MarginContainer" unique_id=1220123014]
 layout_mode = 2
 size_flags_vertical = 0
-theme_override_fonts/font = ExtResource("3_xq7gi")
-text = "UNKNOWN"
-horizontal_alignment = 1
-
-[node name="LockStatePanel" type="PanelContainer" parent="DetailTooltip/TooltipHbox/TooltipVBox" unique_id=593250381]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_7dtr8")
-
-[node name="MarginContainer" type="MarginContainer" parent="DetailTooltip/TooltipHbox/TooltipVBox/LockStatePanel" unique_id=1733216395]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_right = 5
-
-[node name="LockStateText" type="Label" parent="DetailTooltip/TooltipHbox/TooltipVBox/LockStatePanel/MarginContainer" unique_id=876974478]
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_fonts/font = ExtResource("3_xq7gi")
-text = "UNKNOWN"
+text = "Scanning..."
 horizontal_alignment = 1
 
 [node name="BodyBox" type="BoxContainer" parent="DetailTooltip/TooltipHbox" unique_id=873904700]
