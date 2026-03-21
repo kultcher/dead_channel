@@ -1,3 +1,8 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+/DesignNotes/BrainstormInbox/
+/DesignNotes/BrainstormResults/
+/DesignNotes/BrainstormWorking
+/codex/AGENTS.md
+/visuals/
