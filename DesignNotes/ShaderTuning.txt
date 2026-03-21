@@ -1,0 +1,12 @@
+Sniff:
+    Color
+        Script-side tint: RAIN_TINT in sniff_puzzle.gd (line 18)
+        Per-layer alpha: last arg in _add_rain_layer(...) calls at sniff_puzzle.gd (line 70) and sniff_puzzle.gd (line 71)
+        Shader color: rain_color uniform in matrix_rain.gdshader (line 9)
+    Speed
+        Per-layer speed arg in _add_rain_layer(...) at sniff_puzzle.gd (line 70) and sniff_puzzle.gd (line 71)
+        Shader base speed uniform at matrix_rain.gdshader (line 6)
+    Frequency / density
+        Spawn/occupancy density: density in script sniff_puzzle.gd (line 84) and shader matrix_rain.gdshader (line 7)
+        Glyph change frequency: glyph_refresh_rate in matrix_rain.gdshader (line 10)
+        Stream granularity (how many cells): columns/rows from script sniff_puzzle.gd (line 81) and sniff_puzzle.gd (line 82)

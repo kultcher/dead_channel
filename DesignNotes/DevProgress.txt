@@ -1,0 +1,75 @@
+Development Progress
+
+- Signal Timeline: timeline_manager.gd, grid_layer.gd
+> Mostly functional in a basic state. timeline_manager is the "arbiter of truth" that measures the runners' distance from signals. grid_layer draws and animates the grid using Node2D's _draw().
+
+- Signals: signal_entity.gd, SignalData.gd, ActiveSignal.gd + various components
+> Baseline functional. Using a factory + composition pattern. SignalData defines a Signal's properties, ActiveSignal translates them into on-screen signal_entities. Currently, Signals scroll toward the player at appropriate speed, can be scanned by mouse-over to show a detailed tooltip. Scan information is revealed in layers, as defined in ActiveSignal.gd. The only piece of actual interaction with the runners currently is a "vision" component (like for Cameras) that will be hooked into the heat system when implemented. Signals can also be left-clicked to open a terminal_window.
+
+- Heat: Basic visual and tracking
+
+- Terminal: terminal_window.gd, window_manager.gd, CommandDispatch.gd
+> Baseline functional, most commands not yet implemented. Clicking a signal pops up the terminal window and allows the user to type commands. Currently only "ACC" (access) command has a baseline implementation. Commands are sent to CommandDispatch, which processes them and communicates back to the terminal and other areas impacted by the command. window_manager handles linking the terminal window to the ActiveSignal. (Note: Future consideration is having the terminal not explicitly linked to Signals so the player can access any visible node via a single terminal window.) window_manager will also be used to manager puzzle windows when those are implemented.
+> ACCESS, KILL and RUN baseline functional
+
+2/7/2026:
+- Sniffer minigame: Prototype complete, awaiting cleanup.
+- Decrypt minigame: Prototype complete
+
+2/8/2026:
+- IC: Template built, simple IC crated.
+- ResponseComponent and Response effects: template for discrete effects created.
+
+2/11/2026:
+- Added terminal tabbing
+
+2/12/2026:
+- Added signal mobility and guard
+
+3/16/2026:
+- Added basic implementation of tactical pause
+- Added basic RunManager (for handling level data and run state) and TutorialManager (for handling tutorial state and progression)
+- Added simple dialogue window for tutorial and story dialogue
+- Initialized Jargonizer class
+
+3/17/2026:
+- Added more tutorial stuff
+- Fixed reboot interaction with tactical pause
+
+3/19/2026:
+- Added a focus overlay for tutorial
+- Added paging and continue-from-pause functionality to tutorial dialogue window
+- Reworked RunDef/RunSpawn system into script-based system for more flexibility and readability
+
+
+Short-term TODO:
+- Add an objective tracker
+- Add a cleaner way to update scan tooltips (array?)
+- Fix guard facing override
+- Adjust delay behavior to ResponseEffect instead of detection
+
+Not Yet Implemented (priority):
+- Even More robust terminal implementation
+- Robust heat implementation with difficulty scaling
+- Advanced Signal functions/behaviors
+- "Jargonizer" - for generating flavorful but semi-random terminal noise
+- guard alert behaviors
+- guard "combat"
+- distraction terminals
+- fuzz minigame
+- More and more advanced IC
+- Programs and RAM
+
+Not Yet Implemented (long-term):
+- Networked signals
+- credentials
+- guard radio "shadows"
+- Runner stats
+- Runner chatter
+- Runner-initiated events
+- Distinct corporate identities
+- Management layer
+- Consumables
+- Split Lanes
+- White Hats
+- expanded "Combat" mode
