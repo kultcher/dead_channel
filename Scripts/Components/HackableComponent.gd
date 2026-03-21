@@ -69,7 +69,7 @@ func _link(_cmd_context):
 
 func _op(cmd_context):
 	if cmd_context.active_sig == null or cmd_context.active_sig.data == null:
-		cmd_context.log_text.append("OP failed. No active signal context.")
+		cmd_context.log_text.append("Invalid context, no operation available.")
 		return
 
 	var signal_data = cmd_context.active_sig.data
@@ -84,7 +84,7 @@ func _op(cmd_context):
 			else:
 				cmd_context.log_text.append(signal_data.display_name + " unlocked.")
 		_:
-			cmd_context.log_text.append("OP failed. No contextual operation available for " + signal_data.display_name + ".")
+			cmd_context.log_text.append("Invalid context, no operation available.")
 
 func _op_disruptor(cmd_context) -> void:
 	var signal_data = cmd_context.active_sig.data

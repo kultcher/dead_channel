@@ -24,10 +24,10 @@ func add_module(module: Resource):
 	modules.append(module)
 
 func command_intercept(cmd_context: CommandContext):
-	var interrupt = false
 	for module in modules:
-		interrupt = module.interrupts_commands(cmd_context.command)
-		return interrupt
+		if module != null and module.interrupts_commands(cmd_context.command):
+			return true
+	return false
 
 func notify_enabled(active_sig: ActiveSignal):
 	for module in modules:

@@ -88,8 +88,6 @@ shape = SubResource("CircleShape2D_wudor")
 [node name="SignalManager" type="Node2D" parent="SignalTimeline" unique_id=1320650835]
 script = ExtResource("4_jx6wh")
 
-[node name="OverlayLayer" type="Node2D" parent="SignalTimeline" unique_id=1228212272]
-
 [node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
 script = ExtResource("5_wudor")
 

@@ -3,9 +3,9 @@
 
 extends Node2D
 
-@onready var timeline_manager = CommandDispatch.timeline_manager
+@onready var timeline_manager = $"../TimelineManager"
 @onready var window_manager = $"../../WindowManager"
-@onready var terminal_window = CommandDispatch.terminal_window
+@onready var terminal_window = $"../../TerminalWindow"
 @onready var spawner = SignalSpawner.new()
 
 var signal_scene = preload("res://Scenes/signal_entity.tscn")
@@ -32,6 +32,19 @@ func get_active_signal(display_name: String):
 	for sig in signal_queue:
 		if sig.data.display_name == display_name:
 			return sig
+
+func get_signal_by_system_id(system_id: String) -> ActiveSignal:
+	for sig in signal_queue:
+		if sig != null and sig.data != null and sig.data.system_id == system_id:
+			return sig
+	return null
+
+func has_signal_in_network(system_id: String) -> bool:
+	return get_signal_by_system_id(system_id) != null
+
+func is_signal_in_range(system_id: String) -> bool:
+	var sig := get_signal_by_system_id(system_id)
+	return sig != null and sig.instance_node != null
 	
 func _process(delta):
 	if currently_scanning_signal != null:
@@ -48,7 +61,6 @@ func spawn_signal_data(data: SignalData, cell_index: float):
 	print("Spawn signal: ", new_signal.data.display_name)
 
 func update_signal_position():
-	var cleared_signals = []
 	for active_sig in signal_queue:
 		var signal_cell_index := active_sig.start_cell_index
 		var signal_lane := float(active_sig.data.lane)
@@ -80,13 +92,12 @@ func update_signal_position():
 			active_sig.instance_node.position = Vector2(visual_x, visual_y) + render_offset
 			
 		else:
-			if visual_x < -100 and active_sig.instance_node != null:
+			if visual_x < -200 and active_sig.instance_node != null:
+				print(terminal_window)
+				if terminal_window != null:
+					terminal_window.hide_tab_for_signal(active_sig)
 				active_sig.instance_node.queue_free()
-				cleared_signals.append(active_sig)
-
-	for active_sig in cleared_signals:
-			active_sig.instance_node = null
-			signal_queue.erase(active_sig)
+				active_sig.instance_node = null
 
 # === SCAN & LOCK LOGIC ===
 

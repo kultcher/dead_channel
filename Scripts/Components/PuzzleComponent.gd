@@ -44,8 +44,9 @@ func process_solve(active_sig: ActiveSignal):
 	puzzle_locked = false
 	#TODO: Find a clean way to update tooltip text... store as an array to print on each line?
 	#WARNING: temporary
-	active_sig.instance_node.tooltip_active_scan_text.text = "HACKED"
-	active_sig.instance_node.tooltip_active_scan.set_self_modulate(Color(255,0,0))
+	if active_sig.instance_node:
+		active_sig.instance_node.tooltip_active_scan_text.text = "HACKED"
+		active_sig.instance_node.tooltip_active_scan.set_self_modulate(Color(255,0,0))
 
 func is_locked() -> bool:
 	return puzzle_type != Type.NONE and puzzle_locked

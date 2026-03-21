@@ -36,7 +36,7 @@ Stray ideas:
 	- IC: "Stasis": Changes to behavior aren't reflected on the timeline
 	- IC: "Blind": No terminal feedback
 	guards "comms pulse" to get brief location hints
-
+	- Heat effects program cleanup times
 
 "Matrix Search" names:
 Sniff

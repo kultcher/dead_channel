@@ -46,6 +46,7 @@ Short-term TODO:
 - Add an objective tracker
 - Add a cleaner way to update scan tooltips (array?)
 - Fix guard facing override
+- Adjust delay behavior to ResponseEffect instead of detection
 
 Not Yet Implemented (priority):
 - Even More robust terminal implementation

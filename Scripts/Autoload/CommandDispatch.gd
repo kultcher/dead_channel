@@ -15,10 +15,9 @@ signal command_complete(cmd_context: CommandContext)
 signal command_error(error_msg: String, context: ActiveSignal)
 
 # === COMMAND REGISTRY ===
-# Easy to expand later
 const VALID_COMMANDS = {
 	"ACCESS": {
-		"valid_flag": ["-bp"],
+		"valid_flags": ["-bp"],
 		"description": "Access: Access a system"
 	},
 	"PROBE": {
@@ -48,126 +47,194 @@ const VALID_COMMANDS = {
 }
 
 const COMMAND_SHORTCUTS = {
-	"ACC": "ACCESS", "INS": "INSPECT", "SPF": "SPOOF", "KIL": "KILL", "PRB": "PROBE", "LNK": "LINK"
+	"ACC": "ACCESS",
+	"INS": "PROBE",
+	"SPF": "SPOOF",
+	"KIL": "KILL",
+	"PRB": "PROBE",
+	"LNK": "LINK"
 }
 
+const ROOT_CONTEXT_ERROR := "Not applicable on ROOT, connect to a session."
+
 func switch_terminal_session(active_sig: ActiveSignal):
+	if active_sig == null:
+		return
 	GlobalEvents.signal_connect.emit(active_sig.data)
 	terminal_window.switch_session(active_sig)
 
 # === MAIN ENTRY POINT ===
 
-# Package commands and sorts it depending on if terminal session matches signal
 func process_command(input: String, active_sig: ActiveSignal = null) -> void:
-	var parsed = parse_input(input.to_lower())
-	var session_sig = terminal_window.active_signal
-
-	# NOTE: Just for invalid command error? Redundant with below?
+	var parsed = parse_input(input)
 	if parsed.has("error"):
-		command_error.emit(parsed.error, active_sig)
+		_fail(parsed.error, active_sig)
 		return
 
-	if parsed.command == "HELP":
+	var cmd_context := CommandContext.new()
+	cmd_context.command = parsed.command
+	cmd_context.flags = parsed.flags
+	cmd_context.arg = parsed.args[0] if not parsed.args.is_empty() else ""
+	cmd_context.active_sig = active_sig
+
+	if cmd_context.command == "HELP":
 		_cmd_help(active_sig)
 		return
 
-	# WARNING: This is a temp fix
-	if session_sig == terminal_window.root_signal: return
-
-	# if no arg given, set arg to session signal for implicit targeting
-	var target_sig: ActiveSignal
-	if !parsed.arg:
-		parsed.arg = active_sig.data.display_name
-		#TODO: Maybe we also need to check if there's an active session? YUP
-
-	target_sig = signal_manager.get_active_signal(parsed.arg)
-		
-	print("CommandDispatch: Target sig: ", target_sig)
-
-	if parsed.command != "RUN" and active_sig.data.puzzle:
-		if active_sig.data.puzzle.puzzle_locked:
-			command_error.emit("ACCESS DENIED", active_sig)
-			return
-
-	# syntax error
-	if parsed.has("error"):
-		command_error.emit(parsed.error, active_sig)
+	var usage_error := _validate_command_usage(cmd_context.command, parsed.args)
+	if usage_error != "":
+		_fail(usage_error, active_sig)
 		return
 
-	# Signal despawned
-	if !target_sig in signal_manager.signal_queue and parsed.command != "RUN":
-		command_error.emit("!!> " + parsed.command + " failed. Connection lost.")
+	var resolved := _resolve_command_context(cmd_context)
+	if resolved.has("error"):
+		_fail(resolved.error, active_sig)
 		return
 
-	var cmd_context = CommandContext.new()
-	cmd_context.active_sig = active_sig
-	cmd_context.flags = parsed.flags
-	cmd_context.command = parsed.command
-	cmd_context.arg = parsed.arg
+	if resolved.has("switch_target"):
+		var switch_target: ActiveSignal = resolved.switch_target
+		switch_terminal_session(switch_target)
+		cmd_context.active_sig = switch_target
 
-	# ACCESS can switch sessions from the terminal regardless
 	if cmd_context.command == "ACCESS":
-		cmd_context.active_sig = target_sig
 		_cmd_access(cmd_context)
 		return
 
-	# Not connected to a session
-	if !session_sig:
-		command_error.emit("!!> " + parsed.command + " failed. No applicable context.")
+	if cmd_context.command != "RUN" and _is_puzzle_locked(cmd_context.active_sig):
+		_fail("ACCESS DENIED", cmd_context.active_sig)
 		return
 
-	if cmd_context.command == "RUN":
-		_try_command(cmd_context)
-		return
-
-	# Wrong session TODO: Add auto-connect to new other session name with prompt
-	if session_sig.data.system_id != cmd_context.arg:
-		command_error.emit("!!> " + parsed.command + " failed. " + parsed.arg + " out of context.", cmd_context.active_sig)
-		return
-		
-	# execute
 	_try_command(cmd_context)
 
-
 # === PARSER ===
+
 func parse_input(input: String) -> Dictionary:
 	var result = {
 		"command": "",
-		"arg": "",
+		"args": [],
 		"flags": []
 	}
-	
+
 	var trimmed = input.strip_edges()
 	if trimmed.is_empty():
 		return {"error": "No command entered"}
-	
-	var parts = trimmed.split(" ", false)  # false = skip empty strings
+
+	var parts = trimmed.split(" ", false)
 	var cmd = parts[0].to_upper()
-	
+
 	if cmd in COMMAND_SHORTCUTS:
 		cmd = COMMAND_SHORTCUTS[cmd]
-	
+
 	if not cmd in VALID_COMMANDS:
 		return {"error": "Unknown command: " + cmd}
-	
+
 	result.command = cmd
-	
-	# Parse arg and flags
+
 	for i in range(1, parts.size()):
 		var part = parts[i]
 		if part.begins_with("-"):
 			result.flags.append(part)
 		else:
-			result.arg = part
-	
+			result.args.append(part.to_lower())
+
 	return result
 
+# === VALIDATION ===
 
+func _validate_command_usage(command: String, args: Array) -> String:
+	var arg_count = args.size()
+
+	match command:
+		"ACCESS":
+			if arg_count <= 0:
+				return "ACC requires a target"
+			if arg_count > 1:
+				return "ACCESS takes exactly one target"
+		"RUN":
+			if arg_count <= 0:
+				return "RUN requires a program name"
+			if arg_count > 1:
+				return "RUN takes exactly one program name"
+		"KILL", "OP", "PROBE":
+			if arg_count > 1:
+				return command + " takes at most one target"
+		"SPOOF":
+			if arg_count <= 0:
+				return "SPOOF requires an explicit target"
+			if arg_count > 1:
+				return "SPOOF takes exactly one target"
+		"HELP":
+			if arg_count > 0:
+				return "HELP takes no arguments"
+
+	return ""
+
+func _resolve_command_context(cmd_context: CommandContext) -> Dictionary:
+	var has_explicit_arg := not cmd_context.arg.is_empty()
+	var session_sig: ActiveSignal = terminal_window.active_signal
+	var using_root := _is_root_session(session_sig)
+
+	match cmd_context.command:
+		"ACCESS":
+			var access_target := _resolve_signal_target(cmd_context.arg)
+			if access_target.has("error"):
+				return access_target
+			return {"switch_target": access_target.signal}
+
+		"RUN":
+			if using_root:
+				return {"error": ROOT_CONTEXT_ERROR}
+			cmd_context.active_sig = session_sig
+			return {}
+
+		"KILL", "OP", "PROBE":
+			if has_explicit_arg:
+				var command_target := _resolve_signal_target(cmd_context.arg)
+				if command_target.has("error"):
+					return command_target
+				return {
+					"switch_target": command_target.signal
+				}
+			if using_root:
+				return {"error": ROOT_CONTEXT_ERROR}
+			cmd_context.active_sig = session_sig
+			return {}
+
+		"SPOOF":
+			return {"error": "SPOOF not yet implemented"}
+
+	return {}
+
+func _resolve_signal_target(system_id: String) -> Dictionary:
+	if signal_manager == null:
+		return {"error": "Signal manager unavailable"}
+	if not signal_manager.has_signal_in_network(system_id):
+		return {"error": "No such signal in network"}
+	if not signal_manager.is_signal_in_range(system_id):
+		return {"error": "No such signal in range"}
+
+	var sig: ActiveSignal = signal_manager.get_signal_by_system_id(system_id)
+	if sig == null:
+		return {"error": "No such signal in network"}
+	return {"signal": sig}
+
+func _is_root_session(active_sig: ActiveSignal) -> bool:
+	return terminal_window != null and active_sig == terminal_window.root_signal
+
+func _is_puzzle_locked(active_sig: ActiveSignal) -> bool:
+	if active_sig == null or active_sig.data == null:
+		return false
+	if active_sig.data.puzzle == null:
+		return false
+	return active_sig.data.puzzle.puzzle_locked
+
+func _fail(error_msg: String, context: ActiveSignal) -> void:
+	command_error.emit(error_msg, context)
 
 # === COMMAND HANDLERS ===
+
 func _cmd_access(cmd_context: CommandContext) -> void:
 	cmd_context.log_text.append("ACCESS GRANTED")
-	terminal_window.switch_session(cmd_context.active_sig)
 	_finalize_command(cmd_context)
 
 func _cmd_help(active_sig: ActiveSignal) -> void:
@@ -179,21 +246,21 @@ func _cmd_help(active_sig: ActiveSignal) -> void:
 	cmd_context.command = "HELP"
 	cmd_context.log_text.append("Opening terminal reference.")
 	_finalize_command(cmd_context)
-		
+
 func _try_command(cmd_context: CommandContext) -> void:
 	print("Command Dispatch trying command: " + cmd_context.command)
 	var ic_modules = cmd_context.active_sig.data.ic_modules
 	if ic_modules != null:
-		var stopped = (ic_modules.command_intercept(cmd_context))
+		var stopped = ic_modules.command_intercept(cmd_context)
 		if stopped:
 			_interrupt_command(cmd_context)
 			return
 	cmd_context.active_sig.data.hackable.try_command(cmd_context)
 	_finalize_command(cmd_context)
-			
-func _interrupt_command(cmd_context: CommandContext):
+
+func _interrupt_command(_cmd_context: CommandContext):
 	pass
-	
+
 func _finalize_command(cmd_context: CommandContext):
 	print("Command Dispatch finished command: " + cmd_context.command)
 	command_complete.emit(cmd_context)

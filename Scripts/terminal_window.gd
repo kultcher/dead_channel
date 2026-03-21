@@ -55,12 +55,16 @@ func switch_session(new_sig: ActiveSignal):
 		ensure_tab_for_session(new_session)
 		clear_log()
 		print_to_log("New session started with " + new_sig.data.system_id)
+		print_to_root("<Session Log>: Connected to " + new_sig.data.system_id)
 		prefix.text = "-" + new_sig.data.system_id + "-["
 
 	# Switch to existing session
 	elif active_signal.terminal_session != null:
 		active_session = active_signal.terminal_session
 		restore_session(active_session)
+
+func print_to_root(text: String):
+	root_session.history.append(text)
 
 func print_to_log(text: String):
 	active_session.history.append(text)
@@ -113,6 +117,28 @@ func _on_session_tabs_tab_close_pressed(tab: int) -> void:
 	if session != null:
 		session.has_tab = false
 	session_tabs.remove_tab(tab)
+
+func hide_tab_for_signal(target_signal: ActiveSignal) -> void:
+	if target_signal == null or target_signal.terminal_session == null:
+		return
+	var session := target_signal.terminal_session
+	
+	if not session.has_tab:
+		return
+
+	var tab_index := _find_tab_for_session(session)
+	if tab_index == -1:
+		session.has_tab = false
+		if active_session == session:
+			restore_session(root_session)
+		return
+
+	if session == active_session:
+		print_to_root("<Session Log>: WARNING: " + target_signal.data.system_id + " no longer in range. Dropping to root.")
+		restore_session(root_session)
+
+	session.has_tab = false
+	session_tabs.remove_tab(tab_index)
 
 func ensure_tab_for_session(session: TerminalSession):
 	var existing_index = _find_tab_for_session(session)
