@@ -43,16 +43,18 @@ Development Progress
 
 3/21/2026:
 - Seperated scanning function into new ScanController
-
+- Cleaned up CommandDispatch flow
+- Switched to "bullet time" instead of tactical pause
 
 Short-term TODO:
+- Tutorial flow: Switch to have "mentor" character who can stop himself, rather than pause
 - Add a cleaner way to update scan tooltips (array?)
-- Fix signal scan tooltip visuals
-- Fix guard facing override
 - Adjust delay behavior to ResponseEffect instead of detection
 
 Polish TODO:
 - Switch scan panels to icons (scan can start as black circle, end on full green | lock state can be a lock or unlocked icon or broken lock)
+- Fix guard facing override
+- Add disconnect behavior to decrypt and other minigames
 
 Not Yet Implemented (priority):
 - Robust heat implementation with difficulty scaling

@@ -13,8 +13,6 @@ var _patrol_direction: int = 1
 var _return_patrol_index: int = -1
 var _dwell_timer: float = 0.0
 var _investigate_timer: float = 0.0
-var _is_paused: bool = false
-
 var _current_alert: GuardAlertData = null
 var _alert_destination_cell_x: float = 0.0
 var _alert_destination_lane_pos: float = 0.0
@@ -45,24 +43,16 @@ func initialize(target_active_sig: ActiveSignal) -> void:
 	active_sig.runtime_position_initialized = true
 
 	GlobalEvents.guard_alert_raised.connect(_on_guard_alert_raised)
-	GlobalEvents.tactical_pause.connect(_on_pause)
-	GlobalEvents.tactical_unpause.connect(_on_unpause)
 	set_process(true)
 
 func _exit_tree() -> void:
 	if GlobalEvents.guard_alert_raised.is_connected(_on_guard_alert_raised):
 		GlobalEvents.guard_alert_raised.disconnect(_on_guard_alert_raised)
-	if GlobalEvents.tactical_pause.is_connected(_on_pause):
-		GlobalEvents.tactical_pause.disconnect(_on_pause)
-	if GlobalEvents.tactical_unpause.is_connected(_on_unpause):
-		GlobalEvents.tactical_unpause.disconnect(_on_unpause)
 
 func _process(delta: float) -> void:
 	if _mobility == null or _mobility.patrol_points.is_empty():
 		return
 	if active_sig == null or active_sig.is_disabled:
-		return
-	if _is_paused:
 		return
 	if _mobility.movement_disabled:
 		return
@@ -338,9 +328,3 @@ func _camera_is_puzzle_locked(camera_sig: ActiveSignal) -> bool:
 	if camera_sig.data.puzzle == null:
 		return false
 	return camera_sig.data.puzzle.is_locked()
-
-func _on_pause() -> void:
-	_is_paused = true
-
-func _on_unpause() -> void:
-	_is_paused = false

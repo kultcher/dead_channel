@@ -10,16 +10,18 @@ var continue_button: Button
 
 var pages: Array[String] = []
 var page_index: int = 0
+var tutorial_event_id: String = ""
 
 signal dismissed
 
 func setup(event: TutorialEvent, focus_rect: Rect2 = Rect2()):
-	chat = $TerminalVBox/ChatLog
+	chat = $TerminalVBox/BodyHBox/ChatLog
 	page_label = $TerminalVBox/FooterHBox/PageLabel
 	left_button = $TerminalVBox/FooterHBox/LeftButton
 	right_button = $TerminalVBox/FooterHBox/RightButton
 	continue_button = $TerminalVBox/FooterHBox/ContinueButton
 	pages = event.text.duplicate()
+	tutorial_event_id = event.id
 	page_index = 0
 	if event.has_custom_position:
 		position = _clamp_to_viewport(event.default_position, get_viewport_rect().size)

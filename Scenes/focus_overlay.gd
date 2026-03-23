@@ -12,11 +12,30 @@ extends Control
 
 var reveal_progress := 0.0
 var focus_center := Vector2.ZERO
+var _target_signal: ActiveSignal = null
+var _target_padding := Vector2(32, 32)
 
 func _ready() -> void:
 	resized.connect(_update_layout)
 	focus_center = size * 0.5
 	visible = false
+	set_process(false)
+	_update_layout()
+
+func _process(_delta: float) -> void:
+	if _target_signal == null:
+		return
+	if _target_signal.instance_node == null or not is_instance_valid(_target_signal.instance_node):
+		clear_focus()
+		return
+
+	var rect = _target_signal.instance_node.get_focus_rect()
+	if rect.size.x <= 0.0 or rect.size.y <= 0.0:
+		return
+
+	var padded_rect = rect.grow_individual(_target_padding.x, _target_padding.y, _target_padding.x, _target_padding.y)
+	focus_size = padded_rect.size
+	focus_center = padded_rect.get_center()
 	_update_layout()
 
 func _update_layout() -> void:
@@ -76,6 +95,8 @@ func reset_overlay() -> void:
 	_set_reveal_progress(0.0)
 
 func set_focus_rect(rect: Rect2, padding: Vector2 = Vector2(32, 32)) -> void:
+	_target_signal = null
+	set_process(false)
 	var padded_rect := rect.grow_individual(padding.x, padding.y, padding.x, padding.y)
 	focus_size = padded_rect.size
 	focus_center = padded_rect.get_center()
@@ -83,5 +104,28 @@ func set_focus_rect(rect: Rect2, padding: Vector2 = Vector2(32, 32)) -> void:
 	reset_overlay()
 	play_reveal_animation()
 
+func set_focus_signal(active_sig: ActiveSignal, padding: Vector2 = Vector2(32, 32)) -> void:
+	if active_sig == null or active_sig.instance_node == null or not is_instance_valid(active_sig.instance_node):
+		clear_focus()
+		return
+
+	_target_signal = active_sig
+	_target_padding = padding
+	set_process(true)
+
+	var rect = active_sig.instance_node.get_focus_rect()
+	if rect.size.x <= 0.0 or rect.size.y <= 0.0:
+		clear_focus()
+		return
+
+	var padded_rect = rect.grow_individual(padding.x, padding.y, padding.x, padding.y)
+	focus_size = padded_rect.size
+	focus_center = padded_rect.get_center()
+	visible = true
+	reset_overlay()
+	play_reveal_animation()
+
 func clear_focus() -> void:
+	_target_signal = null
+	set_process(false)
 	visible = false

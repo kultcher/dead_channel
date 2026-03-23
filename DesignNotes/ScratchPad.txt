@@ -11,13 +11,28 @@ Stray ideas:
 
 	Utility signals:
 	Security terminal: disable nearby IC, open doors, reduce difficulty
-	Comms terminal: get guard positions for a time, or dissipate heat
+	Comms terminal: get guard positions for a time, or dissipate heat, reroute patrol
 	Data terminal: pay boost
+	motion sensors: two types: one requires fast movement, the other requires slow
+	thermal camera: after walls
+	dormant cameras: off by default, triggered by certain conditions
+	blast doors: unhackable - heat management challenge
+	timed doors
+	guard paired with drone?
+	maintenance drones - no detection but alerted but hacks and can fix
+	pulse drones: similar to 360 camera, but different cadence
+	civilians techs who flag tech issues
+	alarm panels that civs or guards can trigger, but you can also hack to trigger as a distraction?
+	power/light switches?
+
+	relay signal: force multiplier that buffs other signals
 
 	Stealing credentials from guards/terminals, escalating credentials
 	Access-locked terminals still solvable, credentials let you shortcut
 	Credentials decay over time?
 	big maybes: keylogger (or social engineering?) for delayed credential access, counter-surveillance on credential usage, ICE credential burn
+
+	- spinning eye camera: fast moving arc that loops 360
 
 	- using doors to block line of sight or trap guards
 
@@ -37,6 +52,20 @@ Stray ideas:
 	- IC: "Blind": No terminal feedback
 	guards "comms pulse" to get brief location hints
 	- Heat effects program cleanup times
+	- "flicker" IC: randomly blinks out of the timeline view
+
+	- Null Spike let's the player see "secret connections" or hidden signals
+	Luxon IC: mutate, evolve
+	- Sentinel: has a caged AI daemon
+	- IC type: Chain - linked signals that trigger each other?
+	- redundancy: hacking some signals wakes up others
+	- disruption on data? like you're stealing data and have to "egg carry" it?
+	- using distraction type signals (coolant pipes) to clear fire blocking runners
+	- RAGNAROK: forced brute-force of doors, but more heat management tools/terminals
+
+	- runs with mobile objective - encourage player to use forward movement
+	- non timeline, hack-only levels with nodemaps?
+	
 
 "Matrix Search" names:
 Sniff
@@ -49,9 +78,80 @@ Story/Lore stuff:
 - white hats as inquisitors and true believers
 - maintenance as rituals
 - AI-dependence leads to knowledge loss, collapse
+- mentor "Blackjack"
 
 Heat isn't just "Alert Level"; it’s "Variance." You are introducing variance into a perfect system.
 IC (Intrusion Countermeasures): Instead of distinct software names, they are named after virtues or corporate values.
 Standard Cyberpunk: "Killer.exe", "Firewall", "Black ICE".
 Dead Channel: "Protocol: Purity", "Asset: Retention", "Human Resources Mitigation".
 Terminal Minigame: When you fail a puzzle or decay happens, the text isn't ACCESS DENIED. It’s NON-COMPLIANT. FAITH IN SUITE 3.0 REQUIRED. SUBMIT TICKET FOR PENANCE.
+
+https://www.fontspace.com/sd-dystopian-font-f109410
+
+Words for AI facilities:
+Shells
+Husks
+Crypts
+Echoes
+
+Common jargon:
+"The paperclip" - general reference to the AI's original purpose as a paperclip maximizer, also used coloquially to refer to hyper-fixating on a single goal or task to the detriment of all else
+"drift" used colloquially to describe the world's slow decay
+"patching", "patcher" - physical bypasses of old AI systems, or the people who make them
+"shim" - a small patch or bypass, often temporary, to get around a system's limitations or failures
+"fallback"
+"downstack vs upstack" - new class signifiers
+"tell it a story" - cargo-cultish behavior of manipulating stale AI systems
+"baseliners" - the current generation born after genetic engineering and AI dependence
+"Preserves" - aka "Jars" the old generation who have been kept alive through anti-aging tech, often in "clinics" or social clubs for the aged. They are the keepers of knowledge about the legacy systems and the world before the collapse, but are often dismissed or ignored by the younger generations.
+"the catch-up" and "spilling": the rapid decline of preserves who lose access to anti-aging tech, "spilling" is the the uglier slang term
+"clinic" - slang for a social club for the aged who still use anti-aging tech
+"the clock" - general term people use for impending collapse when the AI systems fully fail
+"seeing the depth" - the moment of realization of how little people understand the legacy systems
+"Orphan/Daemon AIs"
+"coasting" - the general vibe
+"Husks" - abandoned AI facilities
+
+Slang: 
+"Clip it" - fuck it (clipping paper)
+"looped/looping" - slang for annoying
+"desynced" - slang for broken or crazy
+"burn the grid"
+"Spill you"
+"ping-deaf" - clueless
+"no ping" - no contact
+"pinging empty"
+"ghosted" (maybe ghostwired? ghostroom?) - slang for "all talk"
+"read-only" or "hard path" - slang for "can't be fixed" or impossible
+"riding the clock" - timing actions around systems
+“Cold routes” - areas that the have been abandoned after necessary AI infrastructure 
+"shimmed/shimjob" - cheated/low quality work
+"Static" - it is what it is
+"Noise" - bullshit
+"Skin" - slang for baseliners
+"Jarred" - stuck in the past
+"ticking" - time is running out, as in "This whole place is ticking"
+"deadlined" - no longer drifting, but rather mid-collapse
+"ashed" - degraded beyond recovery
+"catching light" - attracting attention
+"ghosts" - the AIs who left
+
+Greetings and Farewells
+"Stay warm." — Take care, keep your connections alive.
+"Don't drift." — Stay focused, stay sharp. Can be affectionate or a warning.
+"Keep it patched." — Keep it together. Said to someone going through a hard time.
+"Smooth coasting." — Good luck. Slightly ironic — nobody's coast is actually smooth.
+"See you past the clock." — Optimistic, almost defiant. "We'll both still be here when the next thing breaks."
+
+"choom/chummer" equialents:
+"base" - youth slang for friend
+"spoke" - 
+"prox" - someone close to you
+"link"
+
+Decker equivalents:
+"Caller"
+"Shimmer"
+"Prox"
+"Clocker"
+"Drifter/Driftrunner"

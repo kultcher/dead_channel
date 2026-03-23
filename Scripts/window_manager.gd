@@ -20,13 +20,15 @@ var dialogue_window_scene = preload("res://Scenes/dialogue_window.tscn")
 @export var cascade_step := Vector2(25, 25)  # Each window offsets by this amount
 
 var window_count := 0
+var _tutorial_dialogue_hold_tokens: Dictionary = {}
 
 func _ready():
 	CommandDispatch.window_manager = self
 	GlobalEvents.puzzle_started.connect(_puzzle_started)
-	GlobalEvents.tactical_unpause.connect(_on_tactical_unpause)
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_process_input(true)
 	if help_overlay != null:
+		help_overlay.process_mode = Node.PROCESS_MODE_ALWAYS
 		help_overlay.visible = false
 
 func _input(event: InputEvent) -> void:
@@ -53,7 +55,10 @@ func focus_rect(rect: Rect2, padding: Vector2 = Vector2(64, 64)) -> void:
 	focus_overlay.set_focus_rect(rect, padding)
 
 func focus_signal(active_sig: ActiveSignal, padding: Vector2 = Vector2(64, 64)) -> void:
-	focus_rect(get_signal_focus_rect(active_sig), padding)
+	if active_sig == null:
+		focus_overlay.clear_focus()
+		return
+	focus_overlay.set_focus_signal(active_sig, padding)
 
 func focus_control(control: Control, padding: Vector2 = Vector2(64, 64)) -> void:
 	focus_rect(get_control_focus_rect(control), padding)
@@ -74,38 +79,48 @@ func clear_tutorial_objective() -> void:
 func show_help_overlay() -> void:
 	if help_overlay == null:
 		return
-	if not timeline_manager.is_paused:
-		GlobalEvents.tactical_pause.emit()
 	help_overlay.visible = true
 	move_child(help_overlay, get_child_count() - 1)
+	get_tree().paused = true
 
 func hide_help_overlay() -> void:
 	if help_overlay == null:
 		return
 	help_overlay.visible = false
+	get_tree().paused = false
 
 func toggle_help_overlay() -> void:
 	if help_overlay == null:
 		return
 	if help_overlay.visible:
 		hide_help_overlay()
-		if timeline_manager.is_paused:
-			GlobalEvents.tactical_unpause.emit()
 		return
 	show_help_overlay()
 
-func show_tutorial_dialogue(event: TutorialEvent, focus_rect: Rect2 = Rect2()) -> Control:
+func show_tutorial_dialogue(event: TutorialEvent, focus_rect: Rect2 = Rect2(), runner_hold_token: String = "") -> Control:
 	var dialogue = dialogue_window_scene.instantiate()
-	dialogue.dismissed.connect(_on_tutorial_dialogue_dismissed)
+	dialogue.dismissed.connect(_on_tutorial_dialogue_dismissed.bind(dialogue))
 	add_child(dialogue)
 	move_child(dialogue, get_child_count() - 1)
+	if not runner_hold_token.is_empty():
+		_tutorial_dialogue_hold_tokens[dialogue.get_instance_id()] = runner_hold_token
 	dialogue.setup(event, focus_rect)
 	return dialogue
 
-func _on_tutorial_dialogue_dismissed() -> void:
+func _on_tutorial_dialogue_dismissed(dialogue: Control) -> void:
 	clear_focus_overlay()
+	if dialogue != null:
+		var tutorial_event_id = dialogue.get("tutorial_event_id")
+		if tutorial_event_id is String and not tutorial_event_id.is_empty():
+			GlobalEvents.tutorial_dialogue_finished.emit(tutorial_event_id)
+	if dialogue != null:
+		var dialogue_id := dialogue.get_instance_id()
+		if _tutorial_dialogue_hold_tokens.has(dialogue_id):
+			var runner_hold_token: String = _tutorial_dialogue_hold_tokens[dialogue_id]
+			_tutorial_dialogue_hold_tokens.erase(dialogue_id)
+			GlobalEvents.release_runner_hold(runner_hold_token)
 	GlobalEvents.tutorial_lock_changed.emit(false)
-	GlobalEvents.tactical_unpause.emit()
+	GlobalEvents.deactivate_null_spike.emit()
 
 func _puzzle_started(active_sig: ActiveSignal, puzzle_type: PuzzleComponent.Type):
 	var puzzle_window
@@ -125,8 +140,6 @@ func _puzzle_started(active_sig: ActiveSignal, puzzle_type: PuzzleComponent.Type
 	if puzzle_window == null or not is_instance_valid(puzzle_window):
 		return
 	focus_control(puzzle_window, Vector2(32, 32))
-	if timeline_manager.is_paused and puzzle_window.has_method("_on_pause"):
-		puzzle_window.call("_on_pause")
 
 func _on_puzzle_solved(active_sig: ActiveSignal, puzzle_window: Control) -> void:
 	if active_sig != null and active_sig.data != null and active_sig.data.puzzle != null:
@@ -138,6 +151,3 @@ func _on_puzzle_solved(active_sig: ActiveSignal, puzzle_window: Control) -> void
 func _on_puzzle_failed(active_sig: ActiveSignal) -> void:
 	if active_sig != null and active_sig.data != null:
 		GlobalEvents.puzzle_failed.emit(active_sig.data)
-
-func _on_tactical_unpause() -> void:
-	hide_help_overlay()

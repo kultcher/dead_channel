@@ -5,7 +5,6 @@ extends Node2D
 
 @onready var timeline_manager = $"../TimelineManager"
 @onready var runner_team = $RunnerTeam
-@onready var runner_icon = $RunnerTeam/RunnerIcon
 @onready var debug_label = $Debug
 
 # CONFIGURATION
@@ -19,7 +18,6 @@ var grid_color = Color(1, 0.441, 0.0, 1.0)
 var time_elapsed: float = 0.0
 
 func _ready():
-	print("Cell width: ", cell_width, "Lane height: ", lane_height)
 	if runner_team:
 		var x_pos = timeline_manager.cells_to_pixels(timeline_manager.runner_screen_offset_cells)
 		var y_pos = (lane_height * 2.5)

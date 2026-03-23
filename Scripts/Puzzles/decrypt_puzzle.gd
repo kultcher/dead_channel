@@ -61,13 +61,10 @@ var boost_time_left := 0.0
 var cull_progress_style_normal: StyleBoxFlat
 var cull_progress_style_boost: StyleBoxFlat
 
-var is_paused: bool = false
-var _saved_focus_mode: FocusMode = FOCUS_ALL
-var _saved_input_editable: Array[bool] = []
-
+var null_spike_active: bool = false
 func _ready():
-	GlobalEvents.tactical_pause.connect(_on_pause)
-	GlobalEvents.tactical_unpause.connect(_on_unpause)
+	GlobalEvents.activate_null_spike.connect(activate_null_spike)
+	GlobalEvents.deactivate_null_spike.connect(deactivate_null_spike)
 	set_process_input(true)
 	_apply_linked_puzzle_config()
 	_build_ui()
@@ -75,11 +72,11 @@ func _ready():
 	_start_timers()
 
 func _input(event: InputEvent) -> void:
-	if event.is_action_pressed("tactical_pause") and not event.is_echo():
-		if is_paused:
-			GlobalEvents.tactical_unpause.emit()
+	if event.is_action_pressed("null_spike") and not event.is_echo():
+		if null_spike_active:
+			GlobalEvents.deactivate_null_spike.emit()
 		else:
-			GlobalEvents.tactical_pause.emit()
+			GlobalEvents.activate_null_spike.emit()
 		get_viewport().set_input_as_handled()
 
 func _apply_linked_puzzle_config() -> void:
@@ -304,7 +301,6 @@ func _alphabet() -> Array[String]:
 	return letters
 
 func _on_cycle_tick():
-	if is_paused: return
 	for i in keyspaces.size():
 		if keyspaces[i].is_empty():
 			continue
@@ -312,7 +308,6 @@ func _on_cycle_tick():
 		anim_labels[i].text = keyspaces[i][cycle_indices[i]]
 
 func _on_cull_tick():
-	if is_paused: return
 	for i in keyspaces.size():
 		if confirmed[i]:
 			continue
@@ -542,7 +537,6 @@ func _update_cull_ui():
 	cull_label.text = "%.1fs" % left
 
 func _process(delta: float):
-	if is_paused: return
 	_update_boost_timer(delta)
 	_update_cull_ui()
 
@@ -620,33 +614,8 @@ func _lockout_then_confirm(index: int):
 
 # SIGNALLED FUNCTIONS
 
-func _on_pause():
-	release_focus()
-	_saved_focus_mode = focus_mode
-	focus_mode = FOCUS_NONE
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_saved_input_editable.clear()
-	for input in input_edits:
-		_saved_input_editable.append(input.editable)
-		input.release_focus()
-		input.editable = false
-		input.focus_mode = Control.FOCUS_NONE
-	for panel in keyspace_panels:
-		panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	cull_timer.paused = true
-	is_paused = true
+func activate_null_spike():
+	null_spike_active = true
 	
-func _on_unpause():
-	focus_mode = _saved_focus_mode
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	for i in input_edits.size():
-		var input = input_edits[i]
-		input.focus_mode = Control.FOCUS_ALL
-		if i < _saved_input_editable.size():
-			input.editable = _saved_input_editable[i]
-		else:
-			input.editable = true
-	for panel in keyspace_panels:
-		panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	cull_timer.paused = false
-	is_paused = false
+func deactivate_null_spike():
+	null_spike_active = false

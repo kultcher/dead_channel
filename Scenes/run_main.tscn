@@ -4,8 +4,8 @@
 [ext_resource type="Script" uid="uid://d1t84c52jtssw" path="res://Scripts/timeline_manager.gd" id="1_882wi"]
 [ext_resource type="Script" uid="uid://ccamc7sskx0dd" path="res://Scripts/grid_layer.gd" id="2_85m8a"]
 [ext_resource type="Script" uid="uid://f728aufmncfn" path="res://Scripts/tutorial_manager.gd" id="2_r51ll"]
-[ext_resource type="Texture2D" uid="uid://cqq82un1s3x4" path="res://Visuals/icon.svg" id="3_4qt4q"]
 [ext_resource type="Script" uid="uid://cu20kah6ku6q3" path="res://Scripts/signal_manager.gd" id="4_jx6wh"]
+[ext_resource type="Texture2D" uid="uid://kvkbkwgf3xei" path="res://Visuals/Icons/blackjack_icon_ph3.png" id="5_k8c5c"]
 [ext_resource type="Script" uid="uid://gms8x710vr6g" path="res://Scripts/window_manager.gd" id="5_wudor"]
 [ext_resource type="Script" uid="uid://biyb8hixpkc42" path="res://Scripts/heat_tracker.gd" id="6_85m8a"]
 [ext_resource type="PackedScene" uid="uid://dbqweh3v2f0bq" path="res://Scenes/terminal_window.tscn" id="7_4qt4q"]
@@ -17,6 +17,16 @@
 [ext_resource type="Texture2D" uid="uid://bsp50rqqai1yc" path="res://Visuals/digital_background.png" id="12_0p2ub"]
 [ext_resource type="Shader" uid="uid://c16vuww6jgbkf" path="res://Shaders/circuits.gdshader" id="13_d5u5a"]
 [ext_resource type="Texture2D" uid="uid://b77pho6a4a6dm" path="res://Visuals/digital_toplayer.png" id="14_d5u5a"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k8c5c"]
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.3988219, 0.8749259, 0.9848737, 1)
+border_blend = true
+shadow_color = Color(0.34623083, 0.6429446, 1, 0.6)
+shadow_size = 25
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_wudor"]
 radius = 60.0
@@ -77,8 +87,19 @@ offset_bottom = -27.0
 [node name="RunnerTeam" type="Node2D" parent="SignalTimeline/GridLayer" unique_id=868639655]
 scale = Vector2(0.4, 0.4)
 
-[node name="RunnerIcon" type="Sprite2D" parent="SignalTimeline/GridLayer/RunnerTeam" unique_id=2139578560]
-texture = ExtResource("3_4qt4q")
+[node name="PanelContainer" type="PanelContainer" parent="SignalTimeline/GridLayer/RunnerTeam" unique_id=1618148646]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_k8c5c")
+
+[node name="RunnerIcon" type="TextureRect" parent="SignalTimeline/GridLayer/RunnerTeam/PanelContainer" unique_id=420175975]
+layout_mode = 2
+texture = ExtResource("5_k8c5c")
 
 [node name="RunnerArea" type="Area2D" parent="SignalTimeline/GridLayer/RunnerTeam" unique_id=2001800265 groups=["runner"]]
 collision_mask = 0
@@ -96,6 +117,9 @@ script = ExtResource("7_k8c5c")
 script = ExtResource("5_wudor")
 
 [node name="FocusOverlay" parent="WindowManager" unique_id=2047983454 instance=ExtResource("8_4ll5g")]
+focus_size = null
+dim_color = null
+reveal_duration = null
 
 [node name="ObjectiveTracker" parent="WindowManager" unique_id=1310032324 instance=ExtResource("9_2sk7x")]
 offset_left = 1450.0
@@ -104,6 +128,7 @@ offset_right = 1880.0
 offset_bottom = 864.0
 
 [node name="HelpOverlay" parent="WindowManager" unique_id=1226732366 instance=ExtResource("10_ki4rb")]
+visible = false
 offset_left = 200.0
 offset_top = 125.0
 offset_right = -102.0

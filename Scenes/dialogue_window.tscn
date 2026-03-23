@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bhnslpgxwdniq" path="res://Scripts/dialogue_window.gd" id="1_gax6d"]
 [ext_resource type="StyleBox" uid="uid://chg2qawtivc2b" path="res://Resources/StyleBox/TitleBarStyleBox.tres" id="1_td3r8"]
 [ext_resource type="Theme" uid="uid://discgqqbkpb5x" path="res://Resources/StyleBox/MainTheme.tres" id="2_gax6d"]
+[ext_resource type="Texture2D" uid="uid://lp58pd51rai4" path="res://Visuals/Portraits/8-bit_blackjack_close.png" id="4_4pfxs"]
 [ext_resource type="Texture2D" uid="uid://dcyv1i0jnyq7f" path="res://Visuals/play-button (1).svg" id="4_63p5y"]
 
 [sub_resource type="SystemFont" id="SystemFont_63p5y"]
@@ -37,8 +38,21 @@ theme_override_fonts/normal_font = SubResource("SystemFont_63p5y")
 text = "Chat"
 vertical_alignment = 1
 
-[node name="ChatLog" type="RichTextLabel" parent="TerminalVBox" unique_id=1725477988]
+[node name="BodyHBox" type="HBoxContainer" parent="TerminalVBox" unique_id=2143198911]
 layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Portrait" type="TextureRect" parent="TerminalVBox/BodyHBox" unique_id=432894993]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+texture = ExtResource("4_4pfxs")
+expand_mode = 1
+stretch_mode = 4
+flip_h = true
+
+[node name="ChatLog" type="RichTextLabel" parent="TerminalVBox/BodyHBox" unique_id=1725477988]
+layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("2_gax6d")
 text = "<Speaker>: Here is some example text."

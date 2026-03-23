@@ -219,17 +219,17 @@ func get_tutorial_events() -> Array[TutorialEvent]:
 	))
 
 	events.append(build_tutorial_event(
-		"tactical_pause_intro",
+		"null_spike_intro",
 		TutorialEvent.Trigger.CELL_REACHED,
 		25,
 		-1,
 		[
-			"If you get overwhelmed, hit tactical pause (the ` key) and catch your breath. If you need a refresher on terminal commands, use F1.",
-			"You can't interact with Signals while paused, but you can look up terminal commands on the help sheet, review terminal logs and check scanned data. Think about the timing and sequencing to make a plan."
+			"If you get overwhelmed, trigger a null spike (the ` key) to slow the action down. If you need a refresher on terminal commands, use F1.",
+			"Null spike won't stop the run completely, but it will buy you time to scan the field, work the terminal and solve puzzles under less pressure."
 		],
 		Vector2(),
 		Rect2(),
-		"Reach the end. Use tactical pause if you need time to think. And F1 for help on terminal commands."
+		"Reach the end. Use null spike if you need more breathing room. And F1 for help on terminal commands."
 	))
 
 	events.append(build_tutorial_event(

@@ -9,8 +9,7 @@ func get_desc():
 	return desc
 
 func _init():
-	GlobalEvents.tactical_pause.connect(_on_pause)
-	GlobalEvents.tactical_unpause.connect(_on_unpause)
+	pass
 
 func on_disabled(active_sig: ActiveSignal):
 	print("Rebooting signal in %s seconds" % reboot_time)
@@ -27,11 +26,3 @@ func _reboot(active_sig: ActiveSignal):
 		timer = null
 	if active_sig != null and active_sig.is_disabled:
 		active_sig.enable_signal()
-	
-func _on_pause():
-	if timer != null and is_instance_valid(timer):
-		timer.set_paused(true)
-	
-func _on_unpause():
-	if timer != null and is_instance_valid(timer):
-		timer.set_paused(false)

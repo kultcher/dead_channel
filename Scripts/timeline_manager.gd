@@ -7,6 +7,8 @@ extends Node2D
 @export var BASE_CELLS_PER_SECOND: float = 0.2
 @export var slow_speed_modifier: float = 0.5
 @export var fast_speed_modifier: float = 2.5
+@export var null_spike_time_scale: float = 0.25
+@export var null_spike_transition_duration: float = 0.5
 @export var runner_screen_offset_cells: float = 1
 @export var timeline_height_ratio: float = 0.25
 @export var min_timeline_height_px: float = 180.0
@@ -23,12 +25,13 @@ var lane_height: float
 
 # STATE
 var cells_per_second: float = BASE_CELLS_PER_SECOND
-var current_cell_pos: float = 9.0
+var current_cell_pos: float = 0.0
 var last_emitted_cell: int = -1
 var current_cell: int
 var current_speed_mult: float = 1.0
-var is_paused: bool = false
+var null_spike_active: bool = false
 var tutorial_locked: bool = false
+var _time_scale_tween: Tween
 
 # REGISTRATION
 @onready var signal_manager = $"../SignalManager"
@@ -39,21 +42,19 @@ signal layout_changed(viewport_size: Vector2)
 
 func _ready():
 	CommandDispatch.timeline_manager = self
+	Engine.time_scale = 1.0
 	get_viewport().size_changed.connect(_refresh_layout_metrics)
 	_refresh_layout_metrics()
 
 	GlobalEvents.runners_stopped.connect(_on_runners_stopped)
 	GlobalEvents.runners_resumed.connect(_on_runners_resumed)
-	GlobalEvents.tactical_pause.connect(_on_pause)
-	GlobalEvents.tactical_unpause.connect(_on_unpause)
+	GlobalEvents.activate_null_spike.connect(activate_null_spike)
+	GlobalEvents.deactivate_null_spike.connect(deactivate_null_spike)
 	GlobalEvents.tutorial_lock_changed.connect(_on_tutorial_lock_changed)
 
 
 func _process(delta):
 	_handle_input()
-
-	if is_paused:
-		return
 	
 	var actual_speed = cells_per_second * current_speed_mult
 	current_cell_pos += actual_speed * delta
@@ -83,10 +84,8 @@ func _refresh_layout_metrics() -> void:
 	layout_changed.emit(viewport_size)
 
 func _handle_input():
-	if Input.is_action_just_pressed("tactical_pause"):
-		toggle_pause()
-
-	if is_paused: return
+	if Input.is_action_just_pressed("null_spike"):
+		toggle_null_spike()
 
 	# runner speed handling
 	current_speed_mult = 1.0
@@ -98,18 +97,31 @@ func _handle_input():
 	# Optional: Emit signal if you want UI to show "FAST FORWARD" text
 	# emit_signal("speed_changed", current_speed_mult)
 
-func toggle_pause():
+func toggle_null_spike():
+	if not GlobalEvents.is_tutorial_feature_enabled("null_spike"):
+		return
 	if tutorial_locked: return
-	if is_paused:
-		GlobalEvents.tactical_unpause.emit()
+	if null_spike_active:
+		GlobalEvents.deactivate_null_spike.emit()
 	else:
-		GlobalEvents.tactical_pause.emit()
+		GlobalEvents.activate_null_spike.emit()
 
-func _on_unpause():
-	is_paused = false
+func deactivate_null_spike():
+	null_spike_active = false
+	_tween_time_scale(1.0)
 
-func _on_pause():
-	is_paused = true
+func activate_null_spike():
+	null_spike_active = true
+	_tween_time_scale(null_spike_time_scale)
+
+func _tween_time_scale(target_scale: float) -> void:
+	if _time_scale_tween != null and _time_scale_tween.is_valid():
+		_time_scale_tween.kill()
+
+	_time_scale_tween = create_tween()
+	_time_scale_tween.set_trans(Tween.TRANS_SINE)
+	_time_scale_tween.set_ease(Tween.EASE_IN_OUT)
+	_time_scale_tween.tween_property(Engine, "time_scale", target_scale, null_spike_transition_duration)
 
 func _on_tutorial_lock_changed(locked: bool):
 	tutorial_locked = locked

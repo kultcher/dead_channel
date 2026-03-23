@@ -95,13 +95,19 @@ func update_signal_position():
 				active_sig.instance_node = null
 
 func _on_signal_left_clicked(active_sig: ActiveSignal):
+	if not GlobalEvents.is_tutorial_feature_enabled("connect"):
+		return
 	CommandDispatch.switch_terminal_session(active_sig)
 	
 func _on_signal_mouse_enter(signal_entered: ActiveSignal):
+	if not GlobalEvents.is_tutorial_feature_enabled("scan"):
+		return
 	if scan_controller != null:
 		scan_controller.begin_hover(signal_entered)
 
 func _on_signal_right_clicked(signal_clicked: ActiveSignal):
+	if not GlobalEvents.is_tutorial_feature_enabled("scan"):
+		return
 	if scan_controller != null:
 		scan_controller.toggle_lock(signal_clicked)
 	

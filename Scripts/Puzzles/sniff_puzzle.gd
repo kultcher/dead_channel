@@ -33,8 +33,6 @@ var target_slots: Array[PanelContainer] = []
 var pending_targets: Array[String] = [] # Values waiting to re-enter the screen
 var time_to_solve = 0
 
-var is_paused: bool = false
-
 const BASE_CELL_COLOR = Color(0, .85, 0)
 const TARGET_CELL_COLOR = Color(0, 1, 0)
 
@@ -42,8 +40,6 @@ signal puzzle_solved
 signal puzzle_failed
 
 func _ready():
-	GlobalEvents.tactical_pause.connect(_on_pause)
-	GlobalEvents.tactical_unpause.connect(_on_unpause)
 	var vbox = VBoxContainer.new()
 	add_child(vbox)
 	
@@ -96,7 +92,6 @@ func _add_rain_layer(columns: float, rows: float, speed: float, density: float, 
 	grid_panel.add_child(rain_rect)
 
 func _process(delta: float):
-	if is_paused: return
 	time_to_solve += delta
 
 	var is_vertical = config.scroll_direction == "vertical"
@@ -328,14 +323,3 @@ func _mark_slot_complete(index: int, value: String):
 	style.border_color = Color(0, 1, 0, 0.8)
 
 # SIGNALLED FUNCTIONS
-
-func _on_pause():
-	release_focus()
-	for cell in cells:
-		cell.hide()
-	is_paused = true
-	
-func _on_unpause():
-	for cell in cells:
-		cell.show()
-	is_paused = false

@@ -60,12 +60,17 @@ const ROOT_CONTEXT_ERROR := "Not applicable on ROOT, connect to a session."
 func switch_terminal_session(active_sig: ActiveSignal):
 	if active_sig == null:
 		return
+	if not GlobalEvents.is_tutorial_feature_enabled("connect"):
+		return
 	GlobalEvents.signal_connect.emit(active_sig.data)
 	terminal_window.switch_session(active_sig)
 
 # === MAIN ENTRY POINT ===
 
 func process_command(input: String, active_sig: ActiveSignal = null) -> void:
+	if not GlobalEvents.is_tutorial_feature_enabled("terminal_commands"):
+		_fail("COMMANDS DISABLED", active_sig)
+		return
 	var parsed = parse_input(input)
 	if parsed.has("error"):
 		_fail(parsed.error, active_sig)

@@ -196,21 +196,34 @@ func _append_response_effects(runtime_signal: SignalData, effects_to_add: Array)
 func build_tutorial_event(
 	event_id: String,
 	event_trigger: TutorialEvent.Trigger,
-	event_value: int,
-	event_signal_index: int,
-	event_text: Array[String],
+	event_value: int = -1,
+	event_signal_index: int = -1,
+	event_text: Array[String] = [],
 	event_position: Vector2 = Vector2(),
 	event_focus_rect: Rect2 = Rect2(),
-	event_objective_text: String = ""
+	event_objective_text: String = "",
+	event_hold_runners: bool = false,
+	event_release_runner_hold: bool = false,
+	event_runner_hold_key: String = "",
+	event_trigger_key: String = "",
+	event_start_timer_key: String = "",
+	event_start_timer_duration: float = -1.0,
+	event_feature_gates: Dictionary = {}
 ) -> TutorialEvent:
-	var event := TutorialEvent.new()
-	event.id = event_id
-	event.trigger = event_trigger
-	event.value = event_value
-	event.signal_index = event_signal_index
-	event.text.assign(event_text)
-	event.default_position = event_position
-	event.has_custom_position = event_position != Vector2()
-	event.focus_rect = event_focus_rect
-	event.objective_text = event_objective_text
-	return event
+	return TutorialEvent.build_event(
+		event_id,
+		event_trigger,
+		event_value,
+		event_signal_index,
+		event_text,
+		event_position,
+		event_focus_rect,
+		event_objective_text,
+		event_hold_runners,
+		event_release_runner_hold,
+		event_runner_hold_key,
+		event_trigger_key,
+		event_start_timer_key,
+		event_start_timer_duration,
+		event_feature_gates
+	)
