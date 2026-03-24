@@ -5,6 +5,16 @@
 
 extends PanelContainer
 
+const GHOST_TERMINAL_SCENE := preload("res://Scenes/ghost_terminal.tscn")
+const GHOST_SPAWN_THRESHOLDS := [0.15, 0.35, 0.45, 0.55, 0.6, 0.65]
+const GHOST_MARGIN := 48.0
+const GHOST_MIN_SEPARATION := 280.0
+const GHOST_POSITION_ATTEMPTS := 10
+const GHOST_START_OFFSET_MAX := 500
+const NULL_SPIKE_DUMP_2_PATH := "res://Resources/RunData/AuthoredRuns/null_spike_dump2.md"
+const NULL_SPIKE_DUMP_3_PATH := "res://Resources/RunData/AuthoredRuns/null_spike_dump3.md"
+const BREAKDOWN_CHARSET := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]{}<>/\\|!?@#$%^&*()_+-=;:.,~`¢£¥¤§¶µßøÞþÐðΩΛΨΣЖЯФЫЮдёж漢字仮名アイウエオ░▒▓█"
+
 @onready var command_line = $TerminalVBox/CmdLineHBox/CommandLine
 @onready var history = $TerminalVBox/TerminalHistory
 @onready var prefix = $TerminalVBox/CmdLineHBox/InputPrefix
@@ -17,6 +27,12 @@ var active_session: TerminalSession
 var root_signal: ActiveSignal
 var root_session: TerminalSession
 var _dump_in_progress := false
+var _ghost_threshold_index := 0
+var _active_ghosts: Array[Control] = []
+var _last_ghost_quadrant := -1
+var _breakdown_entered_count := 0
+var _collapse_sequence_started := false
+var _main_breakdown_active := false
 
 func _ready():
 	set_context()
@@ -86,6 +102,12 @@ func play_system_dump(text: String, initial_cps: float = 100.0, max_cps: float =
 	command_line.editable = false
 	title_bar.modulate = Color(1.4, 0.35, 0.35, 1.0)
 	title_text.text = "DC_OS | [SYSTEM OVERRIDE]"
+	_clear_ghosts()
+	_ghost_threshold_index = 0
+	_last_ghost_quadrant = -1
+	_breakdown_entered_count = 0
+	_collapse_sequence_started = false
+	_main_breakdown_active = false
 
 	var base_text = history.text
 	if not base_text.ends_with("\n"):
@@ -104,6 +126,8 @@ func play_system_dump(text: String, initial_cps: float = 100.0, max_cps: float =
 		
 		var current_idx = int(chars_revealed)
 		var visible_slice := plain_text.substr(0, int(chars_revealed))
+		_maybe_spawn_ghost(progress, text)
+		
 		if current_idx < total_chars and plain_text[current_idx] == "\n":
 			chars_revealed += 1.0
 			visible_slice = plain_text.substr(0, int(chars_revealed))
@@ -118,6 +142,9 @@ func play_system_dump(text: String, initial_cps: float = 100.0, max_cps: float =
 			await get_tree().process_frame
 
 	history.text = base_text + plain_text + "\n\n[STREAM END]\n"
+	_main_breakdown_active = true
+	_on_breakdown_started(self)
+	await _play_breakdown(base_text + plain_text + "\n\n[STREAM END]\n", max_cps)
 	
 	command_line.editable = previous_editable
 	title_bar.modulate = previous_title_modulate
@@ -125,6 +152,169 @@ func play_system_dump(text: String, initial_cps: float = 100.0, max_cps: float =
 	history.modulate = previous_history_modulate
 	position = previous_position
 	_dump_in_progress = false
+
+func _maybe_spawn_ghost(progress: float, source_text: String) -> void:
+	if _ghost_threshold_index >= GHOST_SPAWN_THRESHOLDS.size():
+		return
+	if progress < GHOST_SPAWN_THRESHOLDS[_ghost_threshold_index]:
+		return
+	_spawn_ghost(source_text, _ghost_threshold_index)
+	_ghost_threshold_index += 1
+
+func _spawn_ghost(source_text: String, ghost_index: int) -> void:
+	if get_parent() == null:
+		return
+	var ghost := GHOST_TERMINAL_SCENE.instantiate()
+	get_parent().add_child(ghost)
+	var ghost_control := ghost as Control
+	if ghost_control != null:
+		_position_ghost(ghost_control, ghost_index)
+		ghost_control.z_index = z_index + ghost_index + 1
+		_active_ghosts.append(ghost_control)
+	if ghost.has_signal("breakdown_started"):
+		ghost.breakdown_started.connect(_on_breakdown_started, CONNECT_ONE_SHOT)
+	if ghost.has_signal("dump_finished"):
+		ghost.dump_finished.connect(_on_ghost_dump_finished.bind(ghost), CONNECT_ONE_SHOT)
+	var ghost_initial_cps := 160.0 + ghost_index * 35.0
+	var ghost_max_cps := 650.0 + ghost_index * 120.0
+	var ghost_start_offset := randi_range(0, GHOST_START_OFFSET_MAX)
+	ghost.play_system_dump(
+		_get_ghost_dump_text(source_text, ghost_index),
+		ghost_initial_cps,
+		ghost_max_cps,
+		ghost_start_offset
+	)
+
+func _position_ghost(ghost: Control, ghost_index: int) -> void:
+	var viewport_size := get_viewport_rect().size
+	var ghost_size := ghost.size
+	if ghost_size.x <= 1.0 or ghost_size.y <= 1.0:
+		ghost_size = size
+	if ghost_size.x <= 1.0 or ghost_size.y <= 1.0:
+		ghost_size = Vector2(800, 600)
+	var max_x := maxf(GHOST_MARGIN, viewport_size.x - ghost_size.x - GHOST_MARGIN)
+	var max_y := maxf(GHOST_MARGIN, viewport_size.y - ghost_size.y - GHOST_MARGIN)
+	var quadrant := _pick_ghost_quadrant()
+	var half_x := maxf(GHOST_MARGIN, max_x * 0.5)
+	var half_y := maxf(GHOST_MARGIN, max_y * 0.5)
+	var x_range := Vector2(GHOST_MARGIN, max_x)
+	var y_range := Vector2(GHOST_MARGIN, max_y)
+	match quadrant:
+		0:
+			x_range = Vector2(GHOST_MARGIN, half_x)
+			y_range = Vector2(GHOST_MARGIN, half_y)
+		1:
+			x_range = Vector2(half_x, max_x)
+			y_range = Vector2(GHOST_MARGIN, half_y)
+		2:
+			x_range = Vector2(GHOST_MARGIN, half_x)
+			y_range = Vector2(half_y, max_y)
+		3:
+			x_range = Vector2(half_x, max_x)
+			y_range = Vector2(half_y, max_y)
+	var chosen_position := Vector2(x_range.x, y_range.x)
+	var best_distance := -1.0
+	for _attempt in range(GHOST_POSITION_ATTEMPTS):
+		var pos_x := randf_range(x_range.x, maxf(x_range.x, x_range.y))
+		var pos_y := randf_range(y_range.x, maxf(y_range.x, y_range.y))
+		var candidate := Vector2(pos_x, pos_y)
+		var nearest_distance := _get_nearest_ghost_distance(candidate)
+		if nearest_distance >= GHOST_MIN_SEPARATION:
+			chosen_position = candidate
+			break
+		if nearest_distance > best_distance:
+			best_distance = nearest_distance
+			chosen_position = candidate
+	ghost.position = chosen_position
+	ghost.modulate.a = 1.0
+	ghost.self_modulate = Color(
+		randf_range(0.92, 1.08),
+		randf_range(0.92, 1.08),
+		randf_range(0.92, 1.08),
+		1.0
+	)
+
+func _pick_ghost_quadrant() -> int:
+	var options := [0, 1, 2, 3]
+	if _last_ghost_quadrant in options:
+		options.erase(_last_ghost_quadrant)
+	var chosen = options[randi() % options.size()]
+	_last_ghost_quadrant = chosen
+	return chosen
+
+func _get_ghost_dump_text(default_text: String, ghost_index: int) -> String:
+	var path := NULL_SPIKE_DUMP_2_PATH if ghost_index < 2 else NULL_SPIKE_DUMP_3_PATH
+	var loaded_text := FileAccess.get_file_as_string(path)
+	if loaded_text.is_empty():
+		return default_text
+	return loaded_text
+
+func _get_nearest_ghost_distance(candidate: Vector2) -> float:
+	if _active_ghosts.is_empty():
+		return INF
+	var nearest_distance := INF
+	for ghost in _active_ghosts:
+		if ghost == null or not is_instance_valid(ghost):
+			continue
+		nearest_distance = minf(nearest_distance, candidate.distance_to(ghost.position))
+	return nearest_distance
+
+func _on_ghost_dump_finished(ghost: Node) -> void:
+	if ghost is Control:
+		_active_ghosts.erase(ghost)
+
+func _clear_ghosts() -> void:
+	for ghost in _active_ghosts:
+		if ghost != null and is_instance_valid(ghost):
+			if ghost.has_method("stop_breakdown"):
+				ghost.stop_breakdown()
+			ghost.queue_free()
+	_active_ghosts.clear()
+
+func _play_breakdown(base_text: String, max_cps: float) -> void:
+	var working_text := base_text
+	while _main_breakdown_active:
+		var line := _generate_breakdown_line()
+		working_text += line + "\n"
+		history.text = working_text
+		_apply_dump_instability(1.0, position, title_bar.modulate, history.modulate)
+		var line_cps := maxf(60.0, max_cps)
+		var line_delay := clampf(float(line.length()) / line_cps, 0.02, 0.12)
+		await get_tree().create_timer(line_delay).timeout
+	_main_breakdown_active = false
+
+func _generate_breakdown_line() -> String:
+	var line_length := randi_range(10, 30)
+	var out := ""
+	for _i in range(line_length):
+		out += BREAKDOWN_CHARSET[randi() % BREAKDOWN_CHARSET.length()]
+	return out
+
+func _on_breakdown_started(_source: Node) -> void:
+	_breakdown_entered_count += 1
+	var total_terminals := 1 + GHOST_SPAWN_THRESHOLDS.size()
+	if _collapse_sequence_started:
+		return
+	if _breakdown_entered_count < total_terminals:
+		return
+	_collapse_sequence_started = true
+	_run_ghost_collapse_sequence()
+
+func _run_ghost_collapse_sequence() -> void:
+	while not _active_ghosts.is_empty():
+		await get_tree().create_timer(0.5).timeout
+		var ghost = _active_ghosts.pop_back()
+		if ghost == null or not is_instance_valid(ghost):
+			continue
+		if ghost.has_method("stop_breakdown"):
+			ghost.stop_breakdown()
+		ghost.queue_free()
+	await get_tree().create_timer(0.5).timeout
+	_main_breakdown_active = false
+	for i in range(10):
+		history.append_text("\n")
+		await get_tree().create_timer(0.1).timeout
+	history.append_text("\n\n[STACK OVERFLOW. Try turning it off and back on again.\n")
 
 func _apply_dump_instability(
 	progress: float,
