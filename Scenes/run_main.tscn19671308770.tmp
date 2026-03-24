@@ -18,7 +18,6 @@
 [ext_resource type="Shader" uid="uid://c16vuww6jgbkf" path="res://Shaders/circuits.gdshader" id="13_d5u5a"]
 [ext_resource type="Texture2D" uid="uid://b77pho6a4a6dm" path="res://Visuals/digital_toplayer.png" id="14_d5u5a"]
 [ext_resource type="Shader" uid="uid://da2dfyfkllxrp" path="res://Visuals/Icons/digital_glitch.gdshader" id="18_3deqw"]
-[ext_resource type="Script" uid="uid://cbv73pnuu78pw" path="res://Scripts/cutscene_controller.gd" id="18_3xdhw"]
 [ext_resource type="Texture2D" uid="uid://ds0t2yw52cuja" path="res://Visuals/glitch_screen.png" id="19_05vun"]
 [ext_resource type="Texture2D" uid="uid://bilm8u1f271kd" path="res://Visuals/NullSpikeKeyPH.png" id="20_26ak2"]
 
@@ -66,6 +65,9 @@ shader_parameter/speed_1 = 0.45
 shader_parameter/speed_2 = -0.32
 shader_parameter/surge_speed = 0.6
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3deqw"]
+bg_color = Color(0, 0, 0, 1)
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_05vun"]
 shader = ExtResource("18_3deqw")
 shader_parameter/speed = 5.0
@@ -84,7 +86,7 @@ script = ExtResource("1_4q6c1")
 
 [node name="TutorialManager" type="Node" parent="." unique_id=755181945]
 script = ExtResource("2_r51ll")
-debug_skip_to_stage = "terminal_dump"
+debug_skip_to_stage = "lab_reveal"
 
 [node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
 position = Vector2(0, 50)
@@ -169,9 +171,9 @@ tooltip_text = "Test"
 [node name="TerminalWindow" parent="." unique_id=340148133 instance=ExtResource("7_4qt4q")]
 z_index = 5
 offset_left = 357.0
-offset_top = 700.0
+offset_top = 746.0
 offset_right = 1483.0
-offset_bottom = 1028.0
+offset_bottom = 1074.0
 
 [node name="SniffWindow" parent="." unique_id=650256936 instance=ExtResource("8_jx6wh")]
 visible = false
@@ -198,25 +200,26 @@ scale = Vector2(1.05, 0.85)
 mouse_filter = 2
 texture = ExtResource("14_d5u5a")
 
-[node name="CutsceneController" type="PanelContainer" parent="." unique_id=2057820020]
+[node name="CutsceneOverlay" type="PanelContainer" parent="." unique_id=2057820020]
+modulate = Color(0, 0, 0, 1)
 z_index = 10
 custom_minimum_size = Vector2(1920, 1080)
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource("18_3xdhw")
+theme_override_styles/panel = SubResource("StyleBoxFlat_3deqw")
 
-[node name="CutsceneGlitchTexture" type="TextureRect" parent="CutsceneController" unique_id=1228991890]
+[node name="CutsceneGlitchTexture" type="TextureRect" parent="CutsceneOverlay" unique_id=1228991890]
 visible = false
 material = SubResource("ShaderMaterial_05vun")
 layout_mode = 2
 texture = ExtResource("19_05vun")
 
-[node name="CutsceneKeyTexture" type="TextureRect" parent="CutsceneController" unique_id=1356882612]
+[node name="CutsceneKeyTexture" type="TextureRect" parent="CutsceneOverlay" unique_id=1477286652]
 visible = false
 layout_mode = 2
 texture = ExtResource("20_26ak2")
 
-[node name="CutsceneRect" type="ColorRect" parent="CutsceneController" unique_id=1019869231]
+[node name="CutsceneRect" type="ColorRect" parent="CutsceneOverlay" unique_id=1019869231]
 visible = false
 layout_mode = 2
 color = Color(0, 0, 0, 1)

@@ -3,7 +3,7 @@
 [ext_resource type="FontFile" uid="uid://g80fed4aap1u" path="res://Visuals/Fonts/FiraCode-SemiBold.ttf" id="1_oiu25"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_03ujl"]
-bg_color = Color(0.4218499, 0.40348017, 0.4043457, 1)
+bg_color = Color(0.2624395, 0.24836084, 0.24836442, 1)
 
 [resource]
 default_font = ExtResource("1_oiu25")

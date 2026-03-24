@@ -47,7 +47,9 @@ Development Progress
 - Switched to "bullet time" instead of tactical pause
 
 Short-term TODO:
-- Tutorial flow: Switch to have "mentor" character who can stop himself, rather than pause
+- Cleanup Sniff tutorial focus lingering after puzzle completion OR block inputs to Sniff until dialogue is complete
+- 
+
 - Add a cleaner way to update scan tooltips (array?)
 - Adjust delay behavior to ResponseEffect instead of detection
 

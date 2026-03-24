@@ -18,9 +18,9 @@ var dialogue_window_scene = preload("res://Scenes/dialogue_window.tscn")
 @export var default_spawn_offset := Vector2(75, 300)
 @export var puzzle_spawn_position := Vector2(760, 430)
 @export var cascade_step := Vector2(25, 25)  # Each window offsets by this amount
+@export var auto_focus_puzzles := true
 
 var window_count := 0
-var _tutorial_dialogue_hold_tokens: Dictionary = {}
 
 func _ready():
 	CommandDispatch.window_manager = self
@@ -97,28 +97,21 @@ func toggle_help_overlay() -> void:
 		return
 	show_help_overlay()
 
-func show_tutorial_dialogue(event: TutorialEvent, focus_rect: Rect2 = Rect2(), runner_hold_token: String = "") -> Control:
+func show_tutorial_dialogue(
+	dialogue_pages: Array[String],
+	focus_rect: Rect2 = Rect2(),
+	default_position: Vector2 = Vector2(),
+	has_custom_position: bool = false
+) -> Control:
 	var dialogue = dialogue_window_scene.instantiate()
-	dialogue.dismissed.connect(_on_tutorial_dialogue_dismissed.bind(dialogue))
+	dialogue.dismissed.connect(_on_tutorial_dialogue_dismissed)
 	add_child(dialogue)
 	move_child(dialogue, get_child_count() - 1)
-	if not runner_hold_token.is_empty():
-		_tutorial_dialogue_hold_tokens[dialogue.get_instance_id()] = runner_hold_token
-	dialogue.setup(event, focus_rect)
+	dialogue.setup_pages(dialogue_pages, focus_rect, default_position, has_custom_position)
 	return dialogue
 
-func _on_tutorial_dialogue_dismissed(dialogue: Control) -> void:
+func _on_tutorial_dialogue_dismissed() -> void:
 	clear_focus_overlay()
-	if dialogue != null:
-		var tutorial_event_id = dialogue.get("tutorial_event_id")
-		if tutorial_event_id is String and not tutorial_event_id.is_empty():
-			GlobalEvents.tutorial_dialogue_finished.emit(tutorial_event_id)
-	if dialogue != null:
-		var dialogue_id := dialogue.get_instance_id()
-		if _tutorial_dialogue_hold_tokens.has(dialogue_id):
-			var runner_hold_token: String = _tutorial_dialogue_hold_tokens[dialogue_id]
-			_tutorial_dialogue_hold_tokens.erase(dialogue_id)
-			GlobalEvents.release_runner_hold(runner_hold_token)
 	GlobalEvents.tutorial_lock_changed.emit(false)
 	GlobalEvents.deactivate_null_spike.emit()
 
@@ -138,6 +131,8 @@ func _puzzle_started(active_sig: ActiveSignal, puzzle_type: PuzzleComponent.Type
 	puzzle_window.position = puzzle_spawn_position
 	await get_tree().process_frame
 	if puzzle_window == null or not is_instance_valid(puzzle_window):
+		return
+	if not auto_focus_puzzles:
 		return
 	focus_control(puzzle_window, Vector2(32, 32))
 

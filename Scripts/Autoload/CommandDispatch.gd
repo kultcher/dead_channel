@@ -69,7 +69,7 @@ func switch_terminal_session(active_sig: ActiveSignal):
 
 func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 	if not GlobalEvents.is_tutorial_feature_enabled("terminal_commands"):
-		_fail("COMMANDS DISABLED", active_sig)
+		_fail("Sequence break: unexpected signal degradation.\nBuffering... Wait 3 seconds, close external communcations and try again.", active_sig)
 		return
 	var parsed = parse_input(input)
 	if parsed.has("error"):
@@ -267,5 +267,7 @@ func _interrupt_command(_cmd_context: CommandContext):
 	pass
 
 func _finalize_command(cmd_context: CommandContext):
+	if cmd_context.status == CommandContext.CommandStatus.FAILURE:
+		return
 	print("Command Dispatch finished command: " + cmd_context.command)
 	command_complete.emit(cmd_context)

@@ -56,10 +56,9 @@ tab_close_display_policy = 2
 
 [node name="TerminalHistory" type="RichTextLabel" parent="TerminalVBox" unique_id=6905137]
 layout_mode = 2
-size_flags_vertical = 0
+size_flags_vertical = 3
 theme = ExtResource("1_tmyac")
 text = "Connecting"
-fit_content = true
 scroll_following = true
 
 [node name="CmdLineHBox" type="HBoxContainer" parent="TerminalVBox" unique_id=1082637649]

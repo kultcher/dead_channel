@@ -10,21 +10,24 @@ var continue_button: Button
 
 var pages: Array[String] = []
 var page_index: int = 0
-var tutorial_event_id: String = ""
 
 signal dismissed
 
-func setup(event: TutorialEvent, focus_rect: Rect2 = Rect2()):
+func setup_pages(
+	dialogue_pages: Array[String],
+	focus_rect: Rect2 = Rect2(),
+	default_position: Vector2 = Vector2(),
+	has_custom_position: bool = false
+) -> void:
 	chat = $TerminalVBox/BodyHBox/ChatLog
 	page_label = $TerminalVBox/FooterHBox/PageLabel
 	left_button = $TerminalVBox/FooterHBox/LeftButton
 	right_button = $TerminalVBox/FooterHBox/RightButton
 	continue_button = $TerminalVBox/FooterHBox/ContinueButton
-	pages = event.text.duplicate()
-	tutorial_event_id = event.id
+	pages = dialogue_pages.duplicate()
 	page_index = 0
-	if event.has_custom_position:
-		position = _clamp_to_viewport(event.default_position, get_viewport_rect().size)
+	if has_custom_position:
+		position = _clamp_to_viewport(default_position, get_viewport_rect().size)
 	elif _has_focus_rect(focus_rect):
 		position = _get_position_from_focus_rect(focus_rect)
 	else:

@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://blc47vyu5os40"]
 
 [ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="1_6yba5"]
+[ext_resource type="Script" uid="uid://bjwel5bmlp6x4" path="res://Scripts/Components/DetectionPatrolPoint.gd" id="1_qn1mi"]
 [ext_resource type="Resource" path="res://Resources/SignalVisuals/camera_visuals.tres" id="1_visuals"]
 [ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="1_vx140"]
 [ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_qn1mi"]
@@ -12,6 +13,7 @@
 script = ExtResource("1_6yba5")
 watch_offset_cells = 0.0
 vision_length_cells = 1.0
+vision_angle_deg = 20.0
 metadata/_custom_type_script = "uid://cxtj1fq7mmq1h"
 
 [sub_resource type="Resource" id="Resource_mefw2"]
@@ -31,6 +33,7 @@ metadata/_custom_type_script = "uid://bwfquhgf0ae5f"
 script = ExtResource("1_vx140")
 type = 1
 system_id = "cam_01"
+facing_deg = 0.0
 visuals = ExtResource("1_visuals")
 hackable = SubResource("Resource_mefw2")
 detection = SubResource("Resource_qkibr")

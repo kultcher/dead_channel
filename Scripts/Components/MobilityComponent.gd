@@ -5,6 +5,7 @@ enum PatrolMode { LOOP, PING_PONG }
 @export var enabled: bool = true
 @export var movement_disabled: bool = false
 @export var move_speed_cells_per_sec: float = 0.15
+@export var turn_speed_deg_per_sec: float = 120.0
 @export var alert_move_speed_multiplier: float = 1.75
 @export var patrol_mode: PatrolMode = PatrolMode.LOOP
 @export var patrol_points: Array[MobilityPatrolPoint] = []

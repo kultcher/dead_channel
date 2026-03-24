@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://cm75afa0wg0sr"]
+
+[ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="1_signal"]
+[ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_hackable"]
+[ext_resource type="Resource" path="res://Resources/SignalVisuals/terminal_visuals.tres" id="3_visuals"]
+
+[sub_resource type="Resource" id="HackableComponent_terminal"]
+script = ExtResource("2_hackable")
+
+[resource]
+script = ExtResource("1_signal")
+type = 7
+system_id = "terminal_01"
+visuals = ExtResource("3_visuals")
+hackable = SubResource("HackableComponent_terminal")

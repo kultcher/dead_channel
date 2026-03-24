@@ -28,6 +28,12 @@ func ensure_initial_lock_state():
 
 func ensure_puzzle_generated() -> void:
 	match puzzle_type:
+		Type.SNIFF:
+			var sniff_config := get_sniff_config()
+			if sniff_config == null:
+				sniff_config = SniffPuzzleConfig.new()
+				puzzle_config = sniff_config
+			sniff_config.ensure_generated(difficulty)
 		Type.DECRYPT:
 			var decrypt_config := get_decrypt_config()
 			if decrypt_config == null:
@@ -35,6 +41,9 @@ func ensure_puzzle_generated() -> void:
 				puzzle_config = decrypt_config
 			decrypt_config.ensure_generated(difficulty)
 			encryption_key = str(decrypt_config.mapping_offset)
+
+func get_sniff_config() -> SniffPuzzleConfig:
+	return puzzle_config as SniffPuzzleConfig
 
 func get_decrypt_config() -> DecryptPuzzleConfig:
 	return puzzle_config as DecryptPuzzleConfig

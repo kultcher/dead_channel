@@ -90,8 +90,10 @@ func _handle_input():
 	# runner speed handling
 	current_speed_mult = 1.0
 	if Input.is_action_pressed("ui_left"): 
+		GlobalEvents.runner_slowdown.emit()
 		current_speed_mult = slow_speed_modifier
 	elif Input.is_action_pressed("ui_right"):
+		GlobalEvents.runner_hustle.emit()
 		current_speed_mult = fast_speed_modifier
 		
 	# Optional: Emit signal if you want UI to show "FAST FORWARD" text

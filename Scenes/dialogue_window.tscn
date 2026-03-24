@@ -5,6 +5,7 @@
 [ext_resource type="Theme" uid="uid://discgqqbkpb5x" path="res://Resources/StyleBox/MainTheme.tres" id="2_gax6d"]
 [ext_resource type="Texture2D" uid="uid://lp58pd51rai4" path="res://Visuals/Portraits/8-bit_blackjack_close.png" id="4_4pfxs"]
 [ext_resource type="Texture2D" uid="uid://dcyv1i0jnyq7f" path="res://Visuals/play-button (1).svg" id="4_63p5y"]
+[ext_resource type="FontFile" uid="uid://1ed0s1dhilyg" path="res://Visuals/Fonts/ShareTechMono-Regular.ttf" id="5_ypsy0"]
 
 [sub_resource type="SystemFont" id="SystemFont_63p5y"]
 font_names = PackedStringArray("OCR A")
@@ -35,26 +36,45 @@ layout_mode = 2
 theme = ExtResource("2_gax6d")
 theme_type_variation = &"TitleBarText"
 theme_override_fonts/normal_font = SubResource("SystemFont_63p5y")
-text = "Chat"
+text = "<Dia.log>"
 vertical_alignment = 1
 
 [node name="BodyHBox" type="HBoxContainer" parent="TerminalVBox" unique_id=2143198911]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Portrait" type="TextureRect" parent="TerminalVBox/BodyHBox" unique_id=432894993]
+[node name="VBoxContainer" type="VBoxContainer" parent="TerminalVBox/BodyHBox" unique_id=2116864522]
+layout_mode = 2
+
+[node name="Portrait" type="TextureRect" parent="TerminalVBox/BodyHBox/VBoxContainer" unique_id=432894993]
+z_index = 15
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
+size_flags_vertical = 3
 texture = ExtResource("4_4pfxs")
 expand_mode = 1
 stretch_mode = 4
 flip_h = true
+
+[node name="SpeakerName" type="RichTextLabel" parent="TerminalVBox/BodyHBox/VBoxContainer" unique_id=195701]
+custom_minimum_size = Vector2(0, 25)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.5
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_fonts/normal_font = ExtResource("5_ypsy0")
+theme_override_font_sizes/normal_font_size = 18
+text = "Blackjack"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ChatLog" type="RichTextLabel" parent="TerminalVBox/BodyHBox" unique_id=1725477988]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("2_gax6d")
+bbcode_enabled = true
 text = "<Speaker>: Here is some example text."
 scroll_following = true
 

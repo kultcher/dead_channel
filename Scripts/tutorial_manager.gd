@@ -2,214 +2,635 @@
 
 extends Node
 
+const NULL_SPIKE_DUMP_PATH := "res://Resources/RunData/AuthoredRuns/null_spike_dump.md"
+
+@export_enum("full", "door_01", "cam_02", "drone_01", "null_door", "lab_reveal", "terminal_dump") var debug_skip_to_stage := "full"
+
 @onready var timeline_manager = $"../SignalTimeline/TimelineManager"
 @onready var signal_manager = $"../SignalTimeline/SignalManager"
-@onready var terminal = $"../TerminalWindow"
+@onready var terminal_window = $"../TerminalWindow"
 @onready var run_manager = $"../RunManager"
 @onready var window_manager = $"../WindowManager"
 
-var events: Array[TutorialEvent] = []
-var _active_runner_hold_tokens: Dictionary = {}
-var _active_timer_versions: Dictionary = {}
+@onready var cutscene_controller = $"../CutsceneController"
 
-var tutorial_level_flags: Dictionary = {
-	"first_signal": false,
-	"first_scan": false,
-	"terminal_intro": false,
-	"heat_intro": false,
-	"minigame_intro": false,
-	"decrypt_intro": false,
-	"decrypt_continued": false,
-	"decrypt_complete": false,
-	"ic_intro": false,
-	"ic_timing": false,
-	"guards_intro": false,
-	"distraction_intro": false,
-	"skill_test": false,
-	"null_spike_intro": false,
-	"run_end_intro": false
-}
+@onready var runner_focus_panel = $"../SignalTimeline/GridLayer/RunnerTeam/PanelContainer"
+@onready var heat_tracker = $"../HeatTracker"
+
+var _active_runner_hold_tokens: Dictionary = {}
+
+signal wait_completed(result: String)
 
 func _ready():
-	events = run_manager.get_tutorial_events()
 	GlobalEvents.reset_tutorial_features()
 	window_manager.clear_tutorial_objective()
-	setup_triggers()
+	if run_manager.get_run_id() == "tutorial":
+		_set_cutscene_black_screen(true)
+		call_deferred("_run_tutorial_sequence")
+	else:
+		_set_cutscene_black_screen(false)
 
-func setup_triggers():
-	GlobalEvents.cell_reached.connect(_check_cell_triggers)
-	GlobalEvents.signal_scan_complete.connect(_check_scan_triggers)
-	GlobalEvents.signal_connect.connect(_check_connect_triggers)
-	GlobalEvents.signal_killed.connect(_check_kill_triggers)
-	GlobalEvents.puzzle_started.connect(_check_puzzle_started_triggers)
-	GlobalEvents.puzzle_solved.connect(_check_puzzle_solved_triggers)
-	GlobalEvents.tutorial_dialogue_finished.connect(_check_dialogue_finished_triggers)
-	GlobalEvents.tutorial_timer_elapsed.connect(_check_timer_elapsed_triggers)
+func _run_tutorial_sequence() -> void:
+	_disable_tutorial_features()
+	match debug_skip_to_stage:
+		"door_01":
+			_prepare_debug_stage_door_01()
+			await _run_door_01_sequence()
+			await _run_cam_02_intro_sequence()
+		"cam_02":
+			_prepare_debug_stage_cam_02()
+			await _run_cam_02_intro_sequence()
+		"drone_01":
+			_prepare_debug_stage_drone_01()
+			await _run_drone_01_intro_sequence()
+		"null_door":
+			_prepare_debug_stage_null_door()
+			await _run_null_door_intro_sequence()			
+		"lab_reveal":
+			_prepare_debug_stage_lab_reveal()
+			await _run_lab_reveal_sequence()
+		"terminal_dump":
+			_prepare_debug_stage_terminal_dump()
+			await _run_terminal_dump_sequence()
+		_:
+			await _run_intro_sequence()
+			await _run_cam_01_sequence()
+			await _run_door_01_sequence()
+			await _run_cam_02_intro_sequence()
 
-func _check_cell_triggers(cell: int):
-	for event in events:
-		if event.trigger == TutorialEvent.Trigger.CELL_REACHED and event.value == cell:
-			_show_tutorial_once(event)
-			return
+func _run_intro_sequence() -> void:
+	_acquire_runner_hold("intro")
+	_set_cutscene_black_screen(true)
+	await _show_dialogue([
+		"All right kid, you ready for the real deal?"
+	], "", Rect2(), Vector2(750, 300), true)
 
+	await cutscene_controller.play_intro_glitch_transition(3)
+	await _show_dialogue([
+		"Just like the sims, right? Only if you fuck it up, it might actually get me killed. No pressure.",
+		"Don't sweat it, should be a milk run. We'll take it nice and slow, and not just because I'm getting old."
+	], "", Rect2(), Vector2(750, 300), true)
 
-func _check_scan_triggers(signal_data: SignalData):
-	for event in events:
-		if event.trigger != TutorialEvent.Trigger.SCAN_COMPLETE:
-			continue
-		if not _event_matches_signal(event, signal_data):
-			continue
-		_show_tutorial_once(event)
+	_release_runner_hold("intro")
+	await get_tree().create_timer(1.0).timeout
+	_focus_runner()
+	await _show_dialogue([
+		"All right, I'm on the move. You should already be seeing some network SIGNALs registering on the timeline.",
+		"It'll look they're moving toward me, but it's all relative\u2014I'm moving toward them. The stationary ones, anyway."
+	], "", window_manager.get_control_focus_rect(runner_focus_panel), Vector2(), false, 2, "intro_walk_and_talk")
+
+func _run_cam_01_sequence() -> void:
+	await _wait_for_cell(3)
+	_acquire_runner_hold("cam_01_gate")
+	await _show_dialogue([
+		"Eyes on two cameras. One is off the main route, so it shouldn't be an issue, but the other is right above the facility door.",
+		"We'll need to take it out, but give it a scan first. Always check for access blocks. Or worse, ICE."
+	], "cam_01")
+	_set_objective("Mouseover the cam_01 signal to scan it.")
+	_enable_feature("scan")
+
+	await _wait_for_scan_complete("cam_01")
+	await _show_dialogue([
+		"Good. Unlocked, no ICE. Probably no one watching, either, but who knows with these old AI husks.",
+		"Some of them are still crawling with drones and turrets. Well, 'spose turrets don't crawl. That I've seen.",
+		"You know the drill. Connect to that camera and KILL it."
+	], "cam_01")
+	_set_objective("Left click the cam_01 signal to connect, then type KILL in the terminal.")
+	_enable_feature("connect")
+	_enable_feature("terminal_commands")
+
+	await _wait_for_signal_killed("cam_01")
+	_release_runner_hold("cam_01_gate")
+
+	#_focus_heat_tracker()
+	await _show_dialogue([
+		"Simple as. Just watch your heat. KILL is noisy, and more network noise means more attention from the system.",
+		"Runners don't like attention. For you, it might just mean more ICE. For us, it tends to come with bullet holes."
+	], "", window_manager.get_control_focus_rect(heat_tracker), Vector2(50, 350), true, 5, "door_walk_and_talk")
+
+func _run_door_01_sequence() -> void:
+	await _wait_for_cell(6)
+	_acquire_runner_hold("door_01_gate")
+
+	await _show_dialogue([
+		"All right, facility door in sight. Give it a scan, if you haven't already."
+	], "door_01")
+	_set_objective("- Mouseover to scan the door_01 signal.")
+
+	await _wait_for_scan_complete("door_01")
+	_focus_door_lock_state("door_01")
+	
+	await _show_dialogue([
+		"Locked, obviously. Different locks require different keys.",
+		"This one auth-locked. Means the credentials are floating around the network, we just need to sniff out the right data. Run your Sniff program."
+	], "door_01")
+	_set_objective("Left click the door_01 signal to connect, then type RUN sniff in the terminal to run the Sniff program.")
+
+	await _wait_for_puzzle_started(PuzzleComponent.Type.SNIFF)
+	_enable_feature("terminal_commands", false) # NOTE: This is *mostly* good enough to prevent sequence break
+
+	await _show_dialogue([
+		"Sniff's simple. The program will tell you the target data, you just need to track it in the datastreams. Simple as."
+	], "door_01")
+	_set_objective("- Find and click the targeted hex code.")
+
+	await _wait_for_puzzle_solved("door_01")
+	await _show_dialogue([
+		"Now you've got access, but you still need to unlock the door in realspace.",
+		"A lot of signals have a basic functionality that you can access with the OPERATE command, or OP for short."
+	], "door_01")
+	_set_objective("- Type OP to unlock the door.")
+
+	await _wait_for_door_unlocked("door_01")
+	_release_runner_hold("door_01_gate")
+	_focus_runner()
+	await _show_dialogue([
+		"See? Milk run, like I said.",
+		"By the way, while you'll be doing a lot of unlocking, OP can also lock doors. You'd be surprised how often that comes in handy.",
+		"Heading inside. Tracking another camera. You know the drill. Scan away. Enjoy it while you can, taking time to scan is a luxury you sometimes can't afford under pressure."
+	], "", window_manager.get_control_focus_rect(runner_focus_panel), Vector2(), false, 9, "cam_02_walk_and_talk")
+	_set_objective("")
+
+func _run_cam_02_intro_sequence() -> void:
+	await _wait_for_cell(10)
+	_acquire_runner_hold("cam_02_gate")
+	await _show_dialogue([
+		"Camera ahead, center lane. Give it a scan."
+	], "cam_02")
+	_set_objective("- Mouseover the cam_02 signal to scan it.")
+	await _wait_for_scan_complete("cam_02")
+
+	await _show_dialogue([
+			"This one's got ICE. Not too dangerous. Reboot: does just what it says. If the Signal goes down, it automatically gets rebooted after a short window.",
+			"This camera is panning, too. Your call how to handle it.",
+			"You can KILL it and take the heat and I'll move past while it reboots, or you can let me know when it's safe to slip by while the camera pans."
+		], "cam_02")
+	_set_objective("- Connect to cam_02 and KILL it OR\n- Hold -> to have Blackjack hustle past while the camera is panned away")
+
+	_enable_feature("terminal_commands", true)
+	
+	GlobalEvents.runner_detected.connect(_runner_detected_dialogue, CONNECT_ONE_SHOT)
+
+	await _cam_02_kill_or_hustle(_get_active_signal("cam_02"))
+	_release_runner_hold("cam_02_gate")
+
+func _run_drone_01_intro_sequence():
+	await _wait_for_cell(13)
+	_acquire_runner_hold("drone_01_gate")
+	await _show_dialogue([
+		"Shit, picking up a drone. Could be armed. They're mobile and not as predictable as cameras. Give it a scan."
+	], "drone_01")
+	_set_objective("Mouseover to scan the drone_01 signal")
+
+	await _wait_for_scan_complete("drone_01")
+
+	await _show_dialogue([
+		"Reboot IC on a 3-second timer. KILL wouldn't buy us much time here. Fortunately, drones do respond to unexpected stimuli. We can use that."
+	], "drone_01")
+	
+	await _show_dialogue([
+		"Connect to that coolant vent and flush it with the OP command. It should be noisy enough to draw the drone away for more than 3 seconds and let me slip past."
+	], "coolant_vent_01")
+	_set_objective("Connect to the coolant_vent_01 signal and type OP to create a distraction")
+
+	await GlobalEvents.mobile_investigating
+	_release_runner_hold("drone_01_gate")
+
+func _run_null_door_intro_sequence():
+	_enable_feature("terminal_commands", false)
+
+	await _wait_for_cell(17)
+	await _show_dialogue([
+		"Phew. All right. I think we're past the hard part. Coming up on... some kind of clean lab? Let's have a look.",
+		"Sniff out that door's key, like last time."
+	], "lab_door", Rect2(), Vector2(), false, 19, "null_lab_leadup")
+	_set_objective("- Connect to the lab_door signal and RUN sniff to unlock it\n- Once unlocked, use OP to open the door")
+
+	window_manager.auto_focus_puzzles = false
+
+	await _wait_for_cell(19)
+	_acquire_runner_hold("lab_door_gate_01")
+
+	_enable_feature("terminal_commands", true)
+
+	await _wait_for_puzzle_started(PuzzleComponent.Type.SNIFF)
+
+	await _show_dialogue([
+		"Whoa. This one is locked down much tighter.",
+		"... Huh. What were the ghosts hiding down here?"
+	], "", Rect2(), Vector2(350, 400), true)
+	
+	await _wait_for_door_unlocked("lab_door")
+	_release_runner_hold("lab_door_gate_01")
+	
+	# preventing sequence break by decrypting terminal early
+	_enable_feature("terminal_commands", false)
+
+	await _wait_for_cell(21.5)
+
+	_acquire_runner_hold("null_terminal_gate_01")
+
+	await _show_dialogue([
+		"...",
+		"What the fuck...?",
+	], "", Rect2(), Vector2(750, 300), true, 22.5, "null_lab_leadup")
+	_release_runner_hold("null_terminal_gate_01")
+
+	await _run_lab_reveal_sequence()
+
+func _run_lab_reveal_sequence() -> void:
+	await _wait_for_cell(25.0)
+	_acquire_runner_hold("null_terminal_gate_02")
+	await _show_dialogue([
+		"Some kind of cyberware... like a datajack interface? An... adapter?",
+		"...",
+		"I found a terminal here to kill the local security. The cameras and drones should be out.",
+		"You need to come inside and see this."
+	], "", Rect2(), Vector2(750,300), true)
+
+	await get_tree().create_timer(1).timeout
+	await cutscene_controller.play_reverse_glitch_transition(2.0)
+
+	await _show_dialogue([
+		"Been going through the specs on this thing. They called it a... *the* \"Null Spike.\"",
+		"It's... I'm reading this in English, kid. They wrote specs in English and never shared this with us.",
+		"...",
+		"You're too young to remember, but the AIs starting to speak their own language before they left. One we didn't... maybe couldn't understand.",
+		"If I'm reading this right... this thing was meant meant to translate. To interface.",
+		"Some of the files are encrypted. Need your deck if we're going to crack them."
+	], "", Rect2(), Vector2(750,300), true)
+
+	await get_tree().create_timer(1).timeout
+	await cutscene_controller.play_still_reveal(2.2)
+
+	await _show_dialogue([
+		"Take a look at this place, huh? Drones in here living better than most upstackers.",
+		"... Anyway.",
+		"This works out, actually — you can try the DECRYPT program without someone's life on the line. Plug in directly, I'll walk you through it.",
+		"It's just like the Sniff program from earlier, just RUN decrypt in the terminal."
+	], "", Rect2(), Vector2(750,300), true)
+	_set_objective("RUN decrypt on the null_terminal")
+
+	_enable_feature("terminal_commands", true)
+	terminal_window.z_index = 100
+	terminal_window.switch_session(_get_active_signal("null_terminal"))
+
+	await _wait_for_puzzle_started(PuzzleComponent.Type.DECRYPT)
+
+	await _show_dialogue([
+		"See that grid? Program's already working on cracking it. It predicts all the possible characters that could fit the cipher down near the bottom. It'll chip away on its own, but slowly.",
+		"You want to speed it up, you can input values manually. Look for the pattern. If you figure out what one letter maps to, plug it in and the whole thing accelerates.",
+		"On a real run, you wanna start decrypt early so the program does most of the work for you. But I promise there'll be times when quickly cracking a cipher will save their asses."
+		], "", Rect2(), Vector2(350,400), true)
+	_set_objective("Solve the encrypted cipher")
+
+	await _wait_for_puzzle_solved("null_terminal")
+
+	await _run_terminal_dump_sequence()
+
+	await _show_dialogue([
+		"...",
+		"Okay. Yeah.",
+		"Kid. If this does what I think it does... this is the most important piece of tech anyone's found since the AIs clipped off and left us to drift.",
+		"This could change everything...",
+		"...Or at least be worth more than either of us will see in a lifetime."
+		], "", Rect2(), Vector2(750,300), true)
+		
+# "BEFORE THE ghosts clipped off and left us to drift in the world they built for us."
+
+func _prepare_debug_stage_door_01() -> void:
+	_set_cutscene_black_screen(false)
+	window_manager.auto_focus_puzzles = true
+	_set_runner_cell(5.2)
+	_mark_signal_scanned("cam_01")
+	_mark_signal_disabled("cam_01")
+	_enable_feature("scan")
+	_enable_feature("connect")
+	_enable_feature("terminal_commands")
+	_enable_feature("null_spike", false)
+	_set_objective("")
+
+func _prepare_debug_stage_cam_02() -> void:
+	_set_cutscene_black_screen(false)
+	window_manager.auto_focus_puzzles = true
+	_set_runner_cell(9.2)
+	_mark_signal_scanned("cam_01")
+	_mark_signal_disabled("cam_01")
+	_mark_signal_scanned("door_01")
+	_mark_door_unlocked("door_01")
+	_enable_feature("scan")
+	_enable_feature("connect")
+	_enable_feature("terminal_commands")
+	_enable_feature("null_spike", false)
+	_set_objective("")
+
+func _prepare_debug_stage_drone_01() -> void:
+	_set_cutscene_black_screen(false)
+	window_manager.auto_focus_puzzles = true
+	_set_runner_cell(12)
+	_enable_feature("scan")
+	_enable_feature("connect")
+	_enable_feature("terminal_commands")
+	_enable_feature("null_spike", false)
+
+func _prepare_debug_stage_null_door() -> void:
+	_set_cutscene_black_screen(false)
+	window_manager.auto_focus_puzzles = false
+	_set_runner_cell(16.9)
+	_enable_feature("scan")
+	_enable_feature("connect")
+	_enable_feature("terminal_commands")
+
+func _prepare_debug_stage_lab_reveal() -> void:
+	_set_cutscene_black_screen(false)
+	window_manager.auto_focus_puzzles = false
+	_set_runner_cell(24.9)
+	_mark_signal_scanned("lab_door")
+	_mark_door_unlocked("lab_door")
+	_enable_feature("scan")
+	_enable_feature("connect")
+	_enable_feature("terminal_commands")
+	_enable_feature("null_spike", false)
+	_set_objective("")
+
+func _prepare_debug_stage_terminal_dump() -> void:
+	_set_cutscene_black_screen(false)
+	window_manager.auto_focus_puzzles = false
+	_set_runner_cell(25.0)
+	_acquire_runner_hold("null_terminal_gate_02")
+	_mark_signal_scanned("lab_door")
+	_mark_door_unlocked("lab_door")
+	_mark_signal_scanned("null_terminal")
+	_unlock_signal_puzzle("null_terminal")
+	_enable_feature("scan")
+	_enable_feature("connect")
+	_enable_feature("terminal_commands")
+	_enable_feature("null_spike", false)
+	_set_objective("")
+	terminal_window.z_index = 100
+	terminal_window.switch_session(_get_active_signal("null_terminal"))
+	cutscene_controller.play_still_reveal(0.01)
+	
+func _set_cutscene_black_screen(enabled: bool) -> void:
+	if cutscene_controller == null:
 		return
+	cutscene_controller.set_black_screen(enabled)
 
-func _check_connect_triggers(signal_data: SignalData):
-	for event in events:
-		if event.trigger == TutorialEvent.Trigger.SIGNAL_CONNECT:
-			_show_tutorial_once(event)
-			return
-
-func _check_kill_triggers(signal_data: SignalData):
-	for event in events:
-		if event.trigger == TutorialEvent.Trigger.SIGNAL_KILLED:
-			_show_tutorial_once(event)
-			return
-
-func _check_puzzle_started_triggers(active_signal: ActiveSignal, puzzle_type: PuzzleComponent.Type):
-	for event in events:
-		if event.trigger != TutorialEvent.Trigger.PUZZLE_STARTED:
-			continue
-		if event.value != int(puzzle_type):
-			continue
-		_show_tutorial_once(event)
+func _set_runner_cell(cell_pos: float) -> void:
+	if timeline_manager == null:
 		return
+	timeline_manager.current_cell_pos = cell_pos
+	timeline_manager.current_cell = floor(cell_pos) as int
+	timeline_manager.last_emitted_cell = timeline_manager.current_cell
 
-func _check_puzzle_solved_triggers(signal_data: SignalData):
-	for event in events:
-		if event.trigger == TutorialEvent.Trigger.PUZZLE_SOLVED:
-			_show_tutorial_once(event)
-			return
-
-func _check_dialogue_finished_triggers(event_id: String):
-	for event in events:
-		if event.trigger != TutorialEvent.Trigger.DIALOGUE_FINISHED:
-			continue
-		if event.trigger_key != event_id:
-			continue
-		_show_tutorial_once(event)
+func _mark_signal_scanned(system_id: String) -> void:
+	var active_sig := _get_active_signal(system_id)
+	if active_sig == null:
 		return
+	if active_sig.scan_layers.is_empty():
+		active_sig.generate_scan_layers()
+	active_sig.current_scan_index = active_sig.scan_layers.size()
+	active_sig.current_layer_progress = 0.0
+	active_sig.is_being_scanned = false
+	if active_sig.instance_node != null:
+		active_sig.instance_node.update_visuals()
 
-func _check_timer_elapsed_triggers(timer_key: String):
-	for event in events:
-		if event.trigger != TutorialEvent.Trigger.TIMER_ELAPSED:
-			continue
-		if event.trigger_key != timer_key:
-			continue
-		_show_tutorial_once(event)
+func _mark_signal_disabled(system_id: String) -> void:
+	var active_sig := _get_active_signal(system_id)
+	if active_sig == null or active_sig.is_disabled:
 		return
+	active_sig.disable_signal()
 
-func _show_tutorial(event: TutorialEvent, custom_focus_rect: Rect2 = Rect2()):
-	_execute_event(event, custom_focus_rect)
-	events.erase(event)
-
-func _show_tutorial_once(event: TutorialEvent, custom_focus_rect: Rect2 = Rect2()) -> void:
-	if not tutorial_level_flags.has(event.id):
-		tutorial_level_flags[event.id] = false
-	if tutorial_level_flags[event.id]:
+func _mark_door_unlocked(system_id: String) -> void:
+	var active_sig := _get_active_signal(system_id)
+	if active_sig == null or active_sig.data == null:
 		return
-	_show_tutorial(event, custom_focus_rect)
-	tutorial_level_flags[event.id] = true
+	active_sig.set_door_locked(false)
 
-func _event_matches_signal(event: TutorialEvent, signal_data: SignalData) -> bool:
-	if event.signal_index < 0:
-		return true
-	if event.signal_index >= signal_manager.signal_queue.size():
-		return false
+func _unlock_signal_puzzle(system_id: String) -> void:
+	var active_sig := _get_active_signal(system_id)
+	if active_sig == null or active_sig.data == null or active_sig.data.puzzle == null:
+		return
+	active_sig.data.puzzle.puzzle_locked = false
 
-	var target_signal: ActiveSignal = signal_manager.signal_queue[event.signal_index]
-	return target_signal != null and target_signal.data == signal_data
+func _run_terminal_dump_sequence() -> void:
+	if terminal_window == null:
+		return
+	var dump_text := FileAccess.get_file_as_string(NULL_SPIKE_DUMP_PATH)
+	if dump_text.is_empty():
+		return
+	await terminal_window.play_system_dump(dump_text)
 
-func _focus_tutorial_target(event: TutorialEvent, custom_focus_rect: Rect2 = Rect2()) -> Rect2:
+func _focus_runner() -> void:
+	if runner_focus_panel == null:
+		window_manager.clear_focus_overlay()
+		return
+	window_manager.focus_control(runner_focus_panel)
+
+func _focus_heat_tracker() -> void:
+	if heat_tracker == null:
+		window_manager.clear_focus_overlay()
+		return
+	window_manager.focus_control(heat_tracker, Vector2(24, 24))
+
+func _focus_door_lock_state(system_id: String) -> void:
+	var active_sig := _get_active_signal(system_id)
+	if active_sig == null or active_sig.instance_node == null:
+		window_manager.clear_focus_overlay()
+		return
+	active_sig.instance_node.show_tooltip()
+	var lock_rect = active_sig.instance_node.get_lock_state_focus_rect()
+	if not _has_focus_rect(lock_rect):
+		window_manager.focus_signal(active_sig)
+		return
+	window_manager.focus_rect(lock_rect, Vector2(16, 16))
+
+func _show_dialogue(
+	dialogue_pages: Array[String],
+	signal_id: String = "",
+	focus_rect: Rect2 = Rect2(),
+	default_position: Vector2 = Vector2(),
+	has_custom_position: bool = false,
+	stop_cell_if_open: int = -1,
+	stop_hold_key: String = ""
+) -> void:
+	var resolved_focus_rect := _apply_focus(signal_id, focus_rect)
+	GlobalEvents.tutorial_lock_changed.emit(true)
+	var dialogue = window_manager.show_tutorial_dialogue(
+		dialogue_pages,
+		resolved_focus_rect,
+		default_position,
+		has_custom_position
+	)
+	if stop_cell_if_open >= 0:
+		_hold_at_cell_until_dialogue_finishes(dialogue, stop_cell_if_open, stop_hold_key)
+	await dialogue.dismissed
+
+func _apply_focus(signal_id: String = "", custom_focus_rect: Rect2 = Rect2()) -> Rect2:
 	if _has_focus_rect(custom_focus_rect):
 		window_manager.focus_rect(custom_focus_rect)
 		return custom_focus_rect
 
-	if _has_focus_rect(event.focus_rect):
-		window_manager.focus_rect(event.focus_rect, Vector2(32, 32))
-		return event.focus_rect
-
-	if event.signal_index < 0:
+	if signal_id.is_empty():
 		window_manager.clear_focus_overlay()
 		return Rect2()
 
-	if event.signal_index >= signal_manager.signal_queue.size():
+	var active_sig := _get_active_signal(signal_id)
+	if active_sig == null:
+		window_manager.clear_focus_overlay()
+		return Rect2()
+	if active_sig.instance_node == null:
 		window_manager.clear_focus_overlay()
 		return Rect2()
 
-	var active_sig: ActiveSignal = signal_manager.signal_queue[event.signal_index]
-	var resolved_focus_rect = window_manager.get_signal_focus_rect(active_sig)
-	if _has_focus_rect(resolved_focus_rect):
-		window_manager.focus_signal(active_sig)
-		return resolved_focus_rect
+	var resolved_focus_rect = active_sig.instance_node.get_focus_rect()
+	if not _has_focus_rect(resolved_focus_rect):
+		window_manager.clear_focus_overlay()
+		return Rect2()
 
-	window_manager.clear_focus_overlay()
-	return Rect2()
+	window_manager.focus_signal(active_sig)
+	return resolved_focus_rect
+
+func _hold_at_cell_until_dialogue_finishes(dialogue: Control, stop_cell: int, hold_key: String) -> void:
+	if dialogue == null or not is_instance_valid(dialogue):
+		return
+	await _wait_for_cell(stop_cell)
+	if dialogue == null or not is_instance_valid(dialogue):
+		return
+	var resolved_hold_key := hold_key if not hold_key.is_empty() else "dialogue_stop_%s" % stop_cell
+	_acquire_runner_hold(resolved_hold_key)
+	await dialogue.dismissed
+	_release_runner_hold(resolved_hold_key)
+
+func _wait_for_cell(target_cell: int) -> void:
+	while timeline_manager.current_cell < target_cell:
+		var args: Array = await _await_signal_args(GlobalEvents.cell_reached)
+		if not args.is_empty() and int(args[0]) >= target_cell:
+			return
+
+func _wait_for_scan_complete(system_id: String) -> void:
+	var active_sig := _get_active_signal(system_id)
+	if active_sig != null and active_sig.current_scan_index >= active_sig.scan_layers.size():
+		return
+	while true:
+		var args: Array = await _await_signal_args(GlobalEvents.signal_scan_complete)
+		var signal_data: SignalData = null
+		if not args.is_empty():
+			signal_data = args[0] as SignalData
+		if signal_data != null and signal_data.system_id == system_id:
+			return
+
+func _wait_for_signal_connect(system_id: String) -> void:
+	var active_sig := _get_active_signal(system_id)
+	if active_sig != null and active_sig.terminal_session != null and active_sig.terminal_session.has_tab:
+		return
+	while true:
+		var args: Array = await _await_signal_args(GlobalEvents.signal_connect)
+		var signal_data: SignalData = null
+		if not args.is_empty():
+			signal_data = args[0] as SignalData
+		if signal_data != null and signal_data.system_id == system_id:
+			return
+
+func _wait_for_signal_killed(system_id: String) -> void:
+	var active_sig := _get_active_signal(system_id)
+	if active_sig != null and active_sig.is_disabled:
+		return
+	while true:
+		var args: Array = await _await_signal_args(GlobalEvents.signal_killed)
+		if not args.is_empty():
+			active_sig = args[0] as ActiveSignal
+		if active_sig != null and active_sig.data != null and active_sig.data.system_id == system_id:
+			return
+
+func _wait_for_puzzle_started(puzzle_type: PuzzleComponent.Type) -> void:
+	while true:
+		var args: Array = await _await_signal_args(GlobalEvents.puzzle_started)
+		if args.size() < 2:
+			continue
+		if int(args[1]) == int(puzzle_type):
+			return
+
+func _wait_for_puzzle_solved(system_id: String) -> void:
+	var active_sig := _get_active_signal(system_id)
+	if active_sig != null and active_sig.data != null and active_sig.data.puzzle != null and not active_sig.data.puzzle.puzzle_locked:
+		return
+	while true:
+		var args: Array = await _await_signal_args(GlobalEvents.puzzle_solved)
+		var signal_data: SignalData = null
+		if not args.is_empty():
+			signal_data = args[0] as SignalData
+		if signal_data != null and signal_data.system_id == system_id:
+			return
+
+func _wait_for_door_unlocked(system_id: String) -> void:
+	while true:
+		var active_sig := _get_active_signal(system_id)
+		if active_sig != null and active_sig.data != null and not active_sig.data.door_locked:
+			return
+		await get_tree().process_frame
+
+func _cam_02_kill_or_hustle(active_signal: ActiveSignal) -> String:
+	var resolved := false
+	
+	var on_move = func():
+		if resolved:
+			return
+		resolved = true
+		wait_completed.emit("move")
+	
+	var on_kill = func(active_signal: ActiveSignal):
+		if resolved:
+			return
+		if active_signal.data.system_id != "cam_02":
+			return
+		resolved = true
+		wait_completed.emit("kill")
+
+	GlobalEvents.runner_hustle.connect(on_move, CONNECT_ONE_SHOT)
+	GlobalEvents.signal_killed.connect(on_kill)
+	
+	var result = await wait_completed
+	
+	if GlobalEvents.signal_killed.is_connected(on_kill):
+		GlobalEvents.signal_killed.disconnect(on_kill)
+		
+	return result
+
+func _runner_detected_dialogue():
+	_show_dialogue([
+		"Agh, it pinged me. Shouldn't be a problem. Quick glances don't build much heat."
+		], "", Rect2(), Vector2(750, 300), true, 12
+	)
+
+func _await_signal_args(signal_to_wait: Signal) -> Array:
+	var result = await signal_to_wait
+	if result is Array:
+		return result
+	return [result]
+
+func _get_active_signal(system_id: String) -> ActiveSignal:
+	if signal_manager == null:
+		return null
+	return signal_manager.get_signal_by_system_id(system_id)
 
 func _has_focus_rect(focus_rect: Rect2) -> bool:
 	return focus_rect.size.x > 0.0 and focus_rect.size.y > 0.0
 
-func _execute_event(event: TutorialEvent, custom_focus_rect: Rect2 = Rect2()) -> void:
-	var resolved_focus_rect := _apply_event_focus(event, custom_focus_rect)
-	_apply_event_state_changes(event)
-	_present_event_dialogue(event, resolved_focus_rect)
-
-func _apply_event_focus(event: TutorialEvent, custom_focus_rect: Rect2 = Rect2()) -> Rect2:
-	return _focus_tutorial_target(event, custom_focus_rect)
-
-func _apply_event_state_changes(event: TutorialEvent) -> void:
-	_apply_runner_hold_changes(event)
-	_apply_objective_text(event)
-	_apply_feature_gates(event)
-	_apply_event_timer(event)
-
-func _present_event_dialogue(event: TutorialEvent, resolved_focus_rect: Rect2) -> void:
-	if not event.has_dialogue():
+func _set_objective(text: String) -> void:
+	if text.is_empty():
+		window_manager.clear_tutorial_objective()
 		return
+	window_manager.set_tutorial_objective(text)
 
-	GlobalEvents.tutorial_lock_changed.emit(true)
-	var runner_hold_token := ""
-	if event.hold_runners:
-		runner_hold_token = _consume_runner_hold_token(event)
-	window_manager.show_tutorial_dialogue(event, resolved_focus_rect, runner_hold_token)
+func _disable_tutorial_features() -> void:
+	_enable_feature("scan", false)
+	_enable_feature("connect", false)
+	_enable_feature("terminal_commands", false)
+	_enable_feature("null_spike", false)
 
-func _apply_objective_text(event: TutorialEvent) -> void:
-	if event.objective_text.is_empty():
-		return
-	window_manager.set_tutorial_objective(event.objective_text)
-
-func _apply_feature_gates(event: TutorialEvent) -> void:
-	for feature_key in event.feature_gates.keys():
-		GlobalEvents.set_tutorial_feature_enabled(feature_key, bool(event.feature_gates[feature_key]))
-
-func _apply_event_timer(event: TutorialEvent) -> void:
-	if event.start_timer_key.is_empty():
-		return
-	if event.start_timer_duration < 0.0:
-		return
-	_start_named_timer(event.start_timer_key, event.start_timer_duration)
-
-func _apply_runner_hold_changes(event: TutorialEvent) -> void:
-	var hold_key := _get_runner_hold_key(event)
-	if event.release_runner_hold:
-		_release_runner_hold(hold_key)
-	if event.hold_runners:
-		_acquire_runner_hold(hold_key)
-
-func _get_runner_hold_key(event: TutorialEvent) -> String:
-	if event == null:
-		return ""
-	if not event.runner_hold_key.is_empty():
-		return event.runner_hold_key
-	return event.id
+func _enable_feature(feature_key: String, enabled: bool = true) -> void:
+	GlobalEvents.set_tutorial_feature_enabled(feature_key, enabled)
 
 func _acquire_runner_hold(hold_key: String) -> void:
 	if hold_key.is_empty():
@@ -226,24 +647,3 @@ func _release_runner_hold(hold_key: String) -> void:
 	var token: String = _active_runner_hold_tokens[hold_key]
 	_active_runner_hold_tokens.erase(hold_key)
 	GlobalEvents.release_runner_hold(token)
-
-func _consume_runner_hold_token(event: TutorialEvent) -> String:
-	var hold_key := _get_runner_hold_key(event)
-	if hold_key.is_empty():
-		return ""
-	if not _active_runner_hold_tokens.has(hold_key):
-		return ""
-	var token: String = _active_runner_hold_tokens[hold_key]
-	_active_runner_hold_tokens.erase(hold_key)
-	return token
-
-func _start_named_timer(timer_key: String, duration: float) -> void:
-	var version := int(_active_timer_versions.get(timer_key, 0)) + 1
-	_active_timer_versions[timer_key] = version
-	_emit_timer_when_ready(timer_key, duration, version)
-
-func _emit_timer_when_ready(timer_key: String, duration: float, version: int) -> void:
-	await get_tree().create_timer(maxf(0.0, duration)).timeout
-	if int(_active_timer_versions.get(timer_key, 0)) != version:
-		return
-	GlobalEvents.tutorial_timer_elapsed.emit(timer_key)

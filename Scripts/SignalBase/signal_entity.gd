@@ -53,6 +53,16 @@ func setup(signal_wrapper: ActiveSignal):
 	my_data = signal_wrapper.data
 	my_active_sig = signal_wrapper
 
+	if my_active_sig != null and not my_active_sig.runtime_position_initialized:
+		my_active_sig.runtime_cell_x = my_active_sig.start_cell_index
+		my_active_sig.runtime_lane = my_data.lane
+		my_active_sig.runtime_lane_pos = float(my_data.lane)
+		my_active_sig.runtime_body_facing_deg = my_data.facing_deg
+		my_active_sig.runtime_detection_facing_deg = my_data.facing_deg
+		my_active_sig.runtime_position_initialized = true
+	if my_data != null and my_data.detection != null and my_active_sig != null:
+		my_data.detection.initialize_runtime(my_active_sig)
+
 	tooltip_main_initial_x = tooltip_main.size.x
 	tooltip_main_initial_y = tooltip_main.size.y
 
@@ -82,12 +92,19 @@ func update_visuals():
 
 	if my_data.type == SignalData.Type.GUARD and my_data.mobility != null:
 		set_guard_revealed(_guard_revealed)
-	
+
 	if my_active_sig.is_disabled:
 		shape.color = Color.DIM_GRAY
 
+	shape.rotation_degrees = _get_visual_facing_deg()
+
 func _process(delta: float) -> void:
-	if my_data == null or my_data.type != SignalData.Type.GUARD or mobility_controller == null:
+	if my_active_sig != null:
+		shape.rotation_degrees = _get_visual_facing_deg()
+
+	if my_data == null or mobility_controller == null:
+		return
+	if my_data.type != SignalData.Type.GUARD and my_data.type != SignalData.Type.DRONE:
 		return
 	if not _guard_revealed:
 		return
@@ -100,6 +117,13 @@ func _process(delta: float) -> void:
 
 	_alert_visual_t = 0.0
 	shape.self_modulate = Color.WHITE
+
+func _get_visual_facing_deg() -> float:
+	if my_active_sig == null:
+		return 0.0
+	if my_data != null and my_data.type == SignalData.Type.DRONE:
+		return my_active_sig.runtime_detection_facing_deg
+	return my_active_sig.runtime_body_facing_deg
 
 func _setup_mobility(signal_wrapper: ActiveSignal) -> void:
 	if signal_wrapper == null:
@@ -270,6 +294,11 @@ func get_focus_rect() -> Rect2:
 
 	var center := get_global_transform_with_canvas().origin
 	return Rect2(center - (local_size * 0.5), local_size)
+
+func get_lock_state_focus_rect() -> Rect2:
+	if tooltip_lock_state == null or not tooltip_lock_state.is_visible_in_tree():
+		return Rect2()
+	return tooltip_lock_state.get_global_rect()
 
 
 func show_scanning_tooltip():

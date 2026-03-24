@@ -16,20 +16,27 @@ signal signal_scan_complete(signal_data: SignalData)
 signal signal_connect(data: SignalData)
 signal signal_hacked(data: SignalData, success: bool)
 signal signal_killed(active_sig: ActiveSignal)
+signal mobile_investigating(active_sig: ActiveSignal)
 signal heat_increased(amount, source)
+
+signal runner_detected(active_sig: ActiveSignal)
 signal runners_damaged(amount: float)
 signal runners_stopped()
 signal runners_resumed()
+signal runner_slowdown()
+signal runner_hustle()
 signal runner_hold_count_changed(count: int)
+
 signal ic_triggered(ice_type: String)
+
 signal guard_alert_raised(alert: GuardAlertData)
 signal guard_comms_ping_started(active_sig: ActiveSignal)
 signal guard_comms_ping_ended(active_sig: ActiveSignal)
+
 signal activate_null_spike()
 signal deactivate_null_spike()
+
 signal tutorial_lock_changed(locked: bool)
-signal tutorial_dialogue_finished(event_id: String)
-signal tutorial_timer_elapsed(timer_key: String)
 signal tutorial_feature_changed(feature_key: String, enabled: bool)
 
 # PUZZLE EVENTS

@@ -16,6 +16,12 @@ func ensure_generated(difficulty: int) -> void:
 	rng.randomize()
 
 	match difficulty:
+		0:
+			cipher = Cipher.REPLACEMENT
+			cipher_text = _generate_unique_cipher_text(rng, 4)
+			mapping_offset = rng.randi_range(2, 4)
+			keyspace_min = 4
+			keyspace_max = 6
 		1:
 			cipher = Cipher.REPLACEMENT
 			cipher_text = _generate_unique_cipher_text(rng, 4)

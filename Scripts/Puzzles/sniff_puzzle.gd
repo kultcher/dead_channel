@@ -40,6 +40,7 @@ signal puzzle_solved
 signal puzzle_failed
 
 func _ready():
+	_apply_linked_puzzle_config()
 	var vbox = VBoxContainer.new()
 	add_child(vbox)
 	
@@ -65,6 +66,36 @@ func _ready():
 	_populate_grid()
 	_generate_targets()
 	_update_footer()
+
+func _apply_linked_puzzle_config() -> void:
+	if linked_signal == null or linked_signal.data == null or linked_signal.data.puzzle == null:
+		return
+
+	var puzzle: PuzzleComponent = linked_signal.data.puzzle
+	puzzle.ensure_puzzle_generated()
+	if puzzle.puzzle_type != PuzzleComponent.Type.SNIFF:
+		return
+
+	var sniff_config := puzzle.get_sniff_config()
+	if sniff_config == null:
+		return
+
+	config.grid_cols = sniff_config.grid_cols
+	config.grid_rows = sniff_config.grid_rows
+	config.cell_size = sniff_config.cell_size
+	config.target_count = sniff_config.target_count
+	config.scroll_direction = _get_scroll_direction_name(sniff_config.scroll_direction)
+	config.base_speed = sniff_config.base_speed
+	if sniff_config.speed_variance >= 0.0:
+		config.speed_variance = sniff_config.speed_variance
+	config.col_speeds = Array(sniff_config.col_speeds)
+
+func _get_scroll_direction_name(scroll_direction: SniffPuzzleConfig.ScrollDirection) -> String:
+	match scroll_direction:
+		SniffPuzzleConfig.ScrollDirection.HORIZONTAL:
+			return "horizontal"
+		_:
+			return "vertical"
 
 func _add_rain_layers():
 	# columns, rows, speed, density, seed_value, alpha_strength
@@ -102,17 +133,22 @@ func _process(delta: float):
 		
 		if is_vertical:
 			cell.position.y += speed * delta
-			if cell.position.y > config.grid_rows * config.cell_size:
-				_recycle_cell(cell, true)
+			if speed >= 0.0 and cell.position.y > config.grid_rows * config.cell_size:
+				_recycle_cell(cell, true, true)
+			elif speed < 0.0 and cell.position.y < -config.cell_size:
+				_recycle_cell(cell, true, false)
 		else:
 			cell.position.x += speed * delta
-			if cell.position.x > config.grid_cols * config.cell_size:
-				_recycle_cell(cell, false)
+			if speed >= 0.0 and cell.position.x > config.grid_cols * config.cell_size:
+				_recycle_cell(cell, false, true)
+			elif speed < 0.0 and cell.position.x < -config.cell_size:
+				_recycle_cell(cell, false, false)
 
 func _calculate_speeds():
 	col_speeds.clear()
 	if config.col_speeds.size() > 0:
-		col_speeds = config.col_speeds.duplicate()
+		for speed_value in config.col_speeds:
+			col_speeds.append(float(speed_value))
 	else:
 		for i in config.grid_cols:
 			var t = float(i) / max(config.grid_cols - 1, 1)
@@ -152,7 +188,7 @@ func _create_cell(col: int, row: int) -> Label:
 	cell.gui_input.connect(_on_cell_input.bind(cell))
 	return cell
 
-func _recycle_cell(cell: Label, is_vertical: bool):
+func _recycle_cell(cell: Label, is_vertical: bool, moving_positive: bool):
 	# 1. Capture the target if we are losing it
 	if cell.get_meta("is_target", false):
 		var val = cell.get_meta("target_value")
@@ -164,11 +200,17 @@ func _recycle_cell(cell: Label, is_vertical: bool):
 	cell.set_meta("target_value", "")
 	cell.add_theme_color_override("font_color", BASE_CELL_COLOR)
 
-	# 3. Reposition to the TOP (The Entrance)
+	# 3. Reposition to the entry side based on scroll direction.
 	if is_vertical:
-		cell.position.y -= (config.grid_rows + 2) * config.cell_size
+		if moving_positive:
+			cell.position.y -= (config.grid_rows + 2) * config.cell_size
+		else:
+			cell.position.y += (config.grid_rows + 2) * config.cell_size
 	else:
-		cell.position.x -= (config.grid_cols + 2) * config.cell_size
+		if moving_positive:
+			cell.position.x -= (config.grid_cols + 2) * config.cell_size
+		else:
+			cell.position.x += (config.grid_cols + 2) * config.cell_size
 
 	# 4. Assign New Value (The Entry Logic)
 	# Check if we have a pending target waiting to enter

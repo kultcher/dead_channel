@@ -87,7 +87,9 @@ func runner_spotted():
 		_start_flash_sequence()
 
 func _process(delta: float):
-	_sync_mobility_facing()
+	if parent_sig != null and parent_sig.my_active_sig != null and not parent_sig.my_active_sig.is_disabled:
+		_update_runtime_facing(delta)
+	_sync_runtime_facing()
 	if is_alert_active:
 		vision_timeout -= delta
 		if vision_timeout <= 0:
@@ -96,16 +98,32 @@ func _process(delta: float):
 	if runner_in_vision and parent_sig and parent_sig.my_data and parent_sig.my_data.detection:
 		parent_sig.my_data.detection.apply_detection(parent_sig.my_active_sig, delta)
 
-func _sync_mobility_facing() -> void:
-	if parent_sig == null:
+func _update_runtime_facing(delta: float) -> void:
+	if parent_sig == null or parent_sig.my_data == null or parent_sig.my_active_sig == null:
 		return
-	if parent_sig.mobility_controller == null:
+	var detection = parent_sig.my_data.detection
+	if detection == null:
+		return
+	if parent_sig.my_data.type == SignalData.Type.DRONE and parent_sig.mobility_controller != null and parent_sig.mobility_controller.has_alert_focus():
+		parent_sig.my_active_sig.runtime_detection_facing_deg = parent_sig.mobility_controller.get_alert_focus_deg()
+		return
+
+	var movement_facing_deg = parent_sig.my_active_sig.runtime_body_facing_deg
+	var movement_has_facing := false
+	if parent_sig.mobility_controller != null:
+		movement_facing_deg = parent_sig.mobility_controller.get_movement_facing_deg()
+		movement_has_facing = parent_sig.mobility_controller.has_movement_facing()
+
+	detection.update_runtime(parent_sig.my_active_sig, delta, movement_facing_deg, movement_has_facing)
+
+func _sync_runtime_facing() -> void:
+	if parent_sig == null:
 		return
 	if parent_sig.my_active_sig == null:
 		return
 	if not parent_sig.my_active_sig.runtime_position_initialized:
 		return
-	rotation_degrees = parent_sig.my_active_sig.runtime_facing_deg
+	rotation_degrees = parent_sig.my_active_sig.runtime_detection_facing_deg
 
 func _start_flash_sequence():
 	alert_tween = create_tween().set_loops()

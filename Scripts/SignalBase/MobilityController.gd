@@ -39,7 +39,7 @@ func initialize(target_active_sig: ActiveSignal) -> void:
 	active_sig.runtime_cell_x = active_sig.start_cell_index
 	active_sig.runtime_lane = active_sig.data.lane
 	active_sig.runtime_lane_pos = float(active_sig.data.lane)
-	active_sig.runtime_facing_deg = _mobility.patrol_points[0].facing_deg
+	active_sig.runtime_body_facing_deg = active_sig.data.facing_deg
 	active_sig.runtime_position_initialized = true
 
 	GlobalEvents.guard_alert_raised.connect(_on_guard_alert_raised)
@@ -99,6 +99,7 @@ func _process_alert_move(delta: float) -> void:
 	_state = State.INVESTIGATING
 
 func _process_investigate(delta: float) -> void:
+	GlobalEvents.mobile_investigating.emit(active_sig)
 	_investigate_timer -= delta
 	if _investigate_timer > 0.0:
 		return
@@ -173,7 +174,7 @@ func _update_facing(dir: Vector2) -> void:
 			dir.x * _timeline_manager.cell_width_px,
 			dir.y * _timeline_manager.lane_height
 		)
-	active_sig.runtime_facing_deg = rad_to_deg(atan2(visual_dir.y, visual_dir.x))
+	active_sig.runtime_body_facing_deg = rad_to_deg(atan2(visual_dir.y, visual_dir.x))
 
 func _next_patrol_index() -> int:
 	var max_i := _mobility.patrol_points.size() - 1
@@ -245,6 +246,34 @@ func _update_render_offset() -> void:
 	if active_sig == null:
 		return
 	active_sig.runtime_render_offset = Vector2.ZERO
+
+func has_movement_facing() -> bool:
+	return _last_move_dir.length_squared() > 0.0001
+
+func get_movement_facing_deg() -> float:
+	return active_sig.runtime_body_facing_deg
+
+func has_alert_focus() -> bool:
+	return _current_alert != null and (_state == State.RESPONDING_ALERT or _state == State.INVESTIGATING)
+
+func get_alert_focus_deg() -> float:
+	if not has_alert_focus():
+		return active_sig.runtime_detection_facing_deg
+
+	var dir := Vector2(
+		_current_alert.target_cell_x - active_sig.runtime_cell_x,
+		float(_current_alert.target_lane) - active_sig.runtime_lane_pos
+	)
+	if dir.length_squared() <= 0.0001:
+		return active_sig.runtime_detection_facing_deg
+
+	var visual_dir := dir
+	if _timeline_manager != null:
+		visual_dir = Vector2(
+			dir.x * _timeline_manager.cell_width_px,
+			dir.y * _timeline_manager.lane_height
+		)
+	return wrapf(rad_to_deg(atan2(visual_dir.y, visual_dir.x)) + 180.0, -180.0, 180.0)
 
 func is_in_alert_state() -> bool:
 	return _state == State.RESPONDING_ALERT or _state == State.INVESTIGATING

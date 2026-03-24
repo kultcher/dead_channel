@@ -1,0 +1,55 @@
+[gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://c70g2pwja1dru"]
+
+[ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="1_2w5hh"]
+[ext_resource type="Script" uid="uid://bjwel5bmlp6x4" path="res://Scripts/Components/DetectionPatrolPoint.gd" id="1_a1o0p"]
+[ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_1drga"]
+[ext_resource type="Script" uid="uid://diftg5rgtn3kr" path="res://Scripts/Components/ICComponent.gd" id="3_p7prs"]
+[ext_resource type="Resource" uid="uid://c43su3v53wrbw" path="res://Resources/ResponseEffects/base_camera_heat.tres" id="4_a1o0p"]
+[ext_resource type="Script" uid="uid://bwfquhgf0ae5f" path="res://Scripts/Components/ResponseComponent.gd" id="5_xrbng"]
+[ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="6_6doba"]
+[ext_resource type="Resource" path="res://Resources/SignalVisuals/camera_visuals.tres" id="7_n0sk7"]
+
+[sub_resource type="Resource" id="Resource_a1o0p"]
+script = ExtResource("1_a1o0p")
+facing_deg = -30.0
+dwell_sec = 1.0
+metadata/_custom_type_script = "uid://bjwel5bmlp6x4"
+
+[sub_resource type="Resource" id="Resource_xrbng"]
+script = ExtResource("1_a1o0p")
+facing_deg = 30.0
+dwell_sec = 1.0
+metadata/_custom_type_script = "uid://bjwel5bmlp6x4"
+
+[sub_resource type="Resource" id="Resource_qkibr"]
+script = ExtResource("1_2w5hh")
+watch_offset_cells = 0.0
+vision_length_cells = 1.0
+turn_speed_deg_per_sec = 30.0
+patrol_points = Array[ExtResource("1_a1o0p")]([SubResource("Resource_a1o0p"), SubResource("Resource_xrbng")])
+metadata/_custom_type_script = "uid://cxtj1fq7mmq1h"
+
+[sub_resource type="Resource" id="Resource_mefw2"]
+script = ExtResource("2_1drga")
+metadata/_custom_type_script = "uid://cysj06bgrv1ai"
+
+[sub_resource type="Resource" id="Resource_gn3xj"]
+script = ExtResource("3_p7prs")
+metadata/_custom_type_script = "uid://diftg5rgtn3kr"
+
+[sub_resource type="Resource" id="Resource_hwdih"]
+script = ExtResource("5_xrbng")
+effects = Array[Resource]([ExtResource("4_a1o0p")])
+metadata/_custom_type_script = "uid://bwfquhgf0ae5f"
+
+[resource]
+script = ExtResource("6_6doba")
+type = 1
+system_id = "cam_01"
+facing_deg = -30.0
+visuals = ExtResource("7_n0sk7")
+hackable = SubResource("Resource_mefw2")
+detection = SubResource("Resource_qkibr")
+response = SubResource("Resource_hwdih")
+ic_modules = SubResource("Resource_gn3xj")
+metadata/_custom_type_script = "uid://bi5xrdfrjowij"

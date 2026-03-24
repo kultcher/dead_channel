@@ -16,8 +16,17 @@ enum ShapeType { CONE, ARC, CIRCLE }
 @export var shape_type: ShapeType = ShapeType.CONE:
 	set = _set_shape_type
 @export var delay: float = 0.0
+@export var follow_movement_facing: bool = true:
+	set = _set_follow_movement_facing
+@export var turn_speed_deg_per_sec: float = 120.0:
+	set = _set_turn_speed_deg_per_sec
+@export var patrol_points: Array[DetectionPatrolPoint] = []:
+	set = _set_patrol_points
 
 var detection_disabled: bool = false
+var _patrol_index: int = 0
+var _patrol_direction: int = 1
+var _dwell_timer: float = 0.0
 
 func _set_vision_length_cells(value: float) -> void:
 	vision_length_cells = max(0.0, value)
@@ -39,10 +48,87 @@ func _set_shape_type(value: ShapeType) -> void:
 	shape_type = value
 	emit_changed()
 
+func _set_follow_movement_facing(value: bool) -> void:
+	follow_movement_facing = value
+	emit_changed()
+
+func _set_turn_speed_deg_per_sec(value: float) -> void:
+	turn_speed_deg_per_sec = maxf(0.0, value)
+	emit_changed()
+
+func _set_patrol_points(value: Array[DetectionPatrolPoint]) -> void:
+	patrol_points = value
+	reset_runtime_state()
+	emit_changed()
+
 func apply_detection(active_sig: ActiveSignal, delta: float) -> void:
 	if active_sig.is_disabled or detection_disabled:
 		return
 	_apply_detection(active_sig, delta)
+
+func initialize_runtime(active_sig: ActiveSignal) -> void:
+	if active_sig == null:
+		return
+	reset_runtime_state()
+	if patrol_points.is_empty():
+		if not active_sig.runtime_position_initialized:
+			active_sig.runtime_detection_facing_deg = active_sig.data.facing_deg
+		return
+	active_sig.runtime_detection_facing_deg = patrol_points[0].facing_deg
+
+func update_runtime(active_sig: ActiveSignal, delta: float, movement_facing_deg: float, movement_has_facing: bool) -> void:
+	if active_sig == null:
+		return
+	if patrol_points.is_empty():
+		if follow_movement_facing and movement_has_facing:
+			active_sig.runtime_detection_facing_deg = movement_facing_deg
+		return
+
+	if _dwell_timer > 0.0:
+		_dwell_timer -= delta
+		if _dwell_timer > 0.0:
+			return
+
+	var target_point := patrol_points[_patrol_index]
+	if not _rotate_toward(active_sig, target_point.facing_deg, delta):
+		return
+
+	_dwell_timer = maxf(0.0, target_point.dwell_sec)
+	_patrol_index = _next_patrol_index()
+
+func reset_runtime_state() -> void:
+	_patrol_index = 0
+	_patrol_direction = 1
+	_dwell_timer = 0.0
+
+func has_patrol_points() -> bool:
+	return not patrol_points.is_empty()
+
+func _rotate_toward(active_sig: ActiveSignal, target_facing_deg: float, delta: float) -> bool:
+	var current := wrapf(active_sig.runtime_detection_facing_deg, -180.0, 180.0)
+	var target := wrapf(target_facing_deg, -180.0, 180.0)
+	var delta_deg := wrapf(target - current, -180.0, 180.0)
+	if absf(delta_deg) <= 0.5:
+		active_sig.runtime_detection_facing_deg = target
+		return true
+
+	var turn_step := turn_speed_deg_per_sec * delta
+	if turn_step <= 0.0 or absf(delta_deg) <= turn_step:
+		active_sig.runtime_detection_facing_deg = target
+		return true
+
+	active_sig.runtime_detection_facing_deg = wrapf(current + signf(delta_deg) * turn_step, -180.0, 180.0)
+	return false
+
+func _next_patrol_index() -> int:
+	var max_i := patrol_points.size() - 1
+	if max_i <= 0:
+		return 0
+	var candidate := _patrol_index + _patrol_direction
+	if candidate < 0 or candidate > max_i:
+		_patrol_direction *= -1
+		candidate = _patrol_index + _patrol_direction
+	return clampi(candidate, 0, max_i)
 
 func build_collision_shape(cell_width_px: float) -> Shape2D:
 
@@ -103,6 +189,7 @@ func _build_polygon_points(cell_width_px: float) -> PackedVector2Array:
 	return points
 
 func _apply_detection(active_sig: ActiveSignal, delta):
+	GlobalEvents.runner_detected.emit()
 	active_sig.instance_node.detection_controller.runner_spotted()
 	if active_sig.data.response:
 		active_sig.data.response.on_detection(active_sig, delta, delay)

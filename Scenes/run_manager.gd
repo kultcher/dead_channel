@@ -1,6 +1,5 @@
 # run_manager.gd
 # Handles parsing (if necessary) and loading run data
-# Also checks for in-run events (tutorial messages, etc.)
 
 extends Node
 
@@ -35,8 +34,3 @@ func get_display_name() -> String:
 	if current_run == null:
 		return ""
 	return current_run.get_display_name()
-
-func get_tutorial_events() -> Array[TutorialEvent]:
-	if current_run == null:
-		return []
-	return current_run.get_tutorial_events()

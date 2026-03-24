@@ -36,6 +36,48 @@ func create_test_cam(id, lane):
 
 	return cam
 
+func create_test_drone(id: String, start_cell: float, lane: int) -> SignalData:
+	var drone := SignalData.new()
+	drone.type = SignalData.Type.DRONE
+	drone.lane = lane
+	drone.system_id = "drone_" + id
+	drone.visuals = camera_visuals
+
+	var detection := DetectionComponent.new()
+	detection.watch_offset_cells = 0.0
+	detection.vision_length_cells = 0.9
+	detection.vision_angle_deg = 20.0
+	detection.shape_type = DetectionComponent.ShapeType.CONE
+	drone.detection = detection
+
+	var hackable := HackableComponent.new()
+	drone.hackable = hackable
+
+	var response := ResponseComponent.new()
+	drone.response = response
+	response.effects.append(base_camera_heat)
+
+	var ic := ICComponent.new()
+	drone.ic_modules = ic
+
+	var mobility := MobilityComponent.new()
+	mobility.move_speed_cells_per_sec = 0.15
+
+	var p0 := MobilityPatrolPoint.new()
+	p0.cell_x = start_cell
+	p0.lane = lane
+	p0.dwell_sec = 2.0
+
+	var p1 := MobilityPatrolPoint.new()
+	p1.cell_x = start_cell + 1.5
+	p1.lane = lane
+	p1.dwell_sec = 2.0
+
+	mobility.patrol_points = [p0, p1]
+	drone.mobility = mobility
+
+	return drone
+
 func create_test_door(id, lane):
 	var door = SignalData.new()
 	door.type = SignalData.Type.DOOR
