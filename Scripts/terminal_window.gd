@@ -26,6 +26,7 @@ var active_signal: ActiveSignal		# assigned by window_manager
 var active_session: TerminalSession
 var root_signal: ActiveSignal
 var root_session: TerminalSession
+
 var _dump_in_progress := false
 var _ghost_threshold_index := 0
 var _active_ghosts: Array[Control] = []
@@ -78,6 +79,20 @@ func switch_session(new_sig: ActiveSignal):
 	elif active_signal.terminal_session != null:
 		active_session = active_signal.terminal_session
 		restore_session(active_session)
+
+func failed_connection_feedback(active_sig):
+	print_unlogged("<Session Log>: WARNING: " + active_sig.data.system_id + " out of range. Dropping to root.")
+	if active_session != root_session:
+		print_to_root("<Session Log>: WARNING: " + active_sig.data.system_id + " out of range. Dropping to root.")
+	restore_session(root_session)
+
+func access_signal_via_click(target_sig: ActiveSignal) -> void:
+	if target_sig == null or target_sig.data == null:
+		return
+	var command_text := "ACC " + target_sig.data.system_id
+	print_to_log("--[ " + command_text)
+	CommandDispatch.process_command(command_text, active_signal)
+
 
 func print_to_root(text: String):
 	root_session.history.append(text)
@@ -311,10 +326,23 @@ func _run_ghost_collapse_sequence() -> void:
 		ghost.queue_free()
 	await get_tree().create_timer(0.5).timeout
 	_main_breakdown_active = false
-	for i in range(10):
-		history.append_text("\n")
-		await get_tree().create_timer(0.1).timeout
-	history.append_text("\n\n[STACK OVERFLOW. Try turning it off and back on again.\n")
+	history.clear()
+	for i in range(20):
+		if i == 9: await type_text_with_delay(history, "\nOVERFLOW: INSUFFICIENT THROUGHPUT (host)", 0.02)
+		elif i == 11: await type_text_with_delay(history, "\n[KNOWN ISSUE. NO FIX PLANNED.]", 0.02)
+		elif i == 14: await type_text_with_delay(history, "\nWORKAROUND: PROCEED", 0.05)
+		elif i == 19: type_text_with_delay(history, "\nSESSION TRANSFERRED", 0.1)
+		else: history.append_text("\n")
+		await get_tree().create_timer(0.2).timeout
+
+func type_text_with_delay(target: RichTextLabel, text: String, delay: float) -> void:
+	var char_index := 0
+	var total_chars := text.length()
+	while char_index < total_chars:
+		target.append_text(text[char_index])
+		char_index += 1
+		await get_tree().create_timer(delay).timeout
+
 
 func _apply_dump_instability(
 	progress: float,

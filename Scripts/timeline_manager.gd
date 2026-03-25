@@ -13,6 +13,7 @@ extends Node2D
 @export var timeline_height_ratio: float = 0.25
 @export var min_timeline_height_px: float = 180.0
 @export var max_timeline_height_px: float = 360.0
+@export var signal_interaction_range_cells: float = 8.0
 
 
 # TIMELINE DIMENSIONS
@@ -32,6 +33,8 @@ var current_speed_mult: float = 1.0
 var null_spike_active: bool = false
 var tutorial_locked: bool = false
 var _time_scale_tween: Tween
+var _view_offset_tween: Tween
+var view_offset_cells: float = 0.0
 
 # REGISTRATION
 @onready var signal_manager = $"../SignalManager"
@@ -66,6 +69,25 @@ func _process(delta):
 
 func cells_to_pixels(cells: float):
 	return cells * cell_width_px
+
+func get_view_cell_pos() -> float:
+	return current_cell_pos + view_offset_cells
+
+func set_view_offset_cells(target_offset_cells: float, duration: float = 0.0) -> void:
+	if _view_offset_tween != null and _view_offset_tween.is_valid():
+		_view_offset_tween.kill()
+
+	if duration <= 0.0:
+		view_offset_cells = target_offset_cells
+		return
+
+	_view_offset_tween = create_tween()
+	_view_offset_tween.set_trans(Tween.TRANS_SINE)
+	_view_offset_tween.set_ease(Tween.EASE_IN)
+	_view_offset_tween.tween_property(self, "view_offset_cells", target_offset_cells, duration)
+
+func clear_view_offset(duration: float = 0.0) -> void:
+	set_view_offset_cells(0.0, duration)
 
 func get_timeline_height() -> float:
 	return lane_height * LANES

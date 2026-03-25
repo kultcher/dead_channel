@@ -46,6 +46,7 @@ func _setup_detection_shape() -> void:
 func _on_detection_changed() -> void:
 	if parent_sig == null or parent_sig.my_data == null or parent_sig.my_data.detection == null:
 		return
+	_refresh_palette()
 	var timeline_manager = CommandDispatch.timeline_manager
 	detection_shape.shape = parent_sig.my_data.detection.build_collision_shape(timeline_manager.cell_width_px)
 	
@@ -60,6 +61,7 @@ func handle_vision_overlay():
 func _build_detection_poly():
 	# Create the node dynamically
 	detection_poly = Polygon2D.new()
+	_refresh_palette()
 	
 	# Visual Style (Semi-transparent yellow/red)
 	detection_poly.color = base_color
@@ -73,6 +75,19 @@ func _build_detection_poly():
 
 	add_child(detection_poly)
 	detection_poly.z_index = -1
+
+func _refresh_palette() -> void:
+	var detection := _get_detection_component()
+	if detection != null and detection.is_attack_state():
+		base_color = Color(1.0, 0.18, 0.18, 0.3)
+		fade_color = Color(1.0, 0.18, 0.18, 0.08)
+		alert_color = Color(1.0, 0.0, 0.0, 0.7)
+	else:
+		base_color = Color(1, 0.8, 0.2, 0.25)
+		fade_color = Color(1, 0.8, 0.2, 0.05)
+		alert_color = Color(1, 0.0, 0.0, 0.6)
+	if detection_poly != null and not is_alert_active:
+		detection_poly.color = base_color
 
 func set_overlay_visible(poly_visible: bool) -> void:
 	if detection_poly:
@@ -152,6 +167,11 @@ func disable_vision():
 func enable_vision():
 	await _reset_visuals()
 	# WARNING: this is maybe a little fragile
+
+func _get_detection_component() -> DetectionComponent:
+	if parent_sig == null or parent_sig.my_data == null:
+		return null
+	return parent_sig.my_data.detection
 
 func _on_detection_area_entered(area: Area2D) -> void:
 	if area.is_in_group("runner"):

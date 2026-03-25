@@ -10,8 +10,8 @@ func get_desc():
 func bind_to_context(signal_data: SignalData, terminal_ref: Control):
 	pass
 
-func interrupts_commands(command: String):
-	pass
+func interrupts_commands(_cmd_context: CommandContext) -> bool:
+	return false
 
 func on_disabled(active_sig: ActiveSignal):
 	pass

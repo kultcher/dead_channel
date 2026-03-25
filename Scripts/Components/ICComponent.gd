@@ -25,7 +25,7 @@ func add_module(module: Resource):
 
 func command_intercept(cmd_context: CommandContext):
 	for module in modules:
-		if module != null and module.interrupts_commands(cmd_context.command):
+		if module != null and module.interrupts_commands(cmd_context):
 			return true
 	return false
 

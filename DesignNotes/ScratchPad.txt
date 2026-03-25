@@ -6,6 +6,12 @@ Stray ideas:
 	Enhanced has built in recognition and triggers immediate alerts
 
 
+visual ideas:
+- sinewave patterns on living signals
+- scanlines or subtle glow on all?
+- crt type effect on cameras?
+
+
 	-max heat effect: reboot, full lockout for X seconds
 	-decrypt: add cull pause
 
@@ -85,6 +91,27 @@ IC (Intrusion Countermeasures): Instead of distinct software names, they are nam
 Standard Cyberpunk: "Killer.exe", "Firewall", "Black ICE".
 Dead Channel: "Protocol: Purity", "Asset: Retention", "Human Resources Mitigation".
 Terminal Minigame: When you fail a puzzle or decay happens, the text isn't ACCESS DENIED. It’s NON-COMPLIANT. FAITH IN SUITE 3.0 REQUIRED. SUBMIT TICKET FOR PENANCE.
+
+_______
+Terminal Scene:
+3. Momentary readable phrase in the noise: Amid the random characters, briefly flash something like:
+you are already connected
+stop parsing
+this is not output
+
+OVERFLOW: Insufficient throughput
+THROUGHPUT EXCEEDED (host)
+.
+KNOWN ISSUE. NO FIX PLANNED.
+WORKAROUND: PROCEED 
+.
+.
+.
+SESSION TRANSFERRED
+
+-- have players terminal cursor change once they install the null spike
+
+_______
 
 https://www.fontspace.com/sd-dystopian-font-f109410
 

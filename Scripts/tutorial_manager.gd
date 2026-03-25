@@ -4,7 +4,7 @@ extends Node
 
 const NULL_SPIKE_DUMP_PATH := "res://Resources/RunData/AuthoredRuns/null_spike_dump.md"
 
-@export_enum("full", "door_01", "cam_02", "drone_01", "null_door", "lab_reveal", "terminal_dump") var debug_skip_to_stage := "full"
+@export_enum("full", "door_01", "cam_02", "drone_01", "null_door", "lab_reveal", "terminal_dump", "alarm", "pre_gauntlet") var debug_skip_to_stage := "full"
 
 @onready var timeline_manager = $"../SignalTimeline/TimelineManager"
 @onready var signal_manager = $"../SignalTimeline/SignalManager"
@@ -52,6 +52,12 @@ func _run_tutorial_sequence() -> void:
 		"terminal_dump":
 			_prepare_debug_stage_terminal_dump()
 			await _run_terminal_dump_sequence()
+		"alarm":
+			_prepare_debug_stage_alarm()
+			await _run_alarm_sequence()
+		"pre_gauntlet":
+			_prepare_debug_pre_gauntlet()
+			await _run_pre_gauntlet_sequence()
 		_:
 			await _run_intro_sequence()
 			await _run_cam_01_sequence()
@@ -239,7 +245,7 @@ func _run_null_door_intro_sequence():
 	await _run_lab_reveal_sequence()
 
 func _run_lab_reveal_sequence() -> void:
-	await _wait_for_cell(25.0)
+	await _wait_for_cell(25)
 	_acquire_runner_hold("null_terminal_gate_02")
 	await _show_dialogue([
 		"Some kind of cyberware... like a datajack interface? An... adapter?",
@@ -287,15 +293,147 @@ func _run_lab_reveal_sequence() -> void:
 	await _wait_for_puzzle_solved("null_terminal")
 
 	await _run_terminal_dump_sequence()
+	await get_tree().create_timer(2).timeout
+	terminal_window.z_index = 0
 
 	await _show_dialogue([
 		"...",
-		"Okay. Yeah.",
 		"Kid. If this does what I think it does... this is the most important piece of tech anyone's found since the AIs clipped off and left us to drift.",
 		"This could change everything...",
-		"...Or at least be worth more than either of us will see in a lifetime."
+		"...Or at least be worth more than either of us will see in a lifetime.",
+		"We'll figure out what to do with it when we're home. For now, let's grab it and go. I'm disengaging the lock."
 		], "", Rect2(), Vector2(750,300), true)
+
+	await get_tree().create_timer(2).timeout
+
+	await _run_alarm_sequence()
+
+func _run_alarm_sequence():
+	_start_cutscene_alarm()
+
+	await _show_dialogue([
+		"Shit. See, this is why we always scan before we mess with things. Now we caught the light.",
+		"Facility's locking down and... That's a lot of drones.",
+		"...",
+		"Seeing a manual shutdown on this terminal. Air-gapped, so no remote access — I'll have to get to it on foot. Jack in, kid. Gonna need your eyes."
+	], "", Rect2(), Vector2(750,300), true)
+
+	await get_tree().create_timer(2).timeout
+	
+	_set_runner_cell(26.5)
+	_get_active_signal("lab_exit").set_door_locked(false)
+	_get_active_signal("lab_exit").disable_signal()
+
+	_release_runner_hold("null_terminal_gate_02")
+
+	await cutscene_controller.play_cutscene_return_transition(2.5, 1)
+
+	# killer drone setup
+	var c_drone = _get_active_signal("c_drone_01").data
+	c_drone.detection.turn_speed_deg_per_sec = 270.0
+	c_drone.mobility.move_speed_cells_per_sec = 0
+	
+	_get_active_signal("coolant_vent_07").disable_signal()
 		
+	await _wait_for_cell(28.5)
+	_enable_feature("terminal_commands", true)
+
+	await _show_dialogue([
+		"Clip, they woke up angry. Can hear 'em clanking.",
+		"Incoming. See what you can do, kid."
+	], "", Rect2(), Vector2(750,300), true, 29.5)
+	_set_objective("Try to stop the combat drone")
+
+	await _wait_for_cell(29.5)
+	c_drone.mobility.move_speed_cells_per_sec = .25
+	await _wait_for_cell(30.5)
+
+	var temp_dialogue = await _show_dialogue([
+		"Clip me. It's fast. And armed. And probably ICEd."
+	], "c_drone_01", Rect2(), Vector2(), false, -1, "", 3)
+	
+	temp_dialogue = await _show_dialogue([
+		"It's almost on me. Kid!?"
+	], "", Rect2(), Vector2(750,300), true, -1, "", 3)
+
+	# NOTE: Make sure this can't get set by anything other than the drone combat
+	await GlobalEvents.runners_stopped
+	_acquire_runner_hold("post_combat")
+
+	temp_dialogue = await _show_dialogue([
+			"Manual override it is!"
+		], "", Rect2(), Vector2(750,300), true, -1, "", 3)
+
+	await get_tree().create_timer(4)
+
+	await _show_dialogue([
+		"Ngh...",
+		"... I'm all right. Still moving. And kid...",
+		"Nothing you could've done. What you can't solve gets solved on the ground. That's my half of the job."
+		], "", window_manager.get_control_focus_rect(runner_focus_panel))
+
+	await get_tree().create_timer(1.5)
+	_release_runner_hold("post_combat")
+
+	_run_pre_gauntlet_sequence()
+	
+func _run_pre_gauntlet_sequence():
+	timeline_manager.cells_per_second = .17
+
+	await _wait_for_cell(35.5)
+	_acquire_runner_hold("pre_gauntlet_01")
+
+	await _show_dialogue([
+		"You've gotta be kidding me."
+	], "", Rect2(), Vector2(750,300), true)
+
+	await get_tree().create_timer(.5).timeout
+
+
+	await timeline_manager.set_view_offset_cells(10, 2.0)
+
+	await _show_dialogue([
+		"...",
+		"Okay. Okay, listen.\n\nI only see one way we get out of this.",
+		"You use the Null Spike.",
+		"Not gonna lie, it's risky. [b]If[/b] I understood it right and [b]if[/b] it actually works...",
+		"You might be able to see the network the way the ghosters did when they built it. Or as close to that as a human is capable."
+	], "", Rect2(), Vector2(750,300), true)
+
+	await get_tree().create_timer(2)
+	timeline_manager.clear_view_offset(1.0)
+
+	_release_runner_hold("pre_gauntlet_01")
+	await _wait_for_cell(36)
+	_acquire_runner_hold("pre_gauntlet_02")
+
+	_enable_feature("terminal_commands", false)
+
+	_set_objective("Type INTERFACE NS_01a.sys -u -c into the terminal to install the Null Spike")
+	await _show_dialogue([
+		"...I swear I'd do it myself if I could.",
+		"Never told you how my 'jack got fried, did I? Used to work on stuff like this. Interfacing with them. We never solved it... Guess maybe they did.",
+		"Burnt me out. That's why you're in the chair and I'm bleeding here.",
+		"And I'm asking you to do the same thing. With tech we found minutes ago in a place the AIs never meant for us to find.",
+		"...I'm sorry kid. Wouldn't ask if I saw another way.",
+		"If you want to do this, you'll need to prep your deck. [b][color=cyan]INTERFACE NS_01a.sys -u -c[/color][/b]\nThen plug back in."
+	], "",  window_manager.get_control_focus_rect(runner_focus_panel), Vector2(750,300), true)
+
+	_enable_feature("terminal_commands", true)
+	
+	await GlobalEvents.null_spike_init
+
+	await _show_dialogue([
+		"Well, your brain is still uncooked. That's a start.",
+		"Well, let's see what this thing can do. Once I'm in relay range, activate the null spike... and then clear me a path.",
+		"You've got this kid. I picked you for a reason."
+	], "", Rect2(), Vector2(750,300), true)
+	_set_objective("Wait for Blackjack to get within range of the drones")
+	_release_runner_hold("pre_gauntlet_02")
+
+	await _wait_for_cell(40.5)
+	_acquire_runner_hold("pre_gauntlet_03")
+
 # "BEFORE THE ghosts clipped off and left us to drift in the world they built for us."
 
 func _prepare_debug_stage_door_01() -> void:
@@ -370,11 +508,38 @@ func _prepare_debug_stage_terminal_dump() -> void:
 	terminal_window.z_index = 100
 	terminal_window.switch_session(_get_active_signal("null_terminal"))
 	cutscene_controller.play_still_reveal(0.01)
+
+func _prepare_debug_stage_alarm() -> void:
+	_prepare_debug_stage_terminal_dump()
+	terminal_window.clear_log()
+	terminal_window.z_index = 0
+
+func _prepare_debug_pre_gauntlet() -> void:
+	# NOTE: Make sure there's no weird floating texture changes
+	cutscene_controller.hide()
+	_enable_feature("scan")
+	_enable_feature("connect")
+	_enable_feature("terminal_commands")
+	_enable_feature("null_spike", false)
+	_get_active_signal("c_drone_01").disable_signal()
+	_set_runner_cell(34.9)
+
+
 	
 func _set_cutscene_black_screen(enabled: bool) -> void:
 	if cutscene_controller == null:
 		return
 	cutscene_controller.set_black_screen(enabled)
+
+func _start_cutscene_alarm() -> void:
+	if cutscene_controller == null:
+		return
+	cutscene_controller.start_alarm_effects()
+
+func _stop_cutscene_alarm(fade_duration: float = 0.35) -> void:
+	if cutscene_controller == null:
+		return
+	await cutscene_controller.stop_alarm_effects(fade_duration)
 
 func _set_runner_cell(cell_pos: float) -> void:
 	if timeline_manager == null:
@@ -451,8 +616,9 @@ func _show_dialogue(
 	focus_rect: Rect2 = Rect2(),
 	default_position: Vector2 = Vector2(),
 	has_custom_position: bool = false,
-	stop_cell_if_open: int = -1,
-	stop_hold_key: String = ""
+	stop_cell_if_open: float = -1,
+	stop_hold_key: String = "",
+	auto_dismiss: int = 0
 ) -> void:
 	var resolved_focus_rect := _apply_focus(signal_id, focus_rect)
 	GlobalEvents.tutorial_lock_changed.emit(true)
@@ -464,7 +630,13 @@ func _show_dialogue(
 	)
 	if stop_cell_if_open >= 0:
 		_hold_at_cell_until_dialogue_finishes(dialogue, stop_cell_if_open, stop_hold_key)
-	await dialogue.dismissed
+	if auto_dismiss > 0:
+		await get_tree().create_timer(auto_dismiss).timeout
+		if dialogue != null:
+			dialogue.dismissed.emit()
+			dialogue.queue_free()
+	else:
+		await dialogue.dismissed
 
 func _apply_focus(signal_id: String = "", custom_focus_rect: Rect2 = Rect2()) -> Rect2:
 	if _has_focus_rect(custom_focus_rect):

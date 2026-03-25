@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="SniffPuzzleConfig" format=3 uid="uid://bg728yq3fo10l"]
+
+[ext_resource type="Script" uid="uid://b1f1mh8h53yai" path="res://Scripts/Puzzles/SniffPuzzleConfig.gd" id="1_ub123"]
+
+[resource]
+script = ExtResource("1_ub123")
+grid_cols = 6
+grid_rows = 6
+cell_size = 50
+target_count = 5
+speed_variance = 0.0
+col_speeds = PackedFloat32Array(-300, 750, -650, 350, -425, 525)
+metadata/_custom_type_script = "uid://b1f1mh8h53yai"

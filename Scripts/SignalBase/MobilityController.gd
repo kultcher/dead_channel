@@ -320,6 +320,8 @@ func _is_revealed_to_player() -> bool:
 	var runner_cell: float = _timeline_manager.current_cell_pos
 	var guard_cell: float = active_sig.runtime_cell_x
 	var runner_dist: float = absf(guard_cell - runner_cell)
+	if _signal_manager != null:
+		runner_dist = _signal_manager.get_horizontal_runner_distance_cells(active_sig)
 	if runner_dist <= _mobility.reveal_range_from_runner_cells:
 		return true
 

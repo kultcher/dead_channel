@@ -1,0 +1,66 @@
+[gd_resource type="Resource" script_class="SignalData" format=3 uid="uid://dyk4furqdtwww"]
+
+[ext_resource type="Script" uid="uid://bjwel5bmlp6x4" path="res://Scripts/Components/DetectionPatrolPoint.gd" id="1_8po47"]
+[ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="2_rf0yq"]
+[ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="3_im5d2"]
+[ext_resource type="Script" uid="uid://diftg5rgtn3kr" path="res://Scripts/Components/ICComponent.gd" id="4_im2j7"]
+[ext_resource type="Script" uid="uid://dlkakjbwkeel2" path="res://Scripts/Components/MobilityPatrolPoint.gd" id="5_wtgq5"]
+[ext_resource type="Script" uid="uid://2orqay7qy0mv" path="res://Scripts/Components/MobilityComponent.gd" id="6_ejqah"]
+[ext_resource type="Resource" uid="uid://c43su3v53wrbw" path="res://Resources/ResponseEffects/base_camera_heat.tres" id="7_xe4yn"]
+[ext_resource type="Script" uid="uid://bwfquhgf0ae5f" path="res://Scripts/Components/ResponseComponent.gd" id="8_tqsw6"]
+[ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="9_hr522"]
+[ext_resource type="Resource" path="res://Resources/SignalVisuals/drone_visuals.tres" id="10_hhjrg"]
+
+[sub_resource type="Resource" id="Resource_k53jp"]
+script = ExtResource("1_8po47")
+facing_deg = 0.0
+metadata/_custom_type_script = "uid://bjwel5bmlp6x4"
+
+[sub_resource type="Resource" id="Resource_pkudv"]
+script = ExtResource("1_8po47")
+metadata/_custom_type_script = "uid://bjwel5bmlp6x4"
+
+[sub_resource type="Resource" id="Resource_u6sds"]
+script = ExtResource("1_8po47")
+facing_deg = 0.0
+metadata/_custom_type_script = "uid://bjwel5bmlp6x4"
+
+[sub_resource type="Resource" id="DetectionComponent_drone"]
+script = ExtResource("2_rf0yq")
+watch_offset_cells = 0.0
+vision_length_cells = 0.5
+vision_angle_deg = 60.0
+delay = 3.0
+patrol_points = Array[ExtResource("1_8po47")]([SubResource("Resource_k53jp"), SubResource("Resource_pkudv"), SubResource("Resource_u6sds")])
+threat_state = 1
+metadata/_custom_type_script = "uid://cxtj1fq7mmq1h"
+
+[sub_resource type="Resource" id="HackableComponent_drone"]
+script = ExtResource("3_im5d2")
+metadata/_custom_type_script = "uid://cysj06bgrv1ai"
+
+[sub_resource type="Resource" id="ICComponent_drone"]
+script = ExtResource("4_im2j7")
+metadata/_custom_type_script = "uid://diftg5rgtn3kr"
+
+[sub_resource type="Resource" id="MobilityComponent_drone"]
+script = ExtResource("6_ejqah")
+metadata/_custom_type_script = "uid://2orqay7qy0mv"
+
+[sub_resource type="Resource" id="ResponseComponent_drone"]
+script = ExtResource("8_tqsw6")
+effects = Array[Resource]([ExtResource("7_xe4yn")])
+metadata/_custom_type_script = "uid://bwfquhgf0ae5f"
+
+[resource]
+script = ExtResource("9_hr522")
+type = 3
+system_id = "drone_01"
+facing_deg = 0.0
+visuals = ExtResource("10_hhjrg")
+hackable = SubResource("HackableComponent_drone")
+detection = SubResource("DetectionComponent_drone")
+response = SubResource("ResponseComponent_drone")
+ic_modules = SubResource("ICComponent_drone")
+mobility = SubResource("MobilityComponent_drone")
+metadata/_custom_type_script = "uid://bi5xrdfrjowij"

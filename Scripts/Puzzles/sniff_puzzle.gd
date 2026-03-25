@@ -21,7 +21,7 @@ const RAIN_TINT = Color(0.0, 1.0, 0.25)
 var linked_signal: ActiveSignal = null
 var grid_panel: Panel
 var grid_container: Control
-var target_footer: HBoxContainer
+var target_footer: HFlowContainer
 var target_label: Label
 
 # --- STATE ---
@@ -301,8 +301,9 @@ func _build_footer(parent: VBoxContainer):
 	footer_panel.add_theme_stylebox_override("panel", footer_style)
 	parent.add_child(footer_panel)
 	
-	target_footer = HBoxContainer.new()
-	target_footer.alignment = BoxContainer.ALIGNMENT_CENTER
+	target_footer = HFlowContainer.new()
+	target_footer.alignment = FlowContainer.ALIGNMENT_CENTER
+	target_footer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	target_footer.add_theme_constant_override("separation", 8)
 	footer_panel.add_child(target_footer)
 	

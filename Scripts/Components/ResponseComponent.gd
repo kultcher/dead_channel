@@ -27,6 +27,7 @@ func _start_delay_window(active_sig: ActiveSignal, delay: float) -> void:
 	var sig_id := active_sig.get_instance_id()
 	_delay_in_progress[sig_id] = true
 	_set_movement_disabled(active_sig, true)
+	_set_detection_paused(active_sig, true)
 	if not _delay_hold_tokens.has(sig_id):
 		_delay_hold_tokens[sig_id] = GlobalEvents.acquire_runner_hold("response_delay")
 	_finish_delay_window(active_sig, delay)
@@ -42,6 +43,7 @@ func _finish_delay_window(active_sig: ActiveSignal, delay: float) -> void:
 		if active_sig.is_disabled:
 			_delay_in_progress.erase(sig_id)
 			_set_movement_disabled(active_sig, false)
+			_set_detection_paused(active_sig, false)
 			_release_delay_hold(sig_id)
 			return
 		var remaining: float = delay - elapsed
@@ -58,6 +60,7 @@ func _finish_delay_window(active_sig: ActiveSignal, delay: float) -> void:
 			active_sig.disable_signal()
 
 	_set_movement_disabled(active_sig, false)
+	_set_detection_paused(active_sig, false)
 	_release_delay_hold(sig_id)
 
 func _apply_effects(active_sig: ActiveSignal, delta: float) -> void:
@@ -111,6 +114,7 @@ func reset_delay_state(active_sig: ActiveSignal, resume_runners: bool = false) -
 	_delay_in_progress.erase(sig_id)
 	_delay_completed.erase(sig_id)
 	_set_movement_disabled(active_sig, false)
+	_set_detection_paused(active_sig, false)
 	_release_delay_hold(sig_id)
 
 func _release_delay_hold(sig_id: int) -> void:
@@ -119,3 +123,8 @@ func _release_delay_hold(sig_id: int) -> void:
 	var token: String = _delay_hold_tokens[sig_id]
 	_delay_hold_tokens.erase(sig_id)
 	GlobalEvents.release_runner_hold(token)
+
+func _set_detection_paused(active_sig: ActiveSignal, paused: bool) -> void:
+	if active_sig == null:
+		return
+	active_sig.runtime_detection_paused = paused

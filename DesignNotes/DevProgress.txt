@@ -46,14 +46,22 @@ Development Progress
 - Cleaned up CommandDispatch flow
 - Switched to "bullet time" instead of tactical pause
 
-Short-term TODO:
-- Cleanup Sniff tutorial focus lingering after puzzle completion OR block inputs to Sniff until dialogue is complete
-- 
+3/22-3/25/2026:
+- Much tutorial building, including cutscene implementation
 
-- Add a cleaner way to update scan tooltips (array?)
-- Adjust delay behavior to ResponseEffect instead of detection
+Short-term TODO:
+- Add "zoom out" for gauntlet
+- Add IC tutorial popup
+- Add null spike init and gauntlet
+- Fade to logo
+- Cleanup signal tooltips
+- Rework UI
 
 Polish TODO:
+- Cleanup cutscene controller (hardcode textures)
+- Split out tutorial script and logic
+- Add a cleaner way to update scan tooltips (array?)
+- Adjust delay behavior to ResponseEffect instead of detection?
 - Switch scan panels to icons (scan can start as black circle, end on full green | lock state can be a lock or unlocked icon or broken lock)
 - Fix guard facing override
 - Add disconnect behavior to decrypt and other minigames

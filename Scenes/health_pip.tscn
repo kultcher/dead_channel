@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://d4fgt7n75cpjv"]
+
+[ext_resource type="Texture2D" uid="uid://dexgxswr6poxu" path="res://Visuals/Icons/health_pip.png" id="1_gpqio"]
+[ext_resource type="Texture2D" uid="uid://oksswkj704xi" path="res://Visuals/Icons/health_pip_border.png" id="2_wfhow"]
+
+[node name="HealthPip" type="CenterContainer" unique_id=451670600]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1900.0
+offset_bottom = -1060.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PipBorder" type="TextureRect" parent="." unique_id=1452211856]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("2_wfhow")
+expand_mode = 1
+
+[node name="PipTexture" type="TextureRect" parent="." unique_id=2014400754]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("1_gpqio")
+expand_mode = 1

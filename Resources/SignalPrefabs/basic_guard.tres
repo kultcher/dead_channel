@@ -16,6 +16,7 @@ vision_length_cells = 0.5
 vision_segments = 16
 shape_type = 1
 delay = 3.0
+threat_state = 1
 metadata/_custom_type_script = "uid://cxtj1fq7mmq1h"
 
 [sub_resource type="Resource" id="Resource_lm3xa"]

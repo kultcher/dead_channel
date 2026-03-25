@@ -33,6 +33,7 @@ signal guard_alert_raised(alert: GuardAlertData)
 signal guard_comms_ping_started(active_sig: ActiveSignal)
 signal guard_comms_ping_ended(active_sig: ActiveSignal)
 
+signal null_spike_init()
 signal activate_null_spike()
 signal deactivate_null_spike()
 

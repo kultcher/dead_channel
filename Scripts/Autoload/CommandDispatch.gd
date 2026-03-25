@@ -69,7 +69,9 @@ func switch_terminal_session(active_sig: ActiveSignal):
 
 func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 	if not GlobalEvents.is_tutorial_feature_enabled("terminal_commands"):
-		_fail("Sequence break: unexpected signal degradation.\nBuffering... Wait 3 seconds, close external communcations and try again.", active_sig)
+		_fail("Sequence break: unexpected signal degradation.\nBuffering... close external communcations and try again.", active_sig)
+		return
+	if _try_special_command(input, active_sig):
 		return
 	var parsed = parse_input(input)
 	if parsed.has("error"):
@@ -216,7 +218,7 @@ func _resolve_signal_target(system_id: String) -> Dictionary:
 	if not signal_manager.has_signal_in_network(system_id):
 		return {"error": "No such signal in network"}
 	if not signal_manager.is_signal_in_range(system_id):
-		return {"error": "No such signal in range"}
+		return {"error": system_id + ": signal not in range"}
 
 	var sig: ActiveSignal = signal_manager.get_signal_by_system_id(system_id)
 	if sig == null:
@@ -235,6 +237,19 @@ func _is_puzzle_locked(active_sig: ActiveSignal) -> bool:
 
 func _fail(error_msg: String, context: ActiveSignal) -> void:
 	command_error.emit(error_msg, context)
+
+func _try_special_command(input: String, active_sig: ActiveSignal) -> bool:
+	var trimmed := input.strip_edges()
+	if trimmed.to_upper() != "INTERFACE NS_01A.SYS -U -C":
+		return false
+
+	var cmd_context := CommandContext.new()
+	cmd_context.active_sig = active_sig
+	cmd_context.command = "INTERFACE"
+	cmd_context.log_text.append("NULL SPIKE INTERFACE STAGED")
+	GlobalEvents.null_spike_init.emit()
+	_finalize_command(cmd_context)
+	return true
 
 # === COMMAND HANDLERS ===
 
@@ -264,10 +279,21 @@ func _try_command(cmd_context: CommandContext) -> void:
 	_finalize_command(cmd_context)
 
 func _interrupt_command(_cmd_context: CommandContext):
-	pass
+	if _cmd_context == null:
+		return
+	if _cmd_context.status == CommandContext.CommandStatus.FAILURE and not _cmd_context.log_text.is_empty():
+		_fail(_cmd_context.log_text[0], _cmd_context.active_sig)
+		return
+	if not _cmd_context.log_text.is_empty():
+		command_complete.emit(_cmd_context)
+		return
+	if _cmd_context.active_sig != null:
+		_fail("Command interrupted.", _cmd_context.active_sig)
 
 func _finalize_command(cmd_context: CommandContext):
 	if cmd_context.status == CommandContext.CommandStatus.FAILURE:
+		if not cmd_context.log_text.is_empty():
+			_fail(cmd_context.log_text[0], cmd_context.active_sig)
 		return
 	print("Command Dispatch finished command: " + cmd_context.command)
 	command_complete.emit(cmd_context)

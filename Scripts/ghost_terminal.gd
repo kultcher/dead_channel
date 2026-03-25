@@ -1,3 +1,5 @@
+#ghost_terminal.gd - Simulates a system dump with glitchy text output and visual instability effects.
+
 extends PanelContainer
 
 signal breakdown_started(source)

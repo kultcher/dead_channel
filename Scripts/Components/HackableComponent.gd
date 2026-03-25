@@ -5,6 +5,10 @@ class_name HackableComponent extends Resource
 
 func try_command(cmd_context):
 	print("trying command: " + cmd_context.command)
+	if cmd_context.active_sig.is_disabled:
+		cmd_context.status = CommandContext.CommandStatus.FAILURE
+		cmd_context.log_text.append("No response. Signal disabled.")
+		return
 	match cmd_context.command:
 		"KILL": _kill(cmd_context)
 		"RUN": _run(cmd_context)

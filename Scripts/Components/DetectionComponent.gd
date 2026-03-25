@@ -4,6 +4,7 @@
 class_name DetectionComponent extends Resource
 
 enum ShapeType { CONE, ARC, CIRCLE }
+enum ThreatState { DETECT, ATTACK }
 
 @export var watch_offset_cells: float = -1.0:
 	set = _set_watch_offset_cells
@@ -22,6 +23,8 @@ enum ShapeType { CONE, ARC, CIRCLE }
 	set = _set_turn_speed_deg_per_sec
 @export var patrol_points: Array[DetectionPatrolPoint] = []:
 	set = _set_patrol_points
+@export var threat_state: ThreatState = ThreatState.DETECT:
+	set = _set_threat_state
 
 var detection_disabled: bool = false
 var _patrol_index: int = 0
@@ -61,6 +64,10 @@ func _set_patrol_points(value: Array[DetectionPatrolPoint]) -> void:
 	reset_runtime_state()
 	emit_changed()
 
+func _set_threat_state(value: ThreatState) -> void:
+	threat_state = value
+	emit_changed()
+
 func apply_detection(active_sig: ActiveSignal, delta: float) -> void:
 	if active_sig.is_disabled or detection_disabled:
 		return
@@ -78,6 +85,8 @@ func initialize_runtime(active_sig: ActiveSignal) -> void:
 
 func update_runtime(active_sig: ActiveSignal, delta: float, movement_facing_deg: float, movement_has_facing: bool) -> void:
 	if active_sig == null:
+		return
+	if active_sig.runtime_detection_paused:
 		return
 	if patrol_points.is_empty():
 		if follow_movement_facing and movement_has_facing:
@@ -103,6 +112,9 @@ func reset_runtime_state() -> void:
 
 func has_patrol_points() -> bool:
 	return not patrol_points.is_empty()
+
+func is_attack_state() -> bool:
+	return threat_state == ThreatState.ATTACK
 
 func _rotate_toward(active_sig: ActiveSignal, target_facing_deg: float, delta: float) -> bool:
 	var current := wrapf(active_sig.runtime_detection_facing_deg, -180.0, 180.0)

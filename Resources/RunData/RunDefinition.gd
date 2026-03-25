@@ -7,6 +7,8 @@ const BASIC_GUARD := preload("res://Resources/SignalPrefabs/basic_guard.tres")
 const BASIC_DISRUPTOR := preload("res://Resources/SignalPrefabs/basic_disruptor.tres")
 const BASIC_TERMINAL := preload("res://Resources/SignalPrefabs/basic_terminal.tres")
 const PANNING_CAMERA := preload("res://Resources/SignalPrefabs/panning_camera.tres")
+const COMBAT_DRONE := preload("res://Resources/SignalPrefabs/combat_drone.tres")
+
 
 func get_run_id() -> String:
 	return ""
@@ -62,6 +64,8 @@ func build_runtime_signal(spawn: Dictionary) -> SignalData:
 		runtime_signal.detection.vision_length_cells = float(spawn["vision_length_cells"])
 	if runtime_signal.detection != null and spawn.has("watch_offset_cells"):
 		runtime_signal.detection.watch_offset_cells = float(spawn["watch_offset_cells"])
+	if runtime_signal.detection != null and spawn.has("detection_threat_state"):
+		runtime_signal.detection.threat_state = int(spawn["detection_threat_state"])
 	if spawn.has("detection_patrol_points"):
 		_override_detection_patrol_points(runtime_signal, spawn["detection_patrol_points"])
 	if spawn.has("mobility"):
@@ -107,8 +111,16 @@ func make_reboot_module(reboot_time: float = 5.0) -> RebootModule:
 	module.reboot_time = reboot_time
 	return module
 
+func make_faraday_module(max_runner_distance_cells: float = 2.0) -> FaradayModule:
+	var module := FaradayModule.new()
+	module.max_runner_distance_cells = max_runner_distance_cells
+	return module
+
 func make_reboot_ic(reboot_time: float = 5.0) -> ICComponent:
 	return make_ic([make_reboot_module(reboot_time)])
+
+func make_faraday_ic(max_runner_distance_cells: float = 2.0) -> ICComponent:
+	return make_ic([make_faraday_module(max_runner_distance_cells)])
 
 func make_response(effects: Array[Resource] = []) -> ResponseComponent:
 	var response := ResponseComponent.new()

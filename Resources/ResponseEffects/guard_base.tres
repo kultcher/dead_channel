@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_37x0a")
 cadence = 0
+effect_type = 1
 sends_alert = true
 amount = 1000.0
 delay = 3.0

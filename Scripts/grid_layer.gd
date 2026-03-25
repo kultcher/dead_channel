@@ -19,15 +19,23 @@ var time_elapsed: float = 0.0
 
 func _ready():
 	if runner_team:
-		var x_pos = timeline_manager.cells_to_pixels(timeline_manager.runner_screen_offset_cells)
-		var y_pos = (lane_height * 2.5)
-		runner_team.position = Vector2(x_pos, y_pos)
+		_update_runner_team_position()
 
 func _process(delta):
 	queue_redraw()
 	time_elapsed += delta
+	_update_runner_team_position()
 	var display_string = "Current cell pos:%.1f" % floor(timeline_manager.current_cell) + "Time elapsed: %.1f" % time_elapsed
 	debug_label.text = display_string
+
+func _update_runner_team_position() -> void:
+	if runner_team == null:
+		return
+	var x_pos = timeline_manager.cells_to_pixels(
+		timeline_manager.runner_screen_offset_cells - timeline_manager.view_offset_cells
+	)
+	var y_pos = (timeline_manager.lane_height * 2.5)
+	runner_team.position = Vector2(x_pos, y_pos)
 
 func _draw():
 	cell_width = timeline_manager.cell_width_px
@@ -44,7 +52,7 @@ func _draw():
 		)
 
 	# 1. Where is the Runner?
-	var runner_pos = timeline_manager.current_cell_pos
+	var runner_pos = timeline_manager.get_view_cell_pos()
 
 	# 2. Where is the Left Edge of the screen in "World Coordinates"?
 	# If runner is at 100, and offset is 1.5... Left edge is 98.5.

@@ -31,6 +31,7 @@ var runtime_lane: int = 2
 var runtime_lane_pos: float = 2.0
 var runtime_body_facing_deg: float = 180.0
 var runtime_detection_facing_deg: float = 180.0
+var runtime_detection_paused: bool = false
 var runtime_render_offset: Vector2 = Vector2.ZERO
 
 func setup():

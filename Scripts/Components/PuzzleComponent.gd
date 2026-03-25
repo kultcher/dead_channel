@@ -59,7 +59,7 @@ func is_locked() -> bool:
 
 func get_desc():
 	if puzzle_type == Type.NONE:
-		return "This shouldn't happen probably?"
+		return "OVERRIDDEN"
 	elif !puzzle_locked:
 		return "HACKED"
 	return puzzle_dict[puzzle_type]

@@ -31,6 +31,8 @@ func notify_signal_despawned(active_sig: ActiveSignal) -> void:
 func start_signal_scan(target_signal: ActiveSignal):
 	if target_signal == null or target_signal.instance_node == null:
 		return
+	if signal_manager != null and not signal_manager.is_signal_within_interaction_range(target_signal):
+		return
 
 	if currently_scanning_signal != null and currently_scanning_signal != target_signal:
 		_cleanup_scan_visuals(currently_scanning_signal)
@@ -45,6 +47,8 @@ func start_signal_scan(target_signal: ActiveSignal):
 
 func handle_lock_toggle(clicked_signal: ActiveSignal):
 	if clicked_signal == null:
+		return
+	if signal_manager != null and not signal_manager.is_signal_within_interaction_range(clicked_signal):
 		return
 
 	clicked_signal.is_tooltip_collapsed = not clicked_signal.is_tooltip_collapsed

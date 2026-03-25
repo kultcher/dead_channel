@@ -40,7 +40,20 @@ func has_signal_in_network(system_id: String) -> bool:
 
 func is_signal_in_range(system_id: String) -> bool:
 	var sig := get_signal_by_system_id(system_id)
-	return sig != null and sig.instance_node != null
+	return sig != null and sig.instance_node != null and is_signal_within_interaction_range(sig)
+
+func get_horizontal_runner_distance_cells(active_sig: ActiveSignal) -> float:
+	if active_sig == null or timeline_manager == null:
+		return INF
+	var signal_cell_index := active_sig.start_cell_index
+	if active_sig.runtime_position_initialized:
+		signal_cell_index = active_sig.runtime_cell_x
+	return absf(signal_cell_index - timeline_manager.current_cell_pos)
+
+func is_signal_within_interaction_range(active_sig: ActiveSignal) -> bool:
+	if active_sig == null or timeline_manager == null:
+		return false
+	return get_horizontal_runner_distance_cells(active_sig) <= timeline_manager.signal_interaction_range_cells
 	
 func _process(delta):
 	update_signal_position()
@@ -63,7 +76,7 @@ func update_signal_position():
 			signal_lane = active_sig.runtime_lane_pos
 
 		# Distance from Runner (who is at current_cell_pos)
-		var dist_from_runner_cells = signal_cell_index - timeline_manager.current_cell_pos
+		var dist_from_runner_cells = signal_cell_index - timeline_manager.get_view_cell_pos()
 		
 		# Visual Position = Runner's Screen X + Distance * Pixels/Cell
 		var runner_screen_x = timeline_manager.cells_to_pixels(timeline_manager.runner_screen_offset_cells)
@@ -97,16 +110,22 @@ func update_signal_position():
 func _on_signal_left_clicked(active_sig: ActiveSignal):
 	if not GlobalEvents.is_tutorial_feature_enabled("connect"):
 		return
-	CommandDispatch.switch_terminal_session(active_sig)
+	if terminal_window == null:
+		return
+	terminal_window.access_signal_via_click(active_sig)
 	
 func _on_signal_mouse_enter(signal_entered: ActiveSignal):
 	if not GlobalEvents.is_tutorial_feature_enabled("scan"):
+		return
+	if not is_signal_within_interaction_range(signal_entered):
 		return
 	if scan_controller != null:
 		scan_controller.begin_hover(signal_entered)
 
 func _on_signal_right_clicked(signal_clicked: ActiveSignal):
 	if not GlobalEvents.is_tutorial_feature_enabled("scan"):
+		return
+	if not is_signal_within_interaction_range(signal_clicked):
 		return
 	if scan_controller != null:
 		scan_controller.toggle_lock(signal_clicked)

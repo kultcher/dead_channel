@@ -58,6 +58,7 @@ tab_close_display_policy = 2
 layout_mode = 2
 size_flags_vertical = 3
 theme = ExtResource("1_tmyac")
+bbcode_enabled = true
 text = "Connecting"
 scroll_following = true
 
