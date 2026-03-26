@@ -3,8 +3,9 @@
 extends Node
 
 const NULL_SPIKE_DUMP_PATH := "res://Resources/RunData/AuthoredRuns/null_spike_dump.md"
+const NULL_SPIKE_SYNC_PATH := "res://Resources/RunData/AuthoredRuns/null_spike_sync.md"
 
-@export_enum("full", "door_01", "cam_02", "drone_01", "null_door", "lab_reveal", "terminal_dump", "alarm", "pre_gauntlet") var debug_skip_to_stage := "full"
+@export_enum("full", "door_01", "cam_02", "drone_01", "null_door", "lab_reveal", "terminal_dump", "alarm", "pre_gauntlet", "gauntlet") var debug_skip_to_stage := "full"
 
 @onready var timeline_manager = $"../SignalTimeline/TimelineManager"
 @onready var signal_manager = $"../SignalTimeline/SignalManager"
@@ -25,6 +26,7 @@ func _ready():
 	GlobalEvents.reset_tutorial_features()
 	window_manager.clear_tutorial_objective()
 	if run_manager.get_run_id() == "tutorial":
+		GlobalEvents.first_null_spike = true
 		_set_cutscene_black_screen(true)
 		call_deferred("_run_tutorial_sequence")
 	else:
@@ -58,6 +60,9 @@ func _run_tutorial_sequence() -> void:
 		"pre_gauntlet":
 			_prepare_debug_pre_gauntlet()
 			await _run_pre_gauntlet_sequence()
+		"gauntlet":
+			_prepare_debug_gauntlet()
+			await _run_gauntlet_sequence()
 		_:
 			await _run_intro_sequence()
 			await _run_cam_01_sequence()
@@ -375,11 +380,9 @@ func _run_alarm_sequence():
 	await get_tree().create_timer(1.5)
 	_release_runner_hold("post_combat")
 
-	_run_pre_gauntlet_sequence()
+	await _run_pre_gauntlet_sequence()
 	
 func _run_pre_gauntlet_sequence():
-	timeline_manager.cells_per_second = .17
-
 	await _wait_for_cell(35.5)
 	_acquire_runner_hold("pre_gauntlet_01")
 
@@ -409,7 +412,7 @@ func _run_pre_gauntlet_sequence():
 
 	_enable_feature("terminal_commands", false)
 
-	_set_objective("Type INTERFACE NS_01a.sys -u -c into the terminal to install the Null Spike")
+	_set_objective("- Type INTERFACE NS_01a.sys -u -c into the terminal to install the Null Spike")
 	await _show_dialogue([
 		"...I swear I'd do it myself if I could.",
 		"Never told you how my 'jack got fried, did I? Used to work on stuff like this. Interfacing with them. We never solved it... Guess maybe they did.",
@@ -422,17 +425,47 @@ func _run_pre_gauntlet_sequence():
 	_enable_feature("terminal_commands", true)
 	
 	await GlobalEvents.null_spike_init
+	await get_tree().create_timer(2)
+	await cutscene_controller.play_null_spike_init_transition()
+	await get_tree().create_timer(2)
 
 	await _show_dialogue([
 		"Well, your brain is still uncooked. That's a start.",
 		"Well, let's see what this thing can do. Once I'm in relay range, activate the null spike... and then clear me a path.",
 		"You've got this kid. I picked you for a reason."
 	], "", Rect2(), Vector2(750,300), true)
-	_set_objective("Wait for Blackjack to get within range of the drones")
+	_set_objective("- Wait for Blackjack to get within range of the drones")
 	_release_runner_hold("pre_gauntlet_02")
 
-	await _wait_for_cell(40.5)
+	await _run_gauntlet_sequence()
+
+func _run_gauntlet_sequence():
+	await _wait_for_cell(38.5)
 	_acquire_runner_hold("pre_gauntlet_03")
+	_show_dialogue([
+		"This is it. Cross your fingers and hit the Spike.\nReady when you are."
+	])
+	_set_objective("- Press Left Shift to activate the Null Spike
+- Use your tools to help Blackjack get past the drones
+- RUN sniff or RUN decrypt to access locked signals
+- KILL exposed signals to disable them
+- Watch out for Reboot and other ICE!")
+	
+	_enable_feature("null_spike", true)
+	await GlobalEvents.activate_first_null_spike
+	# disable null spike while running sync sequence
+	_enable_feature("null_spike", false)
+	_release_runner_hold("pre_gauntlet_03")
+
+	await null_spike_sync_sequence()
+
+func null_spike_sync_sequence():
+	var sync_text := FileAccess.get_file_as_string(NULL_SPIKE_SYNC_PATH)
+
+	terminal_window.switch_session(terminal_window.root_signal)
+	await terminal_window.type_text_with_delay(terminal_window.history, sync_text, .01)
+
+	timeline_manager.activate_null_spike()
 
 # "BEFORE THE ghosts clipped off and left us to drift in the world they built for us."
 
@@ -524,7 +557,9 @@ func _prepare_debug_pre_gauntlet() -> void:
 	_get_active_signal("c_drone_01").disable_signal()
 	_set_runner_cell(34.9)
 
-
+func _prepare_debug_gauntlet() -> void:
+	_prepare_debug_pre_gauntlet()
+	_set_runner_cell(38.0)
 	
 func _set_cutscene_black_screen(enabled: bool) -> void:
 	if cutscene_controller == null:

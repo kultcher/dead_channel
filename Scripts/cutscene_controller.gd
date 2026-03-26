@@ -252,6 +252,72 @@ func play_cutscene_return_transition(duration: float = 1.2, blackout_duration: f
 	modulate = Color.WHITE
 	visible = false
 
+func play_null_spike_init_transition() -> void:
+	if not is_inside_tree():
+		return
+
+	_stop_alarm_tween()
+	_alarm_active = false
+	var captured_texture := await _capture_viewport_texture()
+	visible = true
+	modulate = Color.WHITE
+	_set_black_fade_alpha(1.0)
+	if key_texture != null:
+		key_texture.visible = false
+	if glitch_texture != null:
+		if captured_texture != null:
+			glitch_texture.texture = captured_texture
+		else:
+			glitch_texture.texture = _base_glitch_texture
+		glitch_texture.visible = true
+		glitch_texture.modulate = Color(1.0, 1.0, 1.0, 1.0)
+		_set_glitch_speed(2.0)
+		_set_glitch_intensity(0.12)
+
+	var phase_1 := create_tween()
+	phase_1.set_parallel(true)
+	phase_1.tween_method(_set_black_fade_alpha, 1.0, 0.0, 0.7)
+	phase_1.tween_method(_set_glitch_intensity, 0.12, 0.48, 1.65)
+	phase_1.tween_method(_set_glitch_speed, 2.0, 4.5, 1.65)
+	await phase_1.finished
+
+	await _play_blackout_pulse(0.11, 0.16)
+
+	var phase_2 := create_tween()
+	phase_2.set_parallel(true)
+	phase_2.tween_method(_set_glitch_intensity, 0.48, 0.72, 2.1)
+	phase_2.tween_method(_set_glitch_speed, 4.5, 7.5, 2.1)
+	phase_2.tween_property(glitch_texture, "modulate", Color(1.0, 0.92, 1.04, 1.0), 2.1)
+	await phase_2.finished
+
+	await _play_blackout_pulse(0.09, 0.12)
+
+	var phase_3 := create_tween()
+	phase_3.set_parallel(true)
+	phase_3.tween_method(_set_glitch_intensity, 0.72, 1.0, 0.52)
+	phase_3.tween_method(_set_glitch_speed, 7.5, 13.5, 0.52)
+	phase_3.tween_property(glitch_texture, "modulate", Color(1.0, 0.86, 1.08, 1.0), 0.52)
+	await phase_3.finished
+	await get_tree().create_timer(0.34).timeout
+
+	_set_black_fade_alpha(1.0)
+	await get_tree().create_timer(0.72).timeout
+	_set_glitch_intensity(0.58)
+	_set_glitch_speed(6.0)
+	if glitch_texture != null:
+		glitch_texture.modulate = Color(1.0, 0.94, 1.02, 1.0)
+
+	var phase_4 := create_tween()
+	phase_4.set_parallel(true)
+	phase_4.tween_method(_set_black_fade_alpha, 1.0, 0.0, 0.55)
+	phase_4.tween_method(_set_glitch_intensity, 0.58, 0.0, 2.1)
+	phase_4.tween_method(_set_glitch_speed, 6.0, 2.0, 2.1)
+	phase_4.tween_property(glitch_texture, "modulate", Color(1.0, 1.0, 1.0, 0.0), 2.1)
+	await phase_4.finished
+
+	_reset_alarm_visuals()
+	visible = false
+
 func _capture_viewport_texture() -> Texture2D:
 	var viewport := get_viewport()
 	if viewport == null:
@@ -298,6 +364,14 @@ func _set_glitch_intensity(intensity: float) -> void:
 	if texture_material == null:
 		return
 	texture_material.set_shader_parameter("intensity", clampf(intensity, 0.0, 1.0))
+
+func _set_glitch_speed(speed: float) -> void:
+	if glitch_texture == null:
+		return
+	var texture_material := glitch_texture.material as ShaderMaterial
+	if texture_material == null:
+		return
+	texture_material.set_shader_parameter("speed", maxf(0.0, speed))
 
 func _apply_intro_glitch_progress(progress: float) -> void:
 	var clamped_progress := clampf(progress, 0.0, 1.0)
@@ -392,6 +466,16 @@ func _stop_alarm_tween() -> void:
 	if _alarm_tween != null and _alarm_tween.is_valid():
 		_alarm_tween.kill()
 	_alarm_tween = null
+
+func _play_blackout_pulse(fade_duration: float, hold_duration: float = 0.0) -> void:
+	var blackout_tween := create_tween()
+	blackout_tween.tween_method(_set_black_fade_alpha, _get_black_fade_alpha(), 1.0, maxf(0.01, fade_duration))
+	await blackout_tween.finished
+	if hold_duration > 0.0:
+		await get_tree().create_timer(hold_duration).timeout
+	var reveal_tween := create_tween()
+	reveal_tween.tween_method(_set_black_fade_alpha, 1.0, 0.0, maxf(0.01, fade_duration))
+	await reveal_tween.finished
 
 func _reset_alarm_visuals() -> void:
 	_stop_alarm_tween()

@@ -1,0 +1,247 @@
+[gd_scene format=3 uid="uid://d3dd372cut47v"]
+
+[ext_resource type="Script" uid="uid://i0xx7ugrl0kb" path="res://Scenes/run_manager.gd" id="1_4q6c1"]
+[ext_resource type="Script" uid="uid://d1t84c52jtssw" path="res://Scripts/timeline_manager.gd" id="1_882wi"]
+[ext_resource type="Script" uid="uid://ccamc7sskx0dd" path="res://Scripts/grid_layer.gd" id="2_85m8a"]
+[ext_resource type="Script" uid="uid://f728aufmncfn" path="res://Scripts/tutorial_manager.gd" id="2_r51ll"]
+[ext_resource type="Script" uid="uid://cu20kah6ku6q3" path="res://Scripts/signal_manager.gd" id="4_jx6wh"]
+[ext_resource type="Texture2D" uid="uid://kvkbkwgf3xei" path="res://Visuals/Icons/blackjack_icon_ph3.png" id="5_k8c5c"]
+[ext_resource type="Script" uid="uid://gms8x710vr6g" path="res://Scripts/window_manager.gd" id="5_wudor"]
+[ext_resource type="Script" uid="uid://ctribu2mvviap" path="res://Scenes/runner_health.gd" id="6_1rh14"]
+[ext_resource type="Script" uid="uid://biyb8hixpkc42" path="res://Scripts/heat_tracker.gd" id="6_85m8a"]
+[ext_resource type="PackedScene" uid="uid://dbqweh3v2f0bq" path="res://Scenes/terminal_window.tscn" id="7_4qt4q"]
+[ext_resource type="Script" uid="uid://ct7kxs5lwoyyb" path="res://Scenes/scan_controller.gd" id="7_k8c5c"]
+[ext_resource type="PackedScene" uid="uid://d2nr1ge8ypq88" path="res://Scenes/focus_overlay.tscn" id="8_4ll5g"]
+[ext_resource type="PackedScene" uid="uid://hjsy8naghiwy" path="res://Scenes/sniff.tscn" id="8_jx6wh"]
+[ext_resource type="PackedScene" uid="uid://cjra5kvci873p" path="res://Scenes/objective_tracker.tscn" id="9_2sk7x"]
+[ext_resource type="PackedScene" uid="uid://c7mm45bo2fmyv" path="res://Scenes/help_overlay.tscn" id="10_ki4rb"]
+[ext_resource type="Texture2D" uid="uid://bsp50rqqai1yc" path="res://Visuals/digital_background.png" id="12_0p2ub"]
+[ext_resource type="Shader" uid="uid://c16vuww6jgbkf" path="res://Shaders/circuits.gdshader" id="13_d5u5a"]
+[ext_resource type="Texture2D" uid="uid://b77pho6a4a6dm" path="res://Visuals/digital_toplayer.png" id="14_d5u5a"]
+[ext_resource type="Shader" uid="uid://da2dfyfkllxrp" path="res://Visuals/Icons/digital_glitch.gdshader" id="18_3deqw"]
+[ext_resource type="Script" uid="uid://cbv73pnuu78pw" path="res://Scripts/cutscene_controller.gd" id="18_3xdhw"]
+[ext_resource type="Texture2D" uid="uid://bilm8u1f271kd" path="res://Visuals/NullSpikeKeyPH.png" id="20_26ak2"]
+[ext_resource type="Texture2D" uid="uid://0s1a4ceed6us" path="res://Visuals/glitch_screen2.png" id="21_1rh14"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k8c5c"]
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.3988219, 0.8749259, 0.9848737, 1)
+border_blend = true
+shadow_color = Color(0.34623083, 0.6429446, 1, 0.6)
+shadow_size = 25
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_wudor"]
+radius = 60.0
+
+[sub_resource type="Gradient" id="Gradient_882wi"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_85m8a"]
+gradient = SubResource("Gradient_882wi")
+height = 256
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Gradient" id="Gradient_4qt4q"]
+colors = PackedColorArray(0.7490196, 0.99607843, 0, 1, 1, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_jx6wh"]
+gradient = SubResource("Gradient_4qt4q")
+height = 256
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_o0pqt"]
+shader = ExtResource("13_d5u5a")
+shader_parameter/base_tint = Color(4.2114408e-07, 0.20182168, 0.3126923, 1)
+shader_parameter/hot_tint = Color(6.738305e-07, 0.7189945, 0.7289017, 1)
+shader_parameter/base_glow = 0.65
+shader_parameter/pulse_strength = 0.25
+shader_parameter/shimmer_strength = 0.35
+shader_parameter/alpha_boost = 1.0
+shader_parameter/band_scale_1 = 9.0
+shader_parameter/band_scale_2 = 15.0
+shader_parameter/speed_1 = 0.45
+shader_parameter/speed_2 = -0.32
+shader_parameter/surge_speed = 0.6
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_05vun"]
+shader = ExtResource("18_3deqw")
+shader_parameter/speed = 5.0
+shader_parameter/blur_x = 5.0
+shader_parameter/blur_y = 5.0
+shader_parameter/density = 20.0
+shader_parameter/intensity = 1.0
+shader_parameter/tear_strength = 0.045
+shader_parameter/noise_strength = 0.08
+shader_parameter/tear_density = 11.0
+
+[node name="RunMain" type="Node2D" unique_id=567975848]
+
+[node name="RunManager" type="Node" parent="." unique_id=973638613]
+script = ExtResource("1_4q6c1")
+
+[node name="TutorialManager" type="Node" parent="." unique_id=755181945]
+script = ExtResource("2_r51ll")
+debug_skip_to_stage = "gauntlet"
+
+[node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
+position = Vector2(0, 50)
+
+[node name="TimelineManager" type="Node2D" parent="SignalTimeline" unique_id=1093280978]
+script = ExtResource("1_882wi")
+
+[node name="GridLayer" type="Node2D" parent="SignalTimeline" unique_id=1499063150]
+script = ExtResource("2_85m8a")
+
+[node name="Debug" type="Label" parent="SignalTimeline/GridLayer" unique_id=1352355150]
+offset_top = -50.0
+offset_right = 40.0
+offset_bottom = -27.0
+
+[node name="RunnerTeam" type="Node2D" parent="SignalTimeline/GridLayer" unique_id=868639655]
+scale = Vector2(0.4, 0.4)
+
+[node name="PanelContainer" type="PanelContainer" parent="SignalTimeline/GridLayer/RunnerTeam" unique_id=1618148646]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -69.0
+offset_top = -69.0
+offset_right = 69.0
+offset_bottom = 69.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_k8c5c")
+
+[node name="RunnerIcon" type="TextureRect" parent="SignalTimeline/GridLayer/RunnerTeam/PanelContainer" unique_id=420175975]
+layout_mode = 2
+texture = ExtResource("5_k8c5c")
+
+[node name="RunnerHealth" type="MarginContainer" parent="SignalTimeline/GridLayer/RunnerTeam/PanelContainer" unique_id=846601565]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_bottom = 5
+script = ExtResource("6_1rh14")
+
+[node name="PipVbox" type="HBoxContainer" parent="SignalTimeline/GridLayer/RunnerTeam/PanelContainer/RunnerHealth" unique_id=1652049865]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 8
+
+[node name="RunnerArea" type="Area2D" parent="SignalTimeline/GridLayer/RunnerTeam" unique_id=2001800265 groups=["runner"]]
+collision_mask = 0
+
+[node name="RunnerShape" type="CollisionShape2D" parent="SignalTimeline/GridLayer/RunnerTeam/RunnerArea" unique_id=1342940088]
+shape = SubResource("CircleShape2D_wudor")
+
+[node name="SignalManager" type="Node2D" parent="SignalTimeline" unique_id=1320650835]
+script = ExtResource("4_jx6wh")
+
+[node name="ScanController" type="Node2D" parent="SignalTimeline" unique_id=2064755917]
+script = ExtResource("7_k8c5c")
+
+[node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
+script = ExtResource("5_wudor")
+
+[node name="FocusOverlay" parent="WindowManager" unique_id=2047983454 instance=ExtResource("8_4ll5g")]
+
+[node name="ObjectiveTracker" parent="WindowManager" unique_id=1310032324 instance=ExtResource("9_2sk7x")]
+offset_left = 1450.0
+offset_top = 750.0
+offset_right = 1880.0
+offset_bottom = 864.0
+
+[node name="HelpOverlay" parent="WindowManager" unique_id=1226732366 instance=ExtResource("10_ki4rb")]
+visible = false
+offset_left = 200.0
+offset_top = 125.0
+offset_right = -102.0
+offset_bottom = -111.0
+
+[node name="HeatTracker" type="TextureProgressBar" parent="." unique_id=1028315604]
+offset_left = 25.0
+offset_top = 775.0
+offset_right = 89.0
+offset_bottom = 1031.0
+max_value = 5000.0
+fill_mode = 3
+texture_under = SubResource("GradientTexture2D_85m8a")
+texture_progress = SubResource("GradientTexture2D_jx6wh")
+script = ExtResource("6_85m8a")
+
+[node name="HeatDebug" type="Label" parent="HeatTracker" unique_id=1874187724]
+layout_mode = 0
+offset_left = 68.0
+offset_top = 184.0
+offset_right = 133.0
+offset_bottom = 235.0
+tooltip_text = "Test"
+
+[node name="TerminalWindow" parent="." unique_id=340148133 instance=ExtResource("7_4qt4q")]
+z_index = 5
+offset_left = 357.0
+offset_top = 700.0
+offset_right = 1483.0
+offset_bottom = 1028.0
+
+[node name="SniffWindow" parent="." unique_id=650256936 instance=ExtResource("8_jx6wh")]
+visible = false
+offset_left = 668.0
+offset_top = 365.0
+offset_right = 736.5
+offset_bottom = 396.0
+
+[node name="CircuitBackground" type="TextureRect" parent="." unique_id=1366937746]
+modulate = Color(0, 0, 0, 1)
+z_index = -10
+offset_right = 1920.0
+offset_bottom = 1307.0
+scale = Vector2(1.05, 0.85)
+mouse_filter = 2
+texture = ExtResource("12_0p2ub")
+
+[node name="CircuitBackground2" type="TextureRect" parent="." unique_id=1921801606]
+z_index = -9
+material = SubResource("ShaderMaterial_o0pqt")
+offset_right = 1920.0
+offset_bottom = 1307.0
+scale = Vector2(1.05, 0.85)
+mouse_filter = 2
+texture = ExtResource("14_d5u5a")
+
+[node name="CutsceneController" type="PanelContainer" parent="." unique_id=2057820020]
+z_index = 10
+custom_minimum_size = Vector2(1920, 1080)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("18_3xdhw")
+
+[node name="CutsceneGlitchTexture" type="TextureRect" parent="CutsceneController" unique_id=1228991890]
+visible = false
+material = SubResource("ShaderMaterial_05vun")
+layout_mode = 2
+texture = ExtResource("21_1rh14")
+
+[node name="CutsceneKeyTexture" type="TextureRect" parent="CutsceneController" unique_id=1356882612]
+visible = false
+layout_mode = 2
+texture = ExtResource("20_26ak2")
+
+[node name="CutsceneRect" type="ColorRect" parent="CutsceneController" unique_id=1019869231]
+visible = false
+layout_mode = 2
+color = Color(0, 0, 0, 1)
+
+[node name="StrobeRect" type="ColorRect" parent="CutsceneController" unique_id=1499601247]
+visible = false
+layout_mode = 2
+color = Color(1, 0, 0, 1)
+
+[node name="FlashRect" type="ColorRect" parent="CutsceneController" unique_id=1657344542]
+visible = false
+layout_mode = 2

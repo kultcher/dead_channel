@@ -34,16 +34,20 @@ signal guard_comms_ping_started(active_sig: ActiveSignal)
 signal guard_comms_ping_ended(active_sig: ActiveSignal)
 
 signal null_spike_init()
+signal activate_first_null_spike()
 signal activate_null_spike()
 signal deactivate_null_spike()
 
 signal tutorial_lock_changed(locked: bool)
 signal tutorial_feature_changed(feature_key: String, enabled: bool)
 
+var first_null_spike = false
+
 # PUZZLE EVENTS
 signal puzzle_started(active_signal: ActiveSignal, puzzle_type: PuzzleComponent.Type)
 signal puzzle_failed(signal_data)
 signal puzzle_solved(signal_data)
+
 
 var _runner_holds: Dictionary = {}
 var _runner_hold_counter: int = 0
@@ -53,6 +57,10 @@ var _tutorial_feature_flags := {
 	"terminal_commands": true,
 	"null_spike": true,
 }
+
+
+
+
 
 func acquire_runner_hold(reason: String = "") -> String:
 	_runner_hold_counter += 1

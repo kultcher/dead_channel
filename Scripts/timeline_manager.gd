@@ -124,6 +124,9 @@ func _handle_input():
 func toggle_null_spike():
 	if not GlobalEvents.is_tutorial_feature_enabled("null_spike"):
 		return
+	if GlobalEvents.first_null_spike == true:
+		GlobalEvents.activate_first_null_spike.emit()
+		return
 	if tutorial_locked: return
 	if null_spike_active:
 		GlobalEvents.deactivate_null_spike.emit()
@@ -135,6 +138,7 @@ func deactivate_null_spike():
 	_tween_time_scale(1.0)
 
 func activate_null_spike():
+
 	null_spike_active = true
 	_tween_time_scale(null_spike_time_scale)
 
