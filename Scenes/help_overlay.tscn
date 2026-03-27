@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c7mm45bo2fmyv"]
 
 [ext_resource type="StyleBox" uid="uid://chg2qawtivc2b" path="res://Resources/StyleBox/TitleBarStyleBox.tres" id="1_00hyg"]
+[ext_resource type="Script" uid="uid://cvfdxf107edt" path="res://Scripts/help_overlay.gd" id="1_y8i2o"]
 [ext_resource type="Theme" uid="uid://discgqqbkpb5x" path="res://Resources/StyleBox/MainTheme.tres" id="2_g2bw1"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_00hyg"]
@@ -9,7 +10,11 @@
 font_names = PackedStringArray("OCR A")
 subpixel_positioning = 0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_in4rq"]
+bg_color = Color(0.28235295, 0.40392157, 1, 0.80784315)
+
 [node name="HelpOverlay" type="Panel" unique_id=1226732366]
+process_mode = 3
 self_modulate = Color(0, 0, 0, 1)
 top_level = true
 anchors_preset = 15
@@ -20,6 +25,7 @@ offset_bottom = -236.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_00hyg")
+script = ExtResource("1_y8i2o")
 
 [node name="TerminalVBox" type="VBoxContainer" parent="." unique_id=776111585]
 layout_mode = 0
@@ -59,3 +65,12 @@ Notes:
 - Terminal commands are not case sensitive.
 
 Press F1 to close this and resume the game."
+
+[node name="Button" type="Button" parent="TerminalVBox" unique_id=135433383]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_in4rq")
+text = "Close"
+
+[connection signal="pressed" from="TerminalVBox/Button" to="." method="_on_button_pressed"]

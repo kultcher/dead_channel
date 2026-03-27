@@ -2,8 +2,9 @@ class_name CodexEntry extends Resource
 
 enum CodexType { IC }
 
-@export var name: String
-@export var type: String
-@export var rating: int
+@export var codex_id: StringName
+@export var title: String
+@export var category: String
+@export var extra: String
 @export var icon: Texture2D
-@export var description: String
+@export var body_text: String

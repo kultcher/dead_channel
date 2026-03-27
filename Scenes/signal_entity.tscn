@@ -2,8 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bu5j0vtniw7no" path="res://Scripts/SignalBase/signal_entity.gd" id="1_syivg"]
 [ext_resource type="Script" uid="uid://bf3h4o3iodo4" path="res://Scripts/SignalBase/DetectionController.gd" id="2_6hws6"]
-[ext_resource type="FontFile" uid="uid://b0472lemon553" path="res://Visuals/Fonts/KodeMono-Bold.ttf" id="2_ea3pi"]
-[ext_resource type="FontFile" uid="uid://g80fed4aap1u" path="res://Visuals/Fonts/FiraCode-SemiBold.ttf" id="3_xq7gi"]
+[ext_resource type="PackedScene" uid="uid://dfbl7tsxqd446" path="res://Scenes/signal_detail_tooltip.tscn" id="2_ea3pi"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_syivg"]
 size = Vector2(50, 50)
@@ -19,28 +18,6 @@ height = 96
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.5, 0)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ea3pi"]
-bg_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-expand_margin_left = 1.0
-expand_margin_top = 1.0
-expand_margin_right = 5.0
-expand_margin_bottom = 5.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6hws6"]
-bg_color = Color(0.22091639, 0.44796598, 0.97496897, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7dtr8"]
-bg_color = Color(0.078431375, 0.011764706, 0.17254902, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.8854879, 0.33361515, 0.025840001, 1)
 
 [node name="SignalEntity" type="Node2D" unique_id=2133266310]
 script = ExtResource("1_syivg")
@@ -70,91 +47,14 @@ texture_progress = SubResource("GradientTexture2D_6hws6")
 
 [node name="Shape" type="Polygon2D" parent="." unique_id=927938383]
 
-[node name="DetailTooltip" type="PanelContainer" parent="." unique_id=1530274448]
-self_modulate = Color(1, 1, 1, 0.5)
-z_index = 200
-anchors_preset = 7
+[node name="DetailTooltip" parent="." unique_id=337901490 instance=ExtResource("2_ea3pi")]
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 1.0
 anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -48.0
-offset_top = 24.0
-offset_right = 54.0
-offset_bottom = 103.0
-grow_horizontal = 2
-grow_vertical = 0
-size_flags_horizontal = 10
-size_flags_vertical = 10
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_ea3pi")
-
-[node name="TooltipHbox" type="HBoxContainer" parent="DetailTooltip" unique_id=1260518309]
-layout_mode = 2
-
-[node name="TooltipVBox" type="VBoxContainer" parent="DetailTooltip/TooltipHbox" unique_id=995484535]
-layout_mode = 2
-
-[node name="HeaderPanel" type="PanelContainer" parent="DetailTooltip/TooltipHbox/TooltipVBox" unique_id=1868400285]
-custom_minimum_size = Vector2(96, 0)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_6hws6")
-
-[node name="MarginContainer" type="MarginContainer" parent="DetailTooltip/TooltipHbox/TooltipVBox/HeaderPanel" unique_id=298465643]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_right = 5
-
-[node name="HeaderText" type="Label" parent="DetailTooltip/TooltipHbox/TooltipVBox/HeaderPanel/MarginContainer" unique_id=1976295518]
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_fonts/font = ExtResource("2_ea3pi")
-text = "???"
-horizontal_alignment = 1
-
-[node name="ActiveScanPanel" type="PanelContainer" parent="DetailTooltip/TooltipHbox/TooltipVBox" unique_id=409663200]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_7dtr8")
-
-[node name="MarginContainer" type="MarginContainer" parent="DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel" unique_id=608796245]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_right = 5
-
-[node name="ActiveScanText" type="Label" parent="DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel/MarginContainer" unique_id=1220123014]
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_fonts/font = ExtResource("3_xq7gi")
-text = "UNKNOWN"
-horizontal_alignment = 1
-
-[node name="LockStatePanel" type="PanelContainer" parent="DetailTooltip/TooltipHbox/TooltipVBox" unique_id=593250381]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_7dtr8")
-
-[node name="MarginContainer" type="MarginContainer" parent="DetailTooltip/TooltipHbox/TooltipVBox/LockStatePanel" unique_id=1733216395]
-layout_mode = 2
-theme_override_constants/margin_left = 5
-theme_override_constants/margin_right = 5
-
-[node name="LockStateText" type="Label" parent="DetailTooltip/TooltipHbox/TooltipVBox/LockStatePanel/MarginContainer" unique_id=876974478]
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_fonts/font = ExtResource("3_xq7gi")
-text = "UNKNOWN"
-horizontal_alignment = 1
-
-[node name="BodyBox" type="BoxContainer" parent="DetailTooltip/TooltipHbox" unique_id=873904700]
-layout_mode = 2
-
-[node name="BodyText" type="RichTextLabel" parent="DetailTooltip/TooltipHbox/BodyBox" unique_id=1194117022]
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-fit_content = true
-autowrap_mode = 0
+offset_left = -51.0
+offset_top = 25.0
+offset_right = 51.0
+offset_bottom = 86.0
 
 [node name="DetectionController" type="Area2D" parent="." unique_id=737056803]
 collision_layer = 2

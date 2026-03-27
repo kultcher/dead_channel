@@ -53,7 +53,7 @@ func handle_lock_toggle(clicked_signal: ActiveSignal):
 
 	clicked_signal.is_tooltip_collapsed = not clicked_signal.is_tooltip_collapsed
 	if clicked_signal.instance_node != null:
-		clicked_signal.instance_node.set_tooltip_collapsed(clicked_signal.is_tooltip_collapsed)
+		clicked_signal.instance_node.tooltip_main.set_tooltip_collapsed(clicked_signal.is_tooltip_collapsed)
 		clicked_signal.instance_node.bring_to_front()
 
 func cancel_scan(active_sig: ActiveSignal = null):
@@ -110,4 +110,4 @@ func _cleanup_scan_visuals(sig: ActiveSignal):
 	if sig.instance_node != null:
 		sig.instance_node.set_scan_highlight(false)
 		sig.instance_node.refresh_scan_status()
-		sig.instance_node.set_tooltip_collapsed(sig.is_tooltip_collapsed)
+		sig.instance_node.tooltip_main.set_tooltip_collapsed(sig.is_tooltip_collapsed)

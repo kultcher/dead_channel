@@ -3,9 +3,14 @@
 
 class_name ICModule extends Resource
 
+@export var codex_id: StringName
+
 # Virtual function to be overridden
 func get_desc():
 	return ""
+
+func get_codex_id():
+	return &""
 
 func bind_to_context(signal_data: SignalData, terminal_ref: Control):
 	pass

@@ -7,6 +7,7 @@ var sniff = preload("res://Scenes/sniff.tscn")
 #var fuzz = preload("res://Scenes/fuzz.tscn")
 var decrypt = preload("res://Scenes/decrypt.tscn")
 var dialogue_window_scene = preload("res://Scenes/dialogue_window.tscn")
+var codex_popup = preload("res://Scenes/codex_popup.tscn")
 
 @onready var timeline_manager = $"../SignalTimeline/TimelineManager"
 @onready var signal_manager = $"../SignalTimeline/SignalManager"
@@ -25,6 +26,7 @@ var window_count := 0
 func _ready():
 	CommandDispatch.window_manager = self
 	GlobalEvents.puzzle_started.connect(_puzzle_started)
+	GlobalEvents.show_codex_popup.connect(_show_codex_popup)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_process_input(true)
 	if help_overlay != null:
@@ -96,6 +98,15 @@ func toggle_help_overlay() -> void:
 		hide_help_overlay()
 		return
 	show_help_overlay()
+
+func _show_codex_popup(codex_id: StringName, signal_data: SignalData):
+	var popup = codex_popup.instantiate()
+	if signal_data != null:
+		var signal_instance = signal_manager.get_signal_by_system_id(signal_data.system_id).instance_node
+		popup.position = signal_instance.position + Vector2(-110, 150)
+	add_child(popup)
+	popup.setup_and_display(codex_id)
+
 
 func show_tutorial_dialogue(
 	dialogue_pages: Array[String],

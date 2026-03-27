@@ -68,9 +68,16 @@ func _run_tutorial_sequence() -> void:
 			await _run_cam_01_sequence()
 			await _run_door_01_sequence()
 			await _run_cam_02_intro_sequence()
+			await _run_drone_01_intro_sequence()
+			await _run_null_door_intro_sequence()
+			await _run_lab_reveal_sequence()
+			#await _run_terminal_dump_sequence()
+			await _run_alarm_sequence()
+			await _run_pre_gauntlet_sequence()
+			await _run_gauntlet_sequence()
 
 func _run_intro_sequence() -> void:
-	_set_runner_cell(-3)
+	_set_runner_cell(-1)
 	_acquire_runner_hold("intro")
 	signal_manager.hide_signals()
 	_set_cutscene_black_screen(true)
@@ -93,9 +100,11 @@ func _run_intro_sequence() -> void:
 		"All right, I'm on the move. You should already be seeing some network SIGNALs registering on the timeline.",
 		"It'll look they're moving toward me, but it's all relative\u2014I'm moving toward them. The stationary ones, anyway."
 	], "", window_manager.get_control_focus_rect(runner_focus_panel), Vector2(), false, 2, "intro_walk_and_talk")
+	_set_objective("- Wait for Blackjack to get into position")
+	_run_cam_01_sequence()
 
 func _run_cam_01_sequence() -> void:
-	await _wait_for_cell(3)
+	await _wait_for_cell(1)
 	_acquire_runner_hold("cam_01_gate")
 	await _show_dialogue([
 		"Eyes on two cameras. One is off the main route, so it shouldn't be an issue, but the other is right above the facility door.",
@@ -116,8 +125,8 @@ func _run_cam_01_sequence() -> void:
 
 	await _wait_for_signal_killed("cam_01")
 	_release_runner_hold("cam_01_gate")
+	await get_tree().create_timer(1.0).timeout
 
-	#_focus_heat_tracker()
 	await _show_dialogue([
 		"Simple as. Just watch your heat. KILL is noisy, and more network noise means more attention from the system.",
 		"Runners don't like attention. For you, it might just mean more ICE. For us, it tends to come with bullet holes."
@@ -142,7 +151,6 @@ func _run_door_01_sequence() -> void:
 	_set_objective("Left click the door_01 signal to connect, then type RUN sniff in the terminal to run the Sniff program.")
 
 	await _wait_for_puzzle_started(PuzzleComponent.Type.SNIFF)
-	_enable_feature("terminal_commands", false) # NOTE: This is *mostly* good enough to prevent sequence break
 
 	await _show_dialogue([
 		"Sniff's simple. The program will tell you the target data, you just need to track it in the datastreams. Simple as."
@@ -150,11 +158,12 @@ func _run_door_01_sequence() -> void:
 	_set_objective("- Find and click the targeted hex code.")
 
 	await _wait_for_puzzle_solved("door_01")
+
 	await _show_dialogue([
 		"Now you've got access, but you still need to unlock the door in realspace.",
 		"A lot of signals have a basic functionality that you can access with the OPERATE command, or OP for short."
 	], "door_01")
-	_set_objective("- Type OP to unlock the door.")
+	_set_objective("- Make sure you're connected to the door_01 signal and type OP to unlock the door")
 
 	await _wait_for_door_unlocked("door_01")
 	_release_runner_hold("door_01_gate")
@@ -191,6 +200,7 @@ func _run_cam_02_intro_sequence() -> void:
 
 func _run_drone_01_intro_sequence():
 	await _wait_for_cell(13)
+	# NOTE: Something preventing this hold?
 	_acquire_runner_hold("drone_01_gate")
 	await _show_dialogue([
 		"Shit, picking up a drone. Could be armed. They're mobile and not as predictable as cameras. Give it a scan."
@@ -251,7 +261,6 @@ func _run_null_door_intro_sequence():
 	], "", Rect2(), Vector2(750, 300), true, 22.5, "null_lab_leadup")
 	_release_runner_hold("null_terminal_gate_01")
 
-	await _run_lab_reveal_sequence()
 
 func _run_lab_reveal_sequence() -> void:
 	await _wait_for_cell(25)
@@ -316,8 +325,6 @@ func _run_lab_reveal_sequence() -> void:
 		], "", Rect2(), Vector2(750,300), true)
 
 	await get_tree().create_timer(2).timeout
-
-	await _run_alarm_sequence()
 
 func _run_alarm_sequence():
 	_start_cutscene_alarm()
@@ -387,8 +394,6 @@ func _run_alarm_sequence():
 	await get_tree().create_timer(1.5)
 	_release_runner_hold("post_combat")
 
-	await _run_pre_gauntlet_sequence()
-	
 func _run_pre_gauntlet_sequence():
 	await _wait_for_cell(35.5)
 	_acquire_runner_hold("pre_gauntlet_01")
@@ -443,8 +448,6 @@ func _run_pre_gauntlet_sequence():
 	], "", Rect2(), Vector2(750,300), true)
 	_set_objective("- Wait for Blackjack to get within range of the drones")
 	_release_runner_hold("pre_gauntlet_02")
-
-	await _run_gauntlet_sequence()
 
 func _run_gauntlet_sequence():
 	await _wait_for_cell(38.5)
@@ -703,7 +706,7 @@ func _focus_door_lock_state(system_id: String) -> void:
 		window_manager.clear_focus_overlay()
 		return
 	active_sig.instance_node.show_tooltip()
-	var lock_rect = active_sig.instance_node.get_lock_state_focus_rect()
+	var lock_rect = active_sig.instance_node.tooltip_main.get_lock_state_focus_rect()
 	if not _has_focus_rect(lock_rect):
 		window_manager.focus_signal(active_sig)
 		return
@@ -848,6 +851,7 @@ func _cam_02_kill_or_hustle(active_signal: ActiveSignal) -> String:
 		if resolved:
 			return
 		resolved = true
+		print("returning on move")
 		wait_completed.emit("move")
 	
 	var on_kill = func(active_signal: ActiveSignal):
@@ -856,16 +860,18 @@ func _cam_02_kill_or_hustle(active_signal: ActiveSignal) -> String:
 		if active_signal.data.system_id != "cam_02":
 			return
 		resolved = true
+		print("returning on kill")
 		wait_completed.emit("kill")
 
 	GlobalEvents.runner_hustle.connect(on_move, CONNECT_ONE_SHOT)
 	GlobalEvents.signal_killed.connect(on_kill)
 	
+	print("awaiting")
 	var result = await wait_completed
 	
 	if GlobalEvents.signal_killed.is_connected(on_kill):
 		GlobalEvents.signal_killed.disconnect(on_kill)
-		
+	print("returning for real")
 	return result
 
 func _runner_detected_dialogue():

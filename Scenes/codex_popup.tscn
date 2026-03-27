@@ -1,0 +1,109 @@
+[gd_scene format=3 uid="uid://d2qmwye10uij3"]
+
+[ext_resource type="Script" uid="uid://bqtg3iwfjr0ov" path="res://codex_popup.gd" id="1_dvmgm"]
+[ext_resource type="Texture2D" uid="uid://bmo0ymjiuo6vj" path="res://Visuals/Icons/Simple/anticlockwise-rotation.svg" id="2_12vnh"]
+[ext_resource type="StyleBox" uid="uid://cjkpqgdj663bg" path="res://Resources/StyleBox/orange_button_pressed.tres" id="3_12vnh"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_12vnh"]
+bg_color = Color(0.20784314, 0.20784314, 0.41568628, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_blend = true
+expand_margin_left = 5.0
+expand_margin_top = 5.0
+expand_margin_right = 5.0
+expand_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1l8qv"]
+content_margin_left = 5.0
+content_margin_top = 3.0
+content_margin_right = 5.0
+content_margin_bottom = 3.0
+bg_color = Color(0.14509805, 0.14509805, 0.14509805, 0.49019608)
+
+[node name="CodexPopup" type="PanelContainer" unique_id=1495871548]
+offset_right = 223.0
+offset_bottom = 232.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_12vnh")
+script = ExtResource("1_dvmgm")
+
+[node name="CodexPopupVbox" type="VBoxContainer" parent="." unique_id=1846879100]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CodexPopupVbox" unique_id=614444370]
+layout_mode = 2
+
+[node name="CodexIntro" type="Label" parent="CodexPopupVbox/PanelContainer" unique_id=1145614950]
+layout_mode = 2
+text = "New ICE Encountered!"
+horizontal_alignment = 1
+
+[node name="CodexTopHbox" type="HBoxContainer" parent="CodexPopupVbox" unique_id=1376333416]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="CodexHeaderPanel" type="PanelContainer" parent="CodexPopupVbox/CodexTopHbox" unique_id=2075591393]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1l8qv")
+
+[node name="CodexHeaderVbox" type="VBoxContainer" parent="CodexPopupVbox/CodexTopHbox/CodexHeaderPanel" unique_id=793154042]
+layout_mode = 2
+
+[node name="CodexTitle" type="Label" parent="CodexPopupVbox/CodexTopHbox/CodexHeaderPanel/CodexHeaderVbox" unique_id=1385167692]
+layout_mode = 2
+text = "CODEX TITLE"
+
+[node name="CodexType" type="Label" parent="CodexPopupVbox/CodexTopHbox/CodexHeaderPanel/CodexHeaderVbox" unique_id=816954083]
+layout_mode = 2
+text = "CODEX TYPE"
+
+[node name="CodexExtra" type="Label" parent="CodexPopupVbox/CodexTopHbox/CodexHeaderPanel/CodexHeaderVbox" unique_id=1788378904]
+layout_mode = 2
+text = "CODEX EXTRA"
+
+[node name="CodexHeaderSpacer" type="Control" parent="CodexPopupVbox/CodexTopHbox" unique_id=1661256582]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+
+[node name="CodexIconPanel" type="PanelContainer" parent="CodexPopupVbox/CodexTopHbox" unique_id=1467246286]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+
+[node name="CodexIconContainer" type="CenterContainer" parent="CodexPopupVbox/CodexTopHbox/CodexIconPanel" unique_id=579639833]
+layout_mode = 2
+
+[node name="CodexIcon" type="TextureRect" parent="CodexPopupVbox/CodexTopHbox/CodexIconPanel/CodexIconContainer" unique_id=1460157813]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+texture = ExtResource("2_12vnh")
+expand_mode = 1
+
+[node name="CodexBodyPanel" type="PanelContainer" parent="CodexPopupVbox" unique_id=984213728]
+layout_mode = 2
+
+[node name="CodexBodyMargin" type="MarginContainer" parent="CodexPopupVbox/CodexBodyPanel" unique_id=1578015830]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="CodexBody" type="RichTextLabel" parent="CodexPopupVbox/CodexBodyPanel/CodexBodyMargin" unique_id=7475704]
+layout_mode = 2
+size_flags_vertical = 3
+text = "BODY TEXT
+BODY TEXT
+BODY TEXT"
+fit_content = true
+
+[node name="Button" type="Button" parent="CodexPopupVbox" unique_id=289950964]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = ExtResource("3_12vnh")
+theme_override_styles/hover = ExtResource("3_12vnh")
+text = "Continue"
+
+[connection signal="pressed" from="CodexPopupVbox/Button" to="." method="_on_button_pressed"]

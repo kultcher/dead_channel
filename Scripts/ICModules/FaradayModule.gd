@@ -5,6 +5,9 @@ class_name FaradayModule extends ICModule
 func get_desc():
 	return "Faraday(%.1fc)" % max_runner_distance_cells
 
+func get_codex_id():
+	return &"codex_faraday"
+
 func interrupts_commands(cmd_context: CommandContext) -> bool:
 	if cmd_context == null or cmd_context.active_sig == null:
 		return false

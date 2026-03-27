@@ -7,26 +7,9 @@ extends Node2D
 
 @onready var scan_radial = $ScanRadial
 @onready var tooltip_main = $DetailTooltip
-@onready var tooltip_header = $DetailTooltip/TooltipHbox/TooltipVBox/HeaderPanel/MarginContainer/HeaderText
-@onready var tooltip_body_box = $DetailTooltip/TooltipHbox/BodyBox
-@onready var tooltip_body = $DetailTooltip/TooltipHbox/BodyBox/BodyText
-@onready var tooltip_active_scan = $DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel
-@onready var tooltip_active_scan_text = $DetailTooltip/TooltipHbox/TooltipVBox/ActiveScanPanel/MarginContainer/ActiveScanText
-@onready var tooltip_lock_state = $DetailTooltip/TooltipHbox/TooltipVBox/LockStatePanel
-@onready var tooltip_lock_state_text = $DetailTooltip/TooltipHbox/TooltipVBox/LockStatePanel/MarginContainer/LockStateText
 
 @onready var detection_controller = $DetectionController
 @export var tooltip_gap_y: float = 32.0
-
-const COLOR_STATUS_UNKNOWN := Color("4a2d64")
-const COLOR_STATUS_SCANNING := Color("c56b1f")
-const COLOR_STATUS_COMPLETE := Color("2f8a46")
-const COLOR_STATUS_PARTIAL := Color("c1a126")
-
-const COLOR_LOCK_UNKNOWN := Color("4a2d64")
-const COLOR_LOCK_OPEN := Color("2d66c4")
-const COLOR_LOCK_LOCKED := Color("111111")
-const COLOR_LOCK_HACKED := Color("b3262e")
 
 var mobility_controller: MobilityController = null
 var _guard_revealed: bool = true
@@ -63,13 +46,13 @@ func setup(signal_wrapper: ActiveSignal):
 	if my_data != null and my_data.detection != null and my_active_sig != null:
 		my_data.detection.initialize_runtime(my_active_sig)
 
-	tooltip_main_initial_x = tooltip_main.size.x
-	tooltip_main_initial_y = tooltip_main.size.y
+#	tooltip_main_initial_x = tooltip_main.size.x
+#	tooltip_main_initial_y = tooltip_main.size.y
 
 
 	initialize_tooltip()
 	refresh_status_panels()
-	set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+	tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
 
 	detection_controller.initialize(self)
 	_setup_mobility(signal_wrapper)
@@ -172,10 +155,10 @@ func scan_cleanup():
 	scan_radial.visible = false
 	if my_active_sig != null:
 		refresh_scan_status()
-		set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+		tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
 
 func initialize_tooltip():
-	tooltip_header.text = my_data.display_name
+	tooltip_main.tt_header.text = my_data.display_name
 
 	var layers = my_active_sig.scan_layers
 	for layer in layers:
@@ -183,60 +166,12 @@ func initialize_tooltip():
 			append_tooltip(layer.description)
 
 func append_tooltip(info: String):
-	tooltip_body.text += info + "\n"
+	tooltip_main.tt_body.text += info + "\n"
 
 func show_tooltip():
 	tooltip_main.show()
 	refresh_status_panels()
-	set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
-
-func set_tooltip_collapsed(collapsed: bool):
-	tooltip_main.show()
-	tooltip_body_box.visible = not collapsed
-	tooltip_body.visible = not collapsed
-	tooltip_active_scan.visible = true
-	tooltip_lock_state.visible = true
-	tooltip_main.size.x = tooltip_main_initial_x
-
-func refresh_status_panels():
-	refresh_scan_status()
-	refresh_lock_status()
-
-func refresh_scan_status():
-	if my_active_sig == null:
-		return
-
-	if my_active_sig.is_being_scanned and my_active_sig.current_scan_index < my_active_sig.scan_layers.size():
-		_set_panel_state(tooltip_active_scan, tooltip_active_scan_text, "SCANNING", COLOR_STATUS_SCANNING)
-		return
-
-	if my_active_sig.scan_layers.is_empty() or my_active_sig.current_scan_index >= my_active_sig.scan_layers.size():
-		_set_panel_state(tooltip_active_scan, tooltip_active_scan_text, "COMPLETE", COLOR_STATUS_COMPLETE)
-		return
-
-	if my_active_sig.current_scan_index > 0:
-		_set_panel_state(tooltip_active_scan, tooltip_active_scan_text, "PARTIAL", COLOR_STATUS_PARTIAL)
-		return
-
-	_set_panel_state(tooltip_active_scan, tooltip_active_scan_text, "UNKNOWN", COLOR_STATUS_UNKNOWN)
-
-func refresh_lock_status():
-	if my_active_sig == null:
-		return
-
-	if not _is_access_layer_revealed():
-		_set_panel_state(tooltip_lock_state, tooltip_lock_state_text, "UNKNOWN", COLOR_LOCK_UNKNOWN)
-		return
-
-	if my_data == null or my_data.puzzle == null:
-		_set_panel_state(tooltip_lock_state, tooltip_lock_state_text, "OPEN", COLOR_LOCK_OPEN)
-		return
-
-	if my_data.puzzle.puzzle_locked:
-		_set_panel_state(tooltip_lock_state, tooltip_lock_state_text, "LOCKED", COLOR_LOCK_LOCKED)
-		return
-
-	_set_panel_state(tooltip_lock_state, tooltip_lock_state_text, "HACKED", COLOR_LOCK_HACKED)
+	tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
 
 func _is_access_layer_revealed() -> bool:
 	if my_active_sig == null:
@@ -246,19 +181,71 @@ func _is_access_layer_revealed() -> bool:
 			return layer.revealed
 	return false
 
-func _set_panel_state(panel: PanelContainer, label: Label, text: String, color: Color):
-	if panel == null or label == null:
-		return
-	var base_style := panel.get_theme_stylebox("panel")
-	var style: StyleBoxFlat
-	if base_style is StyleBoxFlat:
-		style = (base_style as StyleBoxFlat).duplicate()
-	else:
-		style = StyleBoxFlat.new()
-	style.bg_color = color
-	panel.add_theme_stylebox_override("panel", style)
-	label.text = text
+func _is_ic_layer_revealed() -> bool:
+	if my_active_sig == null:
+		return false
+	for layer in my_active_sig.scan_layers:
+		if layer.name == "IC":
+			return layer.revealed
+	return false
 
+
+func refresh_status_panels():
+	refresh_scan_status()
+	refresh_lock_status()
+	refresh_ic_status()
+
+enum IconState { UNKNOWN_SCAN, UNKNOWN_LOCK, SCANNING, PARTIAL, COMPLETE, OPEN, LOCKED, HACKED, NO_IC, ACTIVE_IC }
+
+func refresh_scan_status():
+	if my_active_sig == null:
+		return
+
+	if my_active_sig.is_being_scanned and my_active_sig.current_scan_index < my_active_sig.scan_layers.size():
+		tooltip_main.set_panel_state(tooltip_main.tt_scan_icon, IconState.SCANNING)
+		return
+
+	if my_active_sig.scan_layers.is_empty() or my_active_sig.current_scan_index >= my_active_sig.scan_layers.size():
+		tooltip_main.set_panel_state(tooltip_main.tt_scan_icon, IconState.COMPLETE)
+		return
+
+	if my_active_sig.current_scan_index > 0:
+		tooltip_main.set_panel_state(tooltip_main.tt_scan_icon, IconState.PARTIAL)
+		return
+
+	tooltip_main.set_panel_state(tooltip_main.tt_scan_icon, IconState.UNKNOWN_SCAN)
+
+func refresh_lock_status():
+	if my_active_sig == null:
+		return
+
+	if not _is_access_layer_revealed():
+		tooltip_main.set_panel_state(tooltip_main.tt_lock_icon, IconState.UNKNOWN_LOCK)
+		return
+
+	if my_data == null or my_data.puzzle == null:
+		tooltip_main.set_panel_state(tooltip_main.tt_lock_icon, IconState.OPEN)
+		return
+
+	if my_data.puzzle.puzzle_locked:
+		tooltip_main.set_panel_state(tooltip_main.tt_lock_icon, IconState.LOCKED)
+		return
+
+	tooltip_main.set_panel_state(tooltip_main.tt_lock_icon, IconState.HACKED)
+
+func refresh_ic_status():
+	if not _is_ic_layer_revealed(): return
+
+	if my_active_sig == null:
+		return
+
+	if my_data.ic_modules.modules.size() <= 0:
+		tooltip_main.set_panel_state(tooltip_main.tt_ic_icon, IconState.NO_IC)
+		return
+
+	elif my_data.ic_modules.modules.size() > 0:
+		tooltip_main.set_panel_state(tooltip_main.tt_ic_icon, IconState.ACTIVE_IC)
+		return
 
 func bring_to_front():
 	var parent = get_parent()
@@ -296,18 +283,13 @@ func get_focus_rect() -> Rect2:
 	var center := get_global_transform_with_canvas().origin
 	return Rect2(center - (local_size * 0.5), local_size)
 
-func get_lock_state_focus_rect() -> Rect2:
-	if tooltip_lock_state == null or not tooltip_lock_state.is_visible_in_tree():
-		return Rect2()
-	return tooltip_lock_state.get_global_rect()
-
 
 func show_scanning_tooltip():
 	if my_active_sig != null:
 		refresh_scan_status()
-		set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+		tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
 
 func show_scan_complete():
 	if my_active_sig != null:
 		refresh_status_panels()
-		set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+		tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)

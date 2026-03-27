@@ -40,7 +40,7 @@ signal deactivate_null_spike()
 
 signal tutorial_lock_changed(locked: bool)
 signal tutorial_feature_changed(feature_key: String, enabled: bool)
-
+signal show_codex_popup(codex_id: StringName, signal_data: SignalData)
 var first_null_spike = false
 
 # PUZZLE EVENTS
@@ -109,3 +109,4 @@ func is_tutorial_feature_enabled(feature_key: String) -> bool:
 	if feature_key.is_empty():
 		return true
 	return _tutorial_feature_flags.get(feature_key, true)
+	

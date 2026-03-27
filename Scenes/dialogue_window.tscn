@@ -4,7 +4,7 @@
 [ext_resource type="StyleBox" uid="uid://chg2qawtivc2b" path="res://Resources/StyleBox/TitleBarStyleBox.tres" id="1_td3r8"]
 [ext_resource type="Theme" uid="uid://discgqqbkpb5x" path="res://Resources/StyleBox/MainTheme.tres" id="2_gax6d"]
 [ext_resource type="Texture2D" uid="uid://lp58pd51rai4" path="res://Visuals/Portraits/8-bit_blackjack_close.png" id="4_4pfxs"]
-[ext_resource type="Texture2D" uid="uid://dcyv1i0jnyq7f" path="res://Visuals/play-button (1).svg" id="4_63p5y"]
+[ext_resource type="Texture2D" uid="uid://dcyv1i0jnyq7f" path="res://Visuals/Icons/Simple/play-button.svg" id="4_63p5y"]
 [ext_resource type="FontFile" uid="uid://1ed0s1dhilyg" path="res://Visuals/Fonts/ShareTechMono-Regular.ttf" id="5_ypsy0"]
 
 [sub_resource type="SystemFont" id="SystemFont_63p5y"]

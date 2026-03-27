@@ -8,8 +8,8 @@ func get_desc():
 	var desc: String = "Reboot(%ds)" % reboot_time
 	return desc
 
-func _init():
-	pass
+func get_codex_id():
+	return &"codex_reboot"
 
 func on_disabled(active_sig: ActiveSignal):
 	print("Rebooting signal in %s seconds" % reboot_time)

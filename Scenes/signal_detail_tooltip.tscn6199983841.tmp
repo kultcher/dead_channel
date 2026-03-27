@@ -1,0 +1,123 @@
+[gd_scene format=3 uid="uid://dfbl7tsxqd446"]
+
+[ext_resource type="Script" uid="uid://bagu8mxpp1lr" path="res://Scripts/signal_detail_tooltip.gd" id="1_0k24o"]
+[ext_resource type="FontFile" uid="uid://b0472lemon553" path="res://Visuals/Fonts/KodeMono-Bold.ttf" id="1_c086v"]
+[ext_resource type="Texture2D" uid="uid://cc78h6ascgeet" path="res://Visuals/Icons/Simple/radar-blank.svg" id="2_c7hs0"]
+[ext_resource type="Texture2D" uid="uid://ce1a7oxkca27p" path="res://Visuals/Icons/Simple/plain-padlock.svg" id="3_0k24o"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ea3pi"]
+bg_color = Color(0.0627451, 0.0627451, 0.0627451, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+expand_margin_left = 1.0
+expand_margin_top = 1.0
+expand_margin_right = 5.0
+expand_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6hws6"]
+bg_color = Color(0.22091639, 0.44796598, 0.97496897, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7dtr8"]
+bg_color = Color(0.078431375, 0.011764706, 0.17254902, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8854879, 0.33361515, 0.025840001, 1)
+
+[node name="DetailTooltip" type="PanelContainer" unique_id=337901490]
+self_modulate = Color(1, 1, 1, 0.5)
+z_index = 200
+anchors_preset = 10
+anchor_right = 1.0
+offset_right = -1818.0
+offset_bottom = 45.0
+grow_horizontal = 2
+size_flags_horizontal = 10
+size_flags_vertical = 10
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ea3pi")
+script = ExtResource("1_0k24o")
+
+[node name="TooltipHbox" type="HBoxContainer" parent="." unique_id=113857911]
+layout_mode = 2
+
+[node name="TooltipVBox" type="VBoxContainer" parent="TooltipHbox" unique_id=1209469793]
+layout_mode = 2
+
+[node name="HeaderPanel" type="PanelContainer" parent="TooltipHbox/TooltipVBox" unique_id=408525704]
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_6hws6")
+
+[node name="MarginContainer" type="MarginContainer" parent="TooltipHbox/TooltipVBox/HeaderPanel" unique_id=1859253736]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 5
+
+[node name="HeaderText" type="Label" parent="TooltipHbox/TooltipVBox/HeaderPanel/MarginContainer" unique_id=1020932274]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_fonts/font = ExtResource("1_c086v")
+text = "???"
+horizontal_alignment = 1
+
+[node name="IconsHBox" type="HBoxContainer" parent="TooltipHbox/TooltipVBox" unique_id=111364366]
+layout_mode = 2
+alignment = 1
+
+[node name="ActiveScanPanel" type="PanelContainer" parent="TooltipHbox/TooltipVBox/IconsHBox" unique_id=1045182253]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_7dtr8")
+
+[node name="ScanMargin" type="MarginContainer" parent="TooltipHbox/TooltipVBox/IconsHBox/ActiveScanPanel" unique_id=1593288039]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 5
+
+[node name="ActiveScanIcon" type="TextureRect" parent="TooltipHbox/TooltipVBox/IconsHBox/ActiveScanPanel/ScanMargin" unique_id=1872256223]
+self_modulate = Color(0.39215687, 0.39215687, 0.39215687, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("2_c7hs0")
+expand_mode = 1
+
+[node name="LockStatePanel" type="PanelContainer" parent="TooltipHbox/TooltipVBox/IconsHBox" unique_id=500692026]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_7dtr8")
+
+[node name="LockMargin" type="MarginContainer" parent="TooltipHbox/TooltipVBox/IconsHBox/LockStatePanel" unique_id=1179412567]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 5
+
+[node name="LockStateIcon" type="TextureRect" parent="TooltipHbox/TooltipVBox/IconsHBox/LockStatePanel/LockMargin" unique_id=1172675590]
+self_modulate = Color(0.39215687, 0.39215687, 0.39215687, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("3_0k24o")
+expand_mode = 1
+
+[node name="BodyBox" type="BoxContainer" parent="TooltipHbox" unique_id=498601959]
+layout_mode = 2
+
+[node name="BodyText" type="RichTextLabel" parent="TooltipHbox/BodyBox" unique_id=1795723363]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+fit_content = true
+autowrap_mode = 0

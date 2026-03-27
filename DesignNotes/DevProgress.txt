@@ -51,10 +51,8 @@ Development Progress
 
 Short-term TODO:
 - add death state
-- Add IC tutorial popup
-- Add extra gauntlet before lab
-- Add heat generation null spike
-- Cleanup signal tooltips
+- Maybe Add extra gauntlet before lab
+- Finalize signal tooltips, fix right click behavior
 - Rework UI
 
 Polish TODO:

@@ -19,7 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://bsp50rqqai1yc" path="res://Visuals/digital_background.png" id="12_0p2ub"]
 [ext_resource type="Shader" uid="uid://c16vuww6jgbkf" path="res://Shaders/circuits.gdshader" id="13_d5u5a"]
 [ext_resource type="Texture2D" uid="uid://b77pho6a4a6dm" path="res://Visuals/digital_toplayer.png" id="14_d5u5a"]
-[ext_resource type="Shader" uid="uid://da2dfyfkllxrp" path="res://Visuals/Icons/digital_glitch.gdshader" id="18_3deqw"]
+[ext_resource type="Shader" uid="uid://da2dfyfkllxrp" path="res://Shaders/digital_glitch.gdshader" id="18_3deqw"]
 [ext_resource type="Script" uid="uid://cbv73pnuu78pw" path="res://Scripts/cutscene_controller.gd" id="18_3xdhw"]
 [ext_resource type="Texture2D" uid="uid://bilm8u1f271kd" path="res://Visuals/NullSpikeKeyPH.png" id="20_26ak2"]
 [ext_resource type="Texture2D" uid="uid://0s1a4ceed6us" path="res://Visuals/glitch_screen2.png" id="21_1rh14"]
@@ -177,10 +177,10 @@ script = ExtResource("5_wudor")
 [node name="FocusOverlay" parent="WindowManager" unique_id=2047983454 instance=ExtResource("8_4ll5g")]
 
 [node name="ObjectiveTracker" parent="WindowManager" unique_id=1310032324 instance=ExtResource("9_2sk7x")]
-offset_left = 1450.0
+offset_left = 1144.0
 offset_top = 750.0
-offset_right = 1880.0
-offset_bottom = 864.0
+offset_right = 1480.0
+offset_bottom = 1012.0
 
 [node name="HelpOverlay" parent="WindowManager" unique_id=1226732366 instance=ExtResource("10_ki4rb")]
 visible = false

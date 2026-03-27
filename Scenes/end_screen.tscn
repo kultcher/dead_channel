@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dg5e7i346t7vd"]
 
-[ext_resource type="Shader" uid="uid://da2dfyfkllxrp" path="res://Visuals/Icons/digital_glitch.gdshader" id="1_bhpww"]
+[ext_resource type="Shader" uid="uid://da2dfyfkllxrp" path="res://Shaders/digital_glitch.gdshader" id="1_bhpww"]
 [ext_resource type="Texture2D" uid="uid://bt18bthquxe1b" path="res://Visuals/Icons/null_symbol.png" id="2_gdxnu"]
 [ext_resource type="Shader" uid="uid://b1a4mcnowuyg8" path="res://Shaders/null_spike_sync.gdshader" id="3_8yanq"]
 [ext_resource type="FontFile" uid="uid://b0472lemon553" path="res://Visuals/Fonts/KodeMono-Bold.ttf" id="4_gdxnu"]
