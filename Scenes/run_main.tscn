@@ -104,7 +104,7 @@ script = ExtResource("1_4q6c1")
 
 [node name="TutorialManager" type="Node" parent="." unique_id=755181945]
 script = ExtResource("2_r51ll")
-debug_skip_to_stage = "terminal_dump"
+debug_skip_to_stage = "gauntlet"
 
 [node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
 position = Vector2(0, 50)
@@ -195,6 +195,7 @@ offset_top = 775.0
 offset_right = 89.0
 offset_bottom = 1031.0
 max_value = 5000.0
+step = 0.1
 fill_mode = 3
 texture_under = SubResource("GradientTexture2D_85m8a")
 texture_progress = SubResource("GradientTexture2D_jx6wh")

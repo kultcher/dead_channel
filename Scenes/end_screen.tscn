@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://dg5e7i346t7vd"]
+
+[ext_resource type="Shader" uid="uid://da2dfyfkllxrp" path="res://Visuals/Icons/digital_glitch.gdshader" id="1_bhpww"]
+[ext_resource type="Texture2D" uid="uid://bt18bthquxe1b" path="res://Visuals/Icons/null_symbol.png" id="2_gdxnu"]
+[ext_resource type="Shader" uid="uid://b1a4mcnowuyg8" path="res://Shaders/null_spike_sync.gdshader" id="3_8yanq"]
+[ext_resource type="FontFile" uid="uid://b0472lemon553" path="res://Visuals/Fonts/KodeMono-Bold.ttf" id="4_gdxnu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bhpww"]
+bg_color = Color(0.021434654, 0.021434627, 0.021434633, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fi2y0"]
+shader = ExtResource("1_bhpww")
+shader_parameter/speed = 5.0
+shader_parameter/blur_x = 0.999999977648
+shader_parameter/blur_y = 0.999999977648
+shader_parameter/density = 4.999999910592
+shader_parameter/intensity = 0.1999999955296
+shader_parameter/tear_strength = 0.045
+shader_parameter/noise_strength = 0.08
+shader_parameter/tear_density = 11.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_em7vc"]
+shader = ExtResource("3_8yanq")
+shader_parameter/intensity = 0.02999999932944
+shader_parameter/band_density = 80.0
+shader_parameter/stretch_amount = 0.750000035625
+shader_parameter/jitter_speed = 1.999999955296
+shader_parameter/glow_strength = 0.2999999932944
+shader_parameter/glow_tint = Color(0, 0.7411765, 0.59607846, 1)
+
+[node name="Control" type="PanelContainer" unique_id=317944887]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_bhpww")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=382084521]
+layout_mode = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer" unique_id=1224592235]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/CenterContainer" unique_id=1674380795]
+material = SubResource("ShaderMaterial_fi2y0")
+layout_mode = 2
+texture = ExtResource("2_gdxnu")
+
+[node name="ColorRect" type="ColorRect" parent="VBoxContainer/CenterContainer" unique_id=1129234871]
+material = SubResource("ShaderMaterial_em7vc")
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer" unique_id=1705265466]
+self_modulate = Color(0, 0, 0, 1)
+z_index = 100
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/PanelContainer" unique_id=1635654001]
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/PanelContainer/VBoxContainer" unique_id=465216801]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.15
+theme_override_colors/font_shadow_color = Color(0.8784314, 0.5254902, 1, 0.3764706)
+theme_override_constants/shadow_outline_size = 5
+theme_override_fonts/normal_font = ExtResource("4_gdxnu")
+theme_override_font_sizes/bold_font_size = 36
+bbcode_enabled = true
+text = "[b]NULL SIGNAL[/b]"
+horizontal_alignment = 1
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="VBoxContainer/PanelContainer/VBoxContainer" unique_id=1624611796]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_shadow_color = Color(0.8784314, 0.5254902, 1, 0.3764706)
+theme_override_constants/shadow_outline_size = 5
+theme_override_fonts/normal_font = ExtResource("4_gdxnu")
+theme_override_font_sizes/bold_font_size = 36
+bbcode_enabled = true
+text = "Coming someday maybe.
+
+More signal types.
+More IC.
+Advanced terminal commands.
+Active and passive programs.
+Unique megacorps to raid.
+A campaign mode!?"
+horizontal_alignment = 1

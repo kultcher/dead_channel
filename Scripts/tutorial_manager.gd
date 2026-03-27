@@ -492,6 +492,16 @@ func _run_gauntlet_sequence():
 		"K  i  d  !  ?  .  .  .\n  D  i  s  c  o  n  n  e  c  t  !"
 	],  "", Rect2(), Vector2(50,300), true)
 
+	await get_tree().create_timer(2).timeout
+
+	signal_manager.hide_signals()
+	timeline_manager.toggle_null_spike()
+	await cutscene_controller.play_reverse_glitch_transition(2.0)
+	await get_tree().create_timer(.5).timeout
+
+	get_tree().change_scene_to_file("res://Scenes/end_screen.tscn")
+
+
 # "BEFORE THE ghosts clipped off and left us to drift in the world they built for us."
 
 
@@ -501,15 +511,21 @@ func null_spike_sync_sequence():
 	if window != null:
 		window.queue_free()
 
+	_enable_feature("scan", false)
+	Input.set_default_cursor_shape(Input.CURSOR_FORBIDDEN)
+
 	var sync_text := FileAccess.get_file_as_string(NULL_SPIKE_SYNC_PATH)
-	var sync_duration = terminal_window.estimate_type_duration(sync_text, 0.01)
+	var sync_duration = terminal_window.estimate_type_duration(sync_text, 0.02)
+	print(sync_duration)
 	cutscene_controller.start_first_null_spike_sync(sync_duration)
-	await terminal_window.play_null_spike_sync(sync_text, 0.01)
-#	await cutscene_controller.null_spike_sync_finished
+	await terminal_window.play_null_spike_sync(sync_text, 0.02)
+	await cutscene_controller.null_spike_sync_finished
 #	NOTE: Be careful if we change timings
 	GlobalEvents.first_null_spike = false
 	timeline_manager.toggle_null_spike()
-	
+	Input.set_default_cursor_shape(Input.CURSOR_ARROW)
+
+	_enable_feature("scan", true)
 
 
 func _prepare_debug_stage_door_01() -> void:

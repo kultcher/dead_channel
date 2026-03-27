@@ -23,7 +23,10 @@ func _ready():
 
 func _process(delta):
 	queue_redraw()
-	time_elapsed += delta
+	if timeline_manager.null_spike_active:
+		time_elapsed += delta * 2
+	else:
+		time_elapsed += delta
 	_update_runner_team_position()
 	var display_string = "Current cell pos:%.1f" % floor(timeline_manager.current_cell) + "Time elapsed: %.1f" % time_elapsed
 	debug_label.text = display_string

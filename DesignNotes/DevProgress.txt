@@ -50,10 +50,10 @@ Development Progress
 - Much tutorial building, including cutscene implementation
 
 Short-term TODO:
-- Add "zoom out" for gauntlet
+- add death state
 - Add IC tutorial popup
-- Add null spike init and gauntlet
-- Fade to logo
+- Add extra gauntlet before lab
+- Add heat generation null spike
 - Cleanup signal tooltips
 - Rework UI
 
