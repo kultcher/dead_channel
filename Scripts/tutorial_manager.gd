@@ -70,13 +70,17 @@ func _run_tutorial_sequence() -> void:
 			await _run_cam_02_intro_sequence()
 
 func _run_intro_sequence() -> void:
+	_set_runner_cell(-3)
 	_acquire_runner_hold("intro")
+	signal_manager.hide_signals()
 	_set_cutscene_black_screen(true)
 	await _show_dialogue([
 		"All right kid, you ready for the real deal?"
 	], "", Rect2(), Vector2(750, 300), true)
 
 	await cutscene_controller.play_intro_glitch_transition(3)
+	signal_manager.show_signals()
+
 	await _show_dialogue([
 		"Just like the sims, right? Only if you fuck it up, it might actually get me killed. No pressure.",
 		"Don't sweat it, should be a milk run. We'll take it nice and slow, and not just because I'm getting old."
@@ -260,6 +264,8 @@ func _run_lab_reveal_sequence() -> void:
 	], "", Rect2(), Vector2(750,300), true)
 
 	await get_tree().create_timer(1).timeout
+
+	signal_manager.hide_signals()
 	await cutscene_controller.play_reverse_glitch_transition(2.0)
 
 	await _show_dialogue([
@@ -332,6 +338,7 @@ func _run_alarm_sequence():
 	_release_runner_hold("null_terminal_gate_02")
 
 	await cutscene_controller.play_cutscene_return_transition(2.5, 1)
+	signal_manager.show_signals()
 
 	# killer drone setup
 	var c_drone = _get_active_signal("c_drone_01").data
@@ -444,7 +451,7 @@ func _run_gauntlet_sequence():
 	_acquire_runner_hold("pre_gauntlet_03")
 	_show_dialogue([
 		"This is it. Cross your fingers and hit the Spike.\nReady when you are."
-	])
+	], "", Rect2(), Vector2(750,300), true)
 	_set_objective("- Press Left Shift to activate the Null Spike
 - Use your tools to help Blackjack get past the drones
 - RUN sniff or RUN decrypt to access locked signals
@@ -454,20 +461,56 @@ func _run_gauntlet_sequence():
 	_enable_feature("null_spike", true)
 	await GlobalEvents.activate_first_null_spike
 	# disable null spike while running sync sequence
-	_enable_feature("null_spike", false)
 	_release_runner_hold("pre_gauntlet_03")
 
 	await null_spike_sync_sequence()
+	_enable_feature("null_spike", false)
 
-func null_spike_sync_sequence():
-	var sync_text := FileAccess.get_file_as_string(NULL_SPIKE_SYNC_PATH)
+	await _wait_for_cell(47.5)
 
-	terminal_window.switch_session(terminal_window.root_signal)
-	await terminal_window.type_text_with_delay(terminal_window.history, sync_text, .01)
+	#NOTE: Delay logic temporarily hacky
+	_show_dialogue([
+		"H  o  l  y\n    s  h  i  t  .  .  ."
+	], "", Rect2(), Vector2(50,300), true)
 
-	timeline_manager.activate_null_spike()
+	await _wait_for_cell(49.5)
+
+	_show_dialogue([
+		"Y  o  u  '  r  e\n    a  c  t  u  a  l  l  y\n    d  o  i  n  g    i  t  .  .  ."
+	],  "", Rect2(), Vector2(50,300), true)
+
+	await _wait_for_cell(52)
+	_acquire_runner_hold("end")
+
+	_show_dialogue([
+		"I  '  m    h  e  r  e  .  .  .\nY  o  u    n  e  e  d    t  o\nd  i  s  c  o  n  n  e  c  t"
+	],  "", Rect2(), Vector2(50,300), true)
+
+	await get_tree().create_timer(2).timeout
+	
+	_show_dialogue([
+		"K  i  d  !  ?  .  .  .\n  D  i  s  c  o  n  n  e  c  t  !"
+	],  "", Rect2(), Vector2(50,300), true)
 
 # "BEFORE THE ghosts clipped off and left us to drift in the world they built for us."
+
+
+func null_spike_sync_sequence():
+	# clear remaining dialogue window if necessary
+	var window = window_manager.find_child("DialogueWindow", true, false)
+	if window != null:
+		window.queue_free()
+
+	var sync_text := FileAccess.get_file_as_string(NULL_SPIKE_SYNC_PATH)
+	var sync_duration = terminal_window.estimate_type_duration(sync_text, 0.01)
+	cutscene_controller.start_first_null_spike_sync(sync_duration)
+	await terminal_window.play_null_spike_sync(sync_text, 0.01)
+#	await cutscene_controller.null_spike_sync_finished
+#	NOTE: Be careful if we change timings
+	GlobalEvents.first_null_spike = false
+	timeline_manager.toggle_null_spike()
+	
+
 
 func _prepare_debug_stage_door_01() -> void:
 	_set_cutscene_black_screen(false)
@@ -513,6 +556,7 @@ func _prepare_debug_stage_null_door() -> void:
 	_enable_feature("terminal_commands")
 
 func _prepare_debug_stage_lab_reveal() -> void:
+	signal_manager.hide_signals()
 	_set_cutscene_black_screen(false)
 	window_manager.auto_focus_puzzles = false
 	_set_runner_cell(24.9)
@@ -525,6 +569,7 @@ func _prepare_debug_stage_lab_reveal() -> void:
 	_set_objective("")
 
 func _prepare_debug_stage_terminal_dump() -> void:
+	signal_manager.hide_signals()
 	_set_cutscene_black_screen(false)
 	window_manager.auto_focus_puzzles = false
 	_set_runner_cell(25.0)
@@ -543,12 +588,15 @@ func _prepare_debug_stage_terminal_dump() -> void:
 	cutscene_controller.play_still_reveal(0.01)
 
 func _prepare_debug_stage_alarm() -> void:
+	signal_manager.hide_signals()
+	window_manager.auto_focus_puzzles = false
 	_prepare_debug_stage_terminal_dump()
 	terminal_window.clear_log()
 	terminal_window.z_index = 0
 
 func _prepare_debug_pre_gauntlet() -> void:
 	# NOTE: Make sure there's no weird floating texture changes
+	window_manager.auto_focus_puzzles = false
 	cutscene_controller.hide()
 	_enable_feature("scan")
 	_enable_feature("connect")
@@ -805,6 +853,7 @@ func _cam_02_kill_or_hustle(active_signal: ActiveSignal) -> String:
 	return result
 
 func _runner_detected_dialogue():
+	# NOTE: Might need to add cell gating here to keep this from firing later
 	_show_dialogue([
 		"Agh, it pinged me. Shouldn't be a problem. Quick glances don't build much heat."
 		], "", Rect2(), Vector2(750, 300), true, 12
@@ -837,6 +886,7 @@ func _disable_tutorial_features() -> void:
 	_enable_feature("null_spike", false)
 
 func _enable_feature(feature_key: String, enabled: bool = true) -> void:
+	print("Changed: ", feature_key, enabled)
 	GlobalEvents.set_tutorial_feature_enabled(feature_key, enabled)
 
 func _acquire_runner_hold(hold_key: String) -> void:

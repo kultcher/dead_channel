@@ -107,6 +107,13 @@ func update_signal_position():
 				active_sig.instance_node.queue_free()
 				active_sig.instance_node = null
 
+func hide_signals():
+	hide()
+
+func show_signals():
+	show()
+
+
 func _on_signal_left_clicked(active_sig: ActiveSignal):
 	if not GlobalEvents.is_tutorial_feature_enabled("connect"):
 		return

@@ -121,7 +121,7 @@ func _process(delta: float) -> void:
 func _get_visual_facing_deg() -> float:
 	if my_active_sig == null:
 		return 0.0
-	if my_data != null and my_data.type == SignalData.Type.DRONE:
+	if my_data != null and (my_data.type == SignalData.Type.DRONE or my_data.type == SignalData.Type.CAMERA):
 		return my_active_sig.runtime_detection_facing_deg
 	return my_active_sig.runtime_body_facing_deg
 
@@ -280,10 +280,11 @@ func _on_area_2d_mouse_exited() -> void:
 	scan_aborted.emit(my_active_sig)
 
 func _on_detail_tooltip_resized() -> void:
+	#NOTE: Not needed?
 	# reposition tooltip based on new size
 	if !is_node_ready(): return
 	tooltip_main.position.x = (tooltip_main.size.x / 2) * -1
-	tooltip_main.position.y = -tooltip_main.size.y - tooltip_gap_y
+#	tooltip_main.position.y = -tooltip_main.size.y - tooltip_gap_y
 
 func get_focus_rect() -> Rect2:
 	var icon_shape: CollisionShape2D = $SignalIcon/IconCollision

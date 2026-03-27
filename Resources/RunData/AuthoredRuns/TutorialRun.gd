@@ -54,8 +54,8 @@ func get_spawns() -> Array[Dictionary]:
 			"add_ic_modules": [make_faraday_module(3)]}),
 
 		build_spawn(COMBAT_DRONE, 46.5, {"system_id": "c_drone_03", "lane": 2,
-			"patrol_points": make_patrol_route([46.5, 1, 3, 0], [46.5, 4, 3, 0])
-		}),	
+			"patrol_points": make_patrol_route([46.5, 1, 3, 0], [46.5, 4, 3, 0]),
+			"puzzle": make_sniff_puzzle(1)}),
 
 		build_spawn(BASIC_DISRUPTOR, 47.5, {"system_id": "coolant_vent_08", "lane": 0}),
 
@@ -78,5 +78,5 @@ func get_spawns() -> Array[Dictionary]:
 			"add_ic_modules": [make_reboot_module(10)],
 		}),
 		
-		build_spawn(BASIC_TERMINAL, 51.5, {"system_id": "override_terminal", "puzzle": make_decrypt_puzzle(1)}),
+		build_spawn(BASIC_TERMINAL, 52.5, {"system_id": "override_terminal", "puzzle": make_decrypt_puzzle(1)}),
 	]

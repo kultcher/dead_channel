@@ -1,20 +1,32 @@
 extends PanelContainer
 
+const NULL_SPIKE_SYNC_SHADER = preload("res://Shaders/null_spike_sync.gdshader")
+
 @onready var glitch_texture = $CutsceneGlitchTexture
 @onready var key_texture = $CutsceneKeyTexture
 @onready var black_fade = $CutsceneRect
 @onready var strobe_rect = $StrobeRect
 @onready var flash_rect = $FlashRect
+@onready var null_spike_sync_wash = $NullSpikeSyncWash
+@onready var null_spike_sync_overlay = $"../SignalTimeline/NullSpikeSyncOverlay"
 
 var _alarm_tween: Tween
 var _alarm_active := false
 var _base_glitch_texture: Texture2D
 var _damage_pulse_tween: Tween
+var _null_spike_sync_tween: Tween
+var _null_spike_active_tween: Tween
+var _null_spike_active_visual_enabled := false
+
+signal null_spike_sync_finished
 
 func _ready() -> void:
 	if glitch_texture != null:
 		_base_glitch_texture = glitch_texture.texture
 	GlobalEvents.runners_damaged.connect(_on_runners_damaged)
+	GlobalEvents.activate_null_spike.connect(_on_activate_null_spike)
+	GlobalEvents.deactivate_null_spike.connect(_on_deactivate_null_spike)
+	_setup_null_spike_sync_layers()
 
 func set_black_screen(enabled: bool) -> void:
 	visible = enabled
@@ -318,6 +330,129 @@ func play_null_spike_init_transition() -> void:
 	_reset_alarm_visuals()
 	visible = false
 
+func start_first_null_spike_sync(total_duration: float = 4.8) -> void:
+	visible = true
+	set_self_modulate(Color(1,1,1,0))
+
+	_set_black_fade_alpha(0.0)
+	_set_sync_overlay_visible(true)
+	_set_sync_overlay_intensity(0.25)
+	_set_sync_overlay_band_density(3.0)
+	_set_sync_overlay_stretch(0.065)
+	_set_sync_overlay_speed(0.8)
+	_set_sync_overlay_glow(0.4)
+	_set_sync_wash_alpha(0.01)
+
+
+	var total := maxf(5.0, total_duration)
+	var phase_1 := 1.05
+	var pulse_1 := 0.4
+	var phase_2 := 1.2
+	var pulse_2 := 0.45
+	var phase_3 := 0.75
+	var pulse_3 := 0.35
+	var phase_4 := maxf(0.8, total - (phase_1 + pulse_1 + phase_2 + pulse_2 + phase_3 + pulse_3))
+
+	_null_spike_sync_tween = create_tween()
+	_null_spike_sync_tween.finished.connect(_finish_first_null_spike_sync)
+	
+	_null_spike_sync_tween.set_parallel(true)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_intensity, 0.25, 0.29, phase_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_speed, 1.8, 4.0, phase_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_stretch, 0.065, 0.11, phase_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_glow, 0.4, 0.62, phase_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_band_density, 56.0, 92.0, phase_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+
+	_null_spike_sync_tween.chain()
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_intensity, 0.29, 0.32, pulse_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_speed, 4.0, 5.6, pulse_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_stretch, 0.11, 0.145, pulse_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_glow, 0.62, 0.82, pulse_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_band_density, 92.0, 118.0, pulse_1).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	_null_spike_sync_tween.chain()
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_intensity, 0.32, 0.36, phase_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_speed, 5.6, 7.8, phase_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_stretch, 0.145, 0.185, phase_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_glow, 0.82, 1.02, phase_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_band_density, 118.0, 156.0, phase_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+	_null_spike_sync_tween.chain()
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_intensity, 0.36, 0.4, pulse_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_speed, 7.8, 10.5, pulse_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_stretch, 0.185, 0.23, pulse_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_glow, 1.02, 1.25, pulse_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_band_density, 156.0, 196.0, pulse_2).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	_null_spike_sync_tween.chain()
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_intensity, 0.4, 0.39, phase_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_speed, 10.5, 14.0, phase_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_stretch, 0.23, 0.25, phase_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_glow, 1.25, 1.45, phase_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_band_density, 196.0, 228.0, phase_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+	_null_spike_sync_tween.chain()
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_intensity, 0.39, 0.33, pulse_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_speed, 14.0, 8.0, pulse_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_stretch, 0.25, 0.12, pulse_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_glow, 1.45, 0.7, pulse_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_band_density, 228.0, 144.0, pulse_3).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+
+	_null_spike_sync_tween.chain()
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_intensity, 0.33, 0.0, phase_4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_speed, 8.0, 1.2, phase_4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_stretch, 0.12, 0.0, phase_4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_glow, 0.7, 0.0, phase_4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_null_spike_sync_tween.tween_method(_set_sync_overlay_band_density, 144.0, 52.0, phase_4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+
+func stop_first_null_spike_sync() -> void:
+	_stop_null_spike_sync_tween()
+	_finish_first_null_spike_sync()
+
+func start_null_spike_active_effect(duration: float = 0.5) -> void:
+	#if _null_spike_sync_tween != null and _null_spike_sync_tween.is_valid():
+	#	return
+
+	_stop_null_spike_active_tween()
+	_null_spike_active_visual_enabled = true
+	visible = true
+	modulate = Color.WHITE
+	_set_black_fade_alpha(0.0)
+	_set_sync_overlay_visible(true)
+	_set_sync_wash_alpha(0.0)
+
+	var tween_duration := maxf(0.05, duration)
+	var active_tween := create_tween()
+	_null_spike_active_tween = active_tween
+	active_tween.set_parallel(true)
+	active_tween.set_ignore_time_scale(true)
+	active_tween.tween_method(_set_sync_overlay_intensity, _get_sync_overlay_intensity(), 0.1, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.tween_method(_set_sync_overlay_band_density, _get_sync_overlay_band_density(), 80.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.tween_method(_set_sync_overlay_stretch, _get_sync_overlay_stretch(), 0.50, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.tween_method(_set_sync_overlay_speed, _get_sync_overlay_speed(), 20.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.tween_method(_set_sync_overlay_glow, _get_sync_overlay_glow(), 0.03, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	#active_tween.tween_method(_set_sync_wash_alpha, 0.0, 0.08, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.finished.connect(_on_null_spike_active_tween_finished.bind(active_tween))
+
+func stop_null_spike_active_effect(duration: float = 0.5) -> void:
+	if _null_spike_sync_tween != null and _null_spike_sync_tween.is_valid():
+		return
+
+	_stop_null_spike_active_tween()
+	_null_spike_active_visual_enabled = false
+
+	var tween_duration := maxf(0.05, duration)
+	var active_tween := create_tween()
+	_null_spike_active_tween = active_tween
+	active_tween.set_parallel(true)
+	active_tween.tween_method(_set_sync_overlay_intensity, _get_sync_overlay_intensity(), 0.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.tween_method(_set_sync_overlay_band_density, _get_sync_overlay_band_density(), 80.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.tween_method(_set_sync_overlay_stretch, _get_sync_overlay_stretch(), 0.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.tween_method(_set_sync_overlay_speed, _get_sync_overlay_speed(), 1.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.tween_method(_set_sync_overlay_glow, _get_sync_overlay_glow(), 0.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	#active_tween.tween_method(_set_sync_wash_alpha, null_spike_sync_wash.color.a if null_spike_sync_wash != null else 0.0, 0.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	active_tween.finished.connect(_on_null_spike_active_tween_finished.bind(active_tween))
+
 func _capture_viewport_texture() -> Texture2D:
 	var viewport := get_viewport()
 	if viewport == null:
@@ -344,6 +479,25 @@ func _capture_viewport_texture() -> Texture2D:
 		return null
 	return ImageTexture.create_from_image(image)
 
+func _setup_null_spike_sync_layers() -> void:
+	if null_spike_sync_wash != null:
+		null_spike_sync_wash.visible = false
+		null_spike_sync_wash.color = Color(0.62, 1.0, 1.0, 0.0)
+	if null_spike_sync_overlay != null:
+		null_spike_sync_overlay.color = Color.WHITE
+		null_spike_sync_overlay.z_index = 100
+		var sync_material := null_spike_sync_overlay.material as ShaderMaterial
+		if sync_material == null:
+			sync_material = ShaderMaterial.new()
+			sync_material.shader = NULL_SPIKE_SYNC_SHADER
+			null_spike_sync_overlay.material = sync_material
+		null_spike_sync_overlay.visible = false
+		_set_sync_overlay_intensity(0.0)
+		_set_sync_overlay_band_density(80.0)
+		_set_sync_overlay_stretch(0.0)
+		_set_sync_overlay_speed(1.0)
+		_set_sync_overlay_glow(0.0)
+
 func _set_black_fade_alpha(alpha: float) -> void:
 	if black_fade == null:
 		return
@@ -364,6 +518,79 @@ func _set_glitch_intensity(intensity: float) -> void:
 	if texture_material == null:
 		return
 	texture_material.set_shader_parameter("intensity", clampf(intensity, 0.0, 1.0))
+
+func _set_sync_overlay_visible(is_visible: bool) -> void:
+	if null_spike_sync_overlay == null:
+		return
+	null_spike_sync_overlay.visible = is_visible
+
+func _set_sync_overlay_intensity(intensity: float) -> void:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return
+	sync_material.set_shader_parameter("intensity", clampf(intensity, 0.0, 1.0))
+
+func _get_sync_overlay_intensity() -> float:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return 0.0
+	return float(sync_material.get_shader_parameter("intensity"))
+
+func _set_sync_overlay_band_density(value: float) -> void:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return
+	sync_material.set_shader_parameter("band_density", maxf(1.0, value))
+
+func _get_sync_overlay_band_density() -> float:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return 80.0
+	return float(sync_material.get_shader_parameter("band_density"))
+
+func _set_sync_overlay_stretch(value: float) -> void:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return
+	sync_material.set_shader_parameter("stretch_amount", maxf(0.0, value))
+
+func _get_sync_overlay_stretch() -> float:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return 0.0
+	return float(sync_material.get_shader_parameter("stretch_amount"))
+
+func _set_sync_overlay_speed(value: float) -> void:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return
+	sync_material.set_shader_parameter("jitter_speed", maxf(0.0, value))
+
+func _get_sync_overlay_speed() -> float:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return 1.0
+	return float(sync_material.get_shader_parameter("jitter_speed"))
+
+func _set_sync_overlay_glow(value: float) -> void:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return
+	sync_material.set_shader_parameter("glow_strength", maxf(0.0, value))
+
+func _get_sync_overlay_glow() -> float:
+	var sync_material := _get_sync_overlay_material()
+	if sync_material == null:
+		return 0.0
+	return float(sync_material.get_shader_parameter("glow_strength"))
+
+func _set_sync_wash_alpha(alpha: float) -> void:
+	if null_spike_sync_wash == null:
+		return
+	null_spike_sync_wash.visible = alpha > 0.001
+	var color = null_spike_sync_wash.color
+	color.a = clampf(alpha, 0.0, 1.0)
+	null_spike_sync_wash.color = color
 
 func _set_glitch_speed(speed: float) -> void:
 	if glitch_texture == null:
@@ -467,6 +694,56 @@ func _stop_alarm_tween() -> void:
 		_alarm_tween.kill()
 	_alarm_tween = null
 
+func _stop_null_spike_sync_tween() -> void:
+	if _null_spike_sync_tween != null and _null_spike_sync_tween.is_valid():
+		_null_spike_sync_tween.kill()
+	_null_spike_sync_tween = null
+
+func _stop_null_spike_active_tween() -> void:
+	if _null_spike_active_tween != null and _null_spike_active_tween.is_valid():
+		_null_spike_active_tween.kill()
+	_null_spike_active_tween = null
+
+func _finish_first_null_spike_sync() -> void:
+	_stop_null_spike_sync_tween()
+	_set_sync_overlay_visible(false)
+	_set_sync_overlay_intensity(0.0)
+	_set_sync_overlay_band_density(80.0)
+	_set_sync_overlay_stretch(0.0)
+	_set_sync_overlay_speed(1.0)
+	_set_sync_overlay_glow(0.0)
+	_set_sync_wash_alpha(0.0)
+	null_spike_sync_wash.visible = false
+	_set_black_fade_alpha(0.0)
+	if not _alarm_active:
+		visible = false
+	null_spike_sync_finished.emit()
+
+func _on_activate_null_spike() -> void:
+	print("Starting effect")
+	start_null_spike_active_effect()
+
+func _on_deactivate_null_spike() -> void:
+	stop_null_spike_active_effect()
+
+func _on_null_spike_active_tween_finished(finished_tween: Tween) -> void:
+	if _null_spike_active_tween != finished_tween:
+		return
+	_null_spike_active_tween = null
+	if _null_spike_active_visual_enabled:
+		_set_sync_overlay_visible(true)
+		visible = true
+		modulate = Color.WHITE
+		return
+	_set_sync_overlay_visible(false)
+	if not _alarm_active:
+		visible = false
+
+func _get_sync_overlay_material() -> ShaderMaterial:
+	if null_spike_sync_overlay == null:
+		return null
+	return null_spike_sync_overlay.material as ShaderMaterial
+
 func _play_blackout_pulse(fade_duration: float, hold_duration: float = 0.0) -> void:
 	var blackout_tween := create_tween()
 	blackout_tween.tween_method(_set_black_fade_alpha, _get_black_fade_alpha(), 1.0, maxf(0.01, fade_duration))
@@ -479,6 +756,9 @@ func _play_blackout_pulse(fade_duration: float, hold_duration: float = 0.0) -> v
 
 func _reset_alarm_visuals() -> void:
 	_stop_alarm_tween()
+	_stop_null_spike_sync_tween()
+	_stop_null_spike_active_tween()
+	_null_spike_active_visual_enabled = false
 	_set_glitch_intensity(0.0)
 	if glitch_texture != null:
 		glitch_texture.visible = false
@@ -496,5 +776,10 @@ func _reset_alarm_visuals() -> void:
 	if flash_rect != null:
 		flash_rect.visible = false
 		flash_rect.color = Color(1.0, 0.96, 0.96, 0.0)
+	_set_sync_overlay_visible(false)
+	_set_sync_overlay_intensity(0.0)
+	_set_sync_overlay_stretch(0.0)
+	_set_sync_overlay_glow(0.0)
+	_set_sync_wash_alpha(0.0)
 	if not _alarm_active:
 		visible = false

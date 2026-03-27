@@ -35,6 +35,13 @@ func setup_pages(
 	_refresh_page()
 	
 func set_text(text: String):
+	if text.contains(".  .  ."):
+		chat.visible_characters = 0
+		chat.text = text
+		var text_tween = create_tween()
+		await text_tween.tween_property(chat, "visible_characters", text.length(), 2).finished
+		await get_tree().create_timer(1).timeout
+		queue_free()
 	chat.text = text
 
 func _refresh_page():

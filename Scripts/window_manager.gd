@@ -101,7 +101,7 @@ func show_tutorial_dialogue(
 	dialogue_pages: Array[String],
 	focus_rect: Rect2 = Rect2(),
 	default_position: Vector2 = Vector2(),
-	has_custom_position: bool = false
+	has_custom_position: bool = false,
 ) -> Control:
 	var dialogue = dialogue_window_scene.instantiate()
 	dialogue.dismissed.connect(_on_tutorial_dialogue_dismissed)
@@ -113,7 +113,6 @@ func show_tutorial_dialogue(
 func _on_tutorial_dialogue_dismissed() -> void:
 	clear_focus_overlay()
 	GlobalEvents.tutorial_lock_changed.emit(false)
-	GlobalEvents.deactivate_null_spike.emit()
 
 func _puzzle_started(active_sig: ActiveSignal, puzzle_type: PuzzleComponent.Type):
 	var puzzle_window

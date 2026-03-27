@@ -4,11 +4,11 @@
 extends Node2D
 
 # SETTINGS
-@export var BASE_CELLS_PER_SECOND: float = 0.2
+@export var BASE_CELLS_PER_SECOND: float = 0.20
 @export var slow_speed_modifier: float = 0.5
 @export var fast_speed_modifier: float = 2.5
-@export var null_spike_time_scale: float = 0.25
-@export var null_spike_transition_duration: float = 0.5
+@export var null_spike_time_scale: float = 0.5
+@export var null_spike_transition_duration: float = 0.50
 @export var runner_screen_offset_cells: float = 1
 @export var timeline_height_ratio: float = 0.25
 @export var min_timeline_height_px: float = 180.0
@@ -54,7 +54,6 @@ func _ready():
 	GlobalEvents.activate_null_spike.connect(activate_null_spike)
 	GlobalEvents.deactivate_null_spike.connect(deactivate_null_spike)
 	GlobalEvents.tutorial_lock_changed.connect(_on_tutorial_lock_changed)
-
 
 func _process(delta):
 	_handle_input()
@@ -109,6 +108,7 @@ func _handle_input():
 	if Input.is_action_just_pressed("null_spike"):
 		toggle_null_spike()
 
+
 	# runner speed handling
 	current_speed_mult = 1.0
 	if Input.is_action_pressed("ui_left"): 
@@ -127,7 +127,7 @@ func toggle_null_spike():
 	if GlobalEvents.first_null_spike == true:
 		GlobalEvents.activate_first_null_spike.emit()
 		return
-	if tutorial_locked: return
+
 	if null_spike_active:
 		GlobalEvents.deactivate_null_spike.emit()
 	else:
@@ -138,7 +138,6 @@ func deactivate_null_spike():
 	_tween_time_scale(1.0)
 
 func activate_null_spike():
-
 	null_spike_active = true
 	_tween_time_scale(null_spike_time_scale)
 

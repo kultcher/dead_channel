@@ -14,7 +14,6 @@
 [ext_resource type="PackedScene" uid="uid://d2nr1ge8ypq88" path="res://Scenes/focus_overlay.tscn" id="8_4ll5g"]
 [ext_resource type="PackedScene" uid="uid://hjsy8naghiwy" path="res://Scenes/sniff.tscn" id="8_jx6wh"]
 [ext_resource type="PackedScene" uid="uid://cjra5kvci873p" path="res://Scenes/objective_tracker.tscn" id="9_2sk7x"]
-[ext_resource type="Shader" uid="uid://b1a4mcnowuyg8" path="res://Shaders/null_spike_sync.gdshader" id="9_d4ye1"]
 [ext_resource type="PackedScene" uid="uid://c7mm45bo2fmyv" path="res://Scenes/help_overlay.tscn" id="10_ki4rb"]
 [ext_resource type="Texture2D" uid="uid://bsp50rqqai1yc" path="res://Visuals/digital_background.png" id="12_0p2ub"]
 [ext_resource type="Shader" uid="uid://c16vuww6jgbkf" path="res://Shaders/circuits.gdshader" id="13_d5u5a"]
@@ -36,15 +35,6 @@ shadow_size = 25
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_wudor"]
 radius = 60.0
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_2sj47"]
-shader = ExtResource("9_d4ye1")
-shader_parameter/intensity = 0.999999977648
-shader_parameter/band_density = 80.0
-shader_parameter/stretch_amount = 0.08
-shader_parameter/jitter_speed = 3.0
-shader_parameter/glow_strength = 0.6
-shader_parameter/glow_tint = Color(0.75, 1, 1, 1)
 
 [sub_resource type="Gradient" id="Gradient_882wi"]
 
@@ -88,15 +78,6 @@ shader_parameter/tear_strength = 0.045
 shader_parameter/noise_strength = 0.08
 shader_parameter/tear_density = 11.0
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_d4ye1"]
-shader = ExtResource("9_d4ye1")
-shader_parameter/intensity = 0.02999999932944
-shader_parameter/band_density = 30.0
-shader_parameter/stretch_amount = 0.150000007125
-shader_parameter/jitter_speed = 4.99999988824
-shader_parameter/glow_strength = 0.2999999932944
-shader_parameter/glow_tint = Color(0.75, 1, 1, 1)
-
 [node name="RunMain" type="Node2D" unique_id=567975848]
 
 [node name="RunManager" type="Node" parent="." unique_id=973638613]
@@ -104,7 +85,7 @@ script = ExtResource("1_4q6c1")
 
 [node name="TutorialManager" type="Node" parent="." unique_id=755181945]
 script = ExtResource("2_r51ll")
-debug_skip_to_stage = "terminal_dump"
+debug_skip_to_stage = "pre_gauntlet"
 
 [node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
 position = Vector2(0, 50)
@@ -165,11 +146,10 @@ script = ExtResource("4_jx6wh")
 script = ExtResource("7_k8c5c")
 
 [node name="NullSpikeSyncOverlay" type="ColorRect" parent="SignalTimeline" unique_id=1398397070]
-material = SubResource("ShaderMaterial_2sj47")
+visible = false
 offset_top = -23.0
 offset_right = 1920.0
 offset_bottom = 334.0
-mouse_filter = 2
 
 [node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
 script = ExtResource("5_wudor")
@@ -245,42 +225,33 @@ z_index = 10
 custom_minimum_size = Vector2(1920, 1080)
 size_flags_horizontal = 3
 size_flags_vertical = 3
-mouse_filter = 2
 script = ExtResource("18_3xdhw")
 
 [node name="CutsceneGlitchTexture" type="TextureRect" parent="CutsceneController" unique_id=1228991890]
 visible = false
 material = SubResource("ShaderMaterial_05vun")
 layout_mode = 2
-mouse_filter = 2
 texture = ExtResource("21_1rh14")
 
 [node name="CutsceneKeyTexture" type="TextureRect" parent="CutsceneController" unique_id=1356882612]
 visible = false
 layout_mode = 2
-mouse_filter = 2
 texture = ExtResource("20_26ak2")
 
 [node name="CutsceneRect" type="ColorRect" parent="CutsceneController" unique_id=1019869231]
 visible = false
 layout_mode = 2
-mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [node name="StrobeRect" type="ColorRect" parent="CutsceneController" unique_id=1499601247]
 visible = false
 layout_mode = 2
-mouse_filter = 2
 color = Color(1, 0, 0, 1)
 
 [node name="FlashRect" type="ColorRect" parent="CutsceneController" unique_id=1657344542]
 visible = false
 layout_mode = 2
-mouse_filter = 2
 
 [node name="NullSpikeSyncWash" type="ColorRect" parent="CutsceneController" unique_id=1092872760]
-process_mode = 3
 visible = false
-material = SubResource("ShaderMaterial_d4ye1")
 layout_mode = 2
-mouse_filter = 2

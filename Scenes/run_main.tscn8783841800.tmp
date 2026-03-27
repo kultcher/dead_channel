@@ -104,13 +104,23 @@ script = ExtResource("1_4q6c1")
 
 [node name="TutorialManager" type="Node" parent="." unique_id=755181945]
 script = ExtResource("2_r51ll")
-debug_skip_to_stage = "terminal_dump"
+debug_skip_to_stage = "gauntlet"
 
 [node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
 position = Vector2(0, 50)
 
 [node name="TimelineManager" type="Node2D" parent="SignalTimeline" unique_id=1093280978]
 script = ExtResource("1_882wi")
+BASE_CELLS_PER_SECOND = null
+slow_speed_modifier = null
+fast_speed_modifier = null
+null_spike_time_scale = null
+null_spike_transition_duration = null
+runner_screen_offset_cells = null
+timeline_height_ratio = null
+min_timeline_height_px = null
+max_timeline_height_px = null
+signal_interaction_range_cells = null
 
 [node name="GridLayer" type="Node2D" parent="SignalTimeline" unique_id=1499063150]
 script = ExtResource("2_85m8a")
@@ -245,7 +255,6 @@ z_index = 10
 custom_minimum_size = Vector2(1920, 1080)
 size_flags_horizontal = 3
 size_flags_vertical = 3
-mouse_filter = 2
 script = ExtResource("18_3xdhw")
 
 [node name="CutsceneGlitchTexture" type="TextureRect" parent="CutsceneController" unique_id=1228991890]

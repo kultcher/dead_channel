@@ -336,12 +336,68 @@ func _run_ghost_collapse_sequence() -> void:
 		await get_tree().create_timer(0.2).timeout
 
 func type_text_with_delay(target: RichTextLabel, text: String, delay: float) -> void:
-	var char_index := 0
-	var total_chars := text.length()
-	while char_index < total_chars:
-		target.append_text(text[char_index])
-		char_index += 1
-		await get_tree().create_timer(delay).timeout
+	if target == null or text.is_empty():
+		return
+
+	var safe_delay := maxf(0.001, delay)
+	var chars_per_second := 1.0 / safe_delay
+	var full_text := text.replace("\r\n", "\n")
+	var total_chars := full_text.length()
+	var chars_revealed: float = 0.0
+	var base_text := target.text
+
+	while chars_revealed < total_chars:
+		var delta := get_process_delta_time()
+		var current_idx := int(chars_revealed)
+
+		if current_idx < total_chars and full_text[current_idx] == "\n":
+			chars_revealed += 1.0
+			target.text = base_text + full_text.substr(0, int(chars_revealed))
+			await get_tree().create_timer(minf(0.04, safe_delay * 2.0)).timeout
+			continue
+
+		chars_revealed += chars_per_second * delta
+		target.text = base_text + full_text.substr(0, int(chars_revealed))
+		await get_tree().process_frame
+
+	target.text = base_text + full_text
+
+func estimate_type_duration(text: String, delay: float) -> float:
+	if text.is_empty():
+		return 0.0
+	var newline_bonus := text.count("\n") * delay * 1.5
+	return (text.length() * delay) + newline_bonus
+
+func play_null_spike_sync(text: String, delay: float = 0.01) -> void:
+	var previous_editable = command_line.editable
+	var previous_title_modulate = title_bar.modulate
+	var previous_title_text = title_text.text
+	var previous_history_modulate = history.modulate
+
+	switch_session(root_signal)
+	if active_session != null:
+		active_session.history.clear()
+	clear_log()
+
+	command_line.editable = false
+	command_line.text = "▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓"
+
+	title_bar.modulate = Color(0.72, 1.28, 1.36, 1.0)
+	title_text.text = "DC_OS | [NULL SPIKE SYNC]"
+	history.modulate = Color(0.82, 1.18, 1.3, 1.0)
+
+	var base_text := "[NULL SPIKE SYNC INITIALIZING]\n[LINK STATE: UNSTABLE]\n\n"
+	history.text = base_text
+	if active_session != null:
+		active_session.history.append(base_text.strip_edges())
+
+	await type_text_with_delay(history, text.replace("\r\n", "\n"), delay)
+
+	command_line.text = ""
+	command_line.editable = previous_editable
+	title_bar.modulate = previous_title_modulate
+	title_text.text = previous_title_text
+	history.modulate = previous_history_modulate
 
 
 func _apply_dump_instability(
