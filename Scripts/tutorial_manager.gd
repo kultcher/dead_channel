@@ -101,7 +101,6 @@ func _run_intro_sequence() -> void:
 		"It'll look they're moving toward me, but it's all relative\u2014I'm moving toward them. The stationary ones, anyway."
 	], "", window_manager.get_control_focus_rect(runner_focus_panel), Vector2(), false, 2, "intro_walk_and_talk")
 	_set_objective("- Wait for Blackjack to get into position")
-	_run_cam_01_sequence()
 
 func _run_cam_01_sequence() -> void:
 	await _wait_for_cell(1)
@@ -158,6 +157,7 @@ func _run_door_01_sequence() -> void:
 	_set_objective("- Find and click the targeted hex code.")
 
 	await _wait_for_puzzle_solved("door_01")
+	window_manager.clear_focus_overlay()
 
 	await _show_dialogue([
 		"Now you've got access, but you still need to unlock the door in realspace.",
@@ -199,6 +199,9 @@ func _run_cam_02_intro_sequence() -> void:
 	_release_runner_hold("cam_02_gate")
 
 func _run_drone_01_intro_sequence():
+	# TODO: Build into tutorial run def at some point
+	var vent = _get_active_signal("coolant_vent_01")
+	vent.disruptor.uses = 5
 	await _wait_for_cell(13)
 	# NOTE: Something preventing this hold?
 	_acquire_runner_hold("drone_01_gate")
@@ -272,6 +275,8 @@ func _run_lab_reveal_sequence() -> void:
 		"You need to come inside and see this."
 	], "", Rect2(), Vector2(750,300), true)
 
+	window_manager.objective_tracker.hide()
+
 	await get_tree().create_timer(1).timeout
 
 	signal_manager.hide_signals()
@@ -295,6 +300,7 @@ func _run_lab_reveal_sequence() -> void:
 		"This works out, actually — you can try the DECRYPT program without someone's life on the line. Plug in directly, I'll walk you through it.",
 		"It's just like the Sniff program from earlier, just RUN decrypt in the terminal."
 	], "", Rect2(), Vector2(750,300), true)
+	window_manager.objective_tracker.show()
 	_set_objective("RUN decrypt on the null_terminal")
 
 	_enable_feature("terminal_commands", true)
@@ -311,6 +317,8 @@ func _run_lab_reveal_sequence() -> void:
 	_set_objective("Solve the encrypted cipher")
 
 	await _wait_for_puzzle_solved("null_terminal")
+	window_manager.objective_tracker.hide()
+
 
 	await _run_terminal_dump_sequence()
 	await get_tree().create_timer(2).timeout
@@ -361,6 +369,8 @@ func _run_alarm_sequence():
 		"Clip, they woke up angry. Can hear 'em clanking.",
 		"Incoming. See what you can do, kid."
 	], "", Rect2(), Vector2(750,300), true, 29.5)
+	window_manager.objective_tracker.show()
+
 	_set_objective("Try to stop the combat drone")
 
 	await _wait_for_cell(29.5)
@@ -876,9 +886,10 @@ func _cam_02_kill_or_hustle(active_signal: ActiveSignal) -> String:
 
 func _runner_detected_dialogue():
 	# NOTE: Might need to add cell gating here to keep this from firing later
+	if timeline_manager.current_cell_pos > 20: return
 	_show_dialogue([
 		"Agh, it pinged me. Shouldn't be a problem. Quick glances don't build much heat."
-		], "", Rect2(), Vector2(750, 300), true, 12
+		], "", Rect2(), Vector2(750, 300), true, -1, "", 3
 	)
 
 func _await_signal_args(signal_to_wait: Signal) -> Array:

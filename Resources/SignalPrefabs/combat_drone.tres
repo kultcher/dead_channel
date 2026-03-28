@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://diftg5rgtn3kr" path="res://Scripts/Components/ICComponent.gd" id="4_im2j7"]
 [ext_resource type="Script" uid="uid://dlkakjbwkeel2" path="res://Scripts/Components/MobilityPatrolPoint.gd" id="5_wtgq5"]
 [ext_resource type="Script" uid="uid://2orqay7qy0mv" path="res://Scripts/Components/MobilityComponent.gd" id="6_ejqah"]
-[ext_resource type="Resource" uid="uid://c43su3v53wrbw" path="res://Resources/ResponseEffects/base_camera_heat.tres" id="7_xe4yn"]
+[ext_resource type="Resource" uid="uid://dajadqu8qqhut" path="res://Resources/ResponseEffects/base_damage.tres" id="7_8po47"]
 [ext_resource type="Script" uid="uid://bwfquhgf0ae5f" path="res://Scripts/Components/ResponseComponent.gd" id="8_tqsw6"]
 [ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="9_hr522"]
 [ext_resource type="Resource" path="res://Resources/SignalVisuals/drone_visuals.tres" id="10_hhjrg"]
@@ -49,7 +49,7 @@ metadata/_custom_type_script = "uid://2orqay7qy0mv"
 
 [sub_resource type="Resource" id="ResponseComponent_drone"]
 script = ExtResource("8_tqsw6")
-effects = Array[Resource]([ExtResource("7_xe4yn")])
+effects = Array[Resource]([ExtResource("7_8po47")])
 metadata/_custom_type_script = "uid://bwfquhgf0ae5f"
 
 [resource]

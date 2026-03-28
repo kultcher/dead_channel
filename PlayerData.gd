@@ -17,6 +17,7 @@ func _has_seen_codex_popup(signal_data: SignalData):
 
 func check_against_codex(signal_data: SignalData) -> Array[StringName]:
 	var codex_ids: Array[StringName] = []
+	if not signal_data.ic_modules: return codex_ids
 	if signal_data.ic_modules.modules.size() > 0:
 		for module in signal_data.ic_modules.modules:
 			codex_ids.append(module.get_codex_id())

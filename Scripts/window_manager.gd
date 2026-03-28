@@ -22,6 +22,7 @@ var codex_popup = preload("res://Scenes/codex_popup.tscn")
 @export var auto_focus_puzzles := true
 
 var window_count := 0
+var _active_puzzle_windows: Dictionary = {}
 
 func _ready():
 	CommandDispatch.window_manager = self
@@ -139,6 +140,8 @@ func _puzzle_started(active_sig: ActiveSignal, puzzle_type: PuzzleComponent.Type
 	add_child(puzzle_window)
 	move_child(puzzle_window, get_child_count() - 1)
 	puzzle_window.position = puzzle_spawn_position
+	_active_puzzle_windows[puzzle_window] = active_sig
+	puzzle_window.tree_exiting.connect(_on_puzzle_window_tree_exiting.bind(puzzle_window), CONNECT_ONE_SHOT)
 	await get_tree().process_frame
 	if puzzle_window == null or not is_instance_valid(puzzle_window):
 		return
@@ -147,6 +150,7 @@ func _puzzle_started(active_sig: ActiveSignal, puzzle_type: PuzzleComponent.Type
 	focus_control(puzzle_window, Vector2(32, 32))
 
 func _on_puzzle_solved(active_sig: ActiveSignal, puzzle_window: Control) -> void:
+	_unregister_puzzle_window(puzzle_window)
 	if active_sig != null and active_sig.data != null and active_sig.data.puzzle != null:
 		active_sig.data.puzzle.process_solve(active_sig)
 		GlobalEvents.puzzle_solved.emit(active_sig.data)
@@ -156,3 +160,31 @@ func _on_puzzle_solved(active_sig: ActiveSignal, puzzle_window: Control) -> void
 func _on_puzzle_failed(active_sig: ActiveSignal) -> void:
 	if active_sig != null and active_sig.data != null:
 		GlobalEvents.puzzle_failed.emit(active_sig.data)
+
+# NOTE: Overengineered maybe?
+func close_puzzles_for_signal(active_sig: ActiveSignal, emit_failed: bool = true) -> void:
+	if active_sig == null:
+		return
+
+	var windows_to_close: Array[Control] = []
+	for puzzle_window in _active_puzzle_windows.keys():
+		if _active_puzzle_windows[puzzle_window] == active_sig and puzzle_window is Control:
+			windows_to_close.append(puzzle_window)
+
+	for puzzle_window in windows_to_close:
+		_unregister_puzzle_window(puzzle_window)
+		if emit_failed and active_sig.data != null:
+			GlobalEvents.puzzle_failed.emit(active_sig.data)
+		if is_instance_valid(puzzle_window):
+			puzzle_window.queue_free()
+
+	if not windows_to_close.is_empty():
+		clear_focus_overlay()
+
+func _unregister_puzzle_window(puzzle_window: Control) -> void:
+	if puzzle_window == null:
+		return
+	_active_puzzle_windows.erase(puzzle_window)
+
+func _on_puzzle_window_tree_exiting(puzzle_window: Control) -> void:
+	_unregister_puzzle_window(puzzle_window)

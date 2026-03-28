@@ -52,10 +52,20 @@ Development Progress
 Short-term TODO:
 - add death state
 - Maybe Add extra gauntlet before lab
-- Finalize signal tooltips, fix right click behavior
 - Rework UI
 
+Verify:
+x add sequence break protection on drone_02 coolant vent
+x clear puzzle on disconnect
+x check sequence break on early puzzle solve (add an out if puzzle is solved)
+x make sure you can't run a puzzle twice
+x check sequence break on early cam_02 kill (add scan objective)
+x decrypt: fix the behavior where if it auto-fills, it waits until next cycle to finish
+x sniff: on miss can hit a null? scroll off?
+
+
 Polish TODO:
+- watch out for disabled terminal before null_lab
 - Cleanup cutscene controller (hardcode textures)
 - Split out tutorial script and logic
 - Add a cleaner way to update scan tooltips (array?)

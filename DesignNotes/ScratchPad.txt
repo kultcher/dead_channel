@@ -1,4 +1,7 @@
-- puzzles
+IC/Puzzle idea:
+	checksum:
+		- two columns of data with multiple cells with very close, longer hex values
+		- player is given a target and needs to find the matching value in the other column among the decoys
 
 Stray ideas:
 	Normal vs. Enhanced cameras:
@@ -59,6 +62,9 @@ visual ideas:
 	guards "comms pulse" to get brief location hints
 	- Heat effects program cleanup times
 	- "flicker" IC: randomly blinks out of the timeline view
+	Solo/Bogart: Ice cancels all other connections
+	Efficiency: punishes you for inactive sessions
+
 
 	- Null Spike let's the player see "secret connections" or hidden signals
 	Luxon IC: mutate, evolve

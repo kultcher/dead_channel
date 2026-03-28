@@ -9,7 +9,6 @@ extends Node2D
 @onready var tooltip_main = $DetailTooltip
 
 @onready var detection_controller = $DetectionController
-@export var tooltip_gap_y: float = 32.0
 
 var mobility_controller: MobilityController = null
 var _guard_revealed: bool = true
@@ -17,9 +16,6 @@ var _alert_visual_t: float = 0.0
 
 var my_data: SignalData
 var my_active_sig: ActiveSignal
-
-var tooltip_main_initial_x: float
-var tooltip_main_initial_y: float
 
 var is_disabled: bool = false
 
@@ -45,9 +41,6 @@ func setup(signal_wrapper: ActiveSignal):
 		my_active_sig.runtime_position_initialized = true
 	if my_data != null and my_data.detection != null and my_active_sig != null:
 		my_data.detection.initialize_runtime(my_active_sig)
-
-#	tooltip_main_initial_x = tooltip_main.size.x
-#	tooltip_main_initial_y = tooltip_main.size.y
 
 
 	initialize_tooltip()
@@ -138,7 +131,6 @@ func set_scan_highlight(active: bool):
 			_alert_visual_t = 0.0
 		else:
 			shape.self_modulate = Color.WHITE
-		tooltip_main.size.x = tooltip_main_initial_x
 
 func update_scan_progress(current: float, max_duration: float):
 	if not scan_radial.visible:
@@ -155,7 +147,6 @@ func scan_cleanup():
 	scan_radial.visible = false
 	if my_active_sig != null:
 		refresh_scan_status()
-		tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
 
 func initialize_tooltip():
 	tooltip_main.tt_header.text = my_data.display_name
@@ -172,6 +163,19 @@ func show_tooltip():
 	tooltip_main.show()
 	refresh_status_panels()
 	tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+
+func show_hover_tooltip():
+	tooltip_main.show()
+	refresh_status_panels()
+	tooltip_main.show_body()
+
+func fade_tooltip_body():
+	if my_active_sig == null:
+		return
+	if my_active_sig.is_tooltip_collapsed:
+		tooltip_main.fade_body_out()
+		return
+	tooltip_main.show_body()
 
 func _is_access_layer_revealed() -> bool:
 	if my_active_sig == null:
@@ -266,13 +270,6 @@ func _on_area_2d_mouse_entered() -> void:
 func _on_area_2d_mouse_exited() -> void:
 	scan_aborted.emit(my_active_sig)
 
-func _on_detail_tooltip_resized() -> void:
-	#NOTE: Not needed?
-	# reposition tooltip based on new size
-	if !is_node_ready(): return
-	tooltip_main.position.x = (tooltip_main.size.x / 2) * -1
-#	tooltip_main.position.y = -tooltip_main.size.y - tooltip_gap_y
-
 func get_focus_rect() -> Rect2:
 	var icon_shape: CollisionShape2D = $SignalIcon/IconCollision
 	var rect_shape := icon_shape.shape as RectangleShape2D
@@ -287,9 +284,9 @@ func get_focus_rect() -> Rect2:
 func show_scanning_tooltip():
 	if my_active_sig != null:
 		refresh_scan_status()
-		tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+		tooltip_main.show_body()
 
 func show_scan_complete():
 	if my_active_sig != null:
 		refresh_status_panels()
-		tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+		tooltip_main.show_body()

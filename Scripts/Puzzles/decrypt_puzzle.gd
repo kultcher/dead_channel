@@ -73,6 +73,8 @@ func _ready():
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("null_spike") and not event.is_echo():
+		if not GlobalEvents.is_tutorial_feature_enabled("null_spike"):
+			return
 		if null_spike_active:
 			GlobalEvents.deactivate_null_spike.emit()
 		else:
@@ -610,6 +612,7 @@ func _lockout_then_confirm(index: int):
 			if confirmed[index]:
 				return
 			_confirmed_collapse(index)
+			_check_solution()
 	)
 
 # SIGNALLED FUNCTIONS

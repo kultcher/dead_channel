@@ -287,7 +287,8 @@ func _check_match(cell: Label):
 		# MISS — brief red flash
 		cell.add_theme_color_override("font_color", Color.RED)
 		get_tree().create_timer(0.15).timeout.connect(
-			func(): cell.add_theme_color_override("font_color", BASE_CELL_COLOR)
+			func():
+				if is_instance_valid(cell): cell.add_theme_color_override("font_color", BASE_CELL_COLOR)
 		)
 
 # === FOOTER UI ===

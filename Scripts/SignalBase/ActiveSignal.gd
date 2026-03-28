@@ -17,7 +17,7 @@ var scan_layers: Array[ScanLayer] = []
 var current_scan_index: int = 0
 var current_layer_progress: float = 0.0
 var is_being_scanned: bool = false
-var is_tooltip_collapsed: bool = false
+var is_tooltip_collapsed: bool = true
 
 var is_disabled: bool = false
 
@@ -47,6 +47,8 @@ func setup():
 
 func disable_signal():
 	is_disabled = true
+	if CommandDispatch.window_manager != null:
+		CommandDispatch.window_manager.close_puzzles_for_signal(self)
 	if instance_node != null:
 		instance_node.detection_controller.disable_vision()
 		instance_node.update_visuals()

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ResponseEffect" format=3 uid="uid://dajadqu8qqhut"]
+
+[ext_resource type="Script" uid="uid://d4r370y7ufys" path="res://Scripts/Components/ResponseEffect.gd" id="1_igrou"]
+
+[resource]
+script = ExtResource("1_igrou")
+cadence = 0
+effect_type = 1
+amount = 1.0
+delay = 3.0
+metadata/_custom_type_script = "uid://d4r370y7ufys"

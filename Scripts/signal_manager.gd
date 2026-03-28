@@ -104,6 +104,8 @@ func update_signal_position():
 					terminal_window.hide_tab_for_signal(active_sig)
 				if scan_controller != null:
 					scan_controller.notify_signal_despawned(active_sig)
+				if window_manager != null:
+					window_manager.close_puzzles_for_signal(active_sig)
 				active_sig.instance_node.queue_free()
 				active_sig.instance_node = null
 
@@ -126,6 +128,8 @@ func _on_signal_mouse_enter(signal_entered: ActiveSignal):
 		return
 	if not is_signal_within_interaction_range(signal_entered):
 		return
+	if signal_entered != null and signal_entered.instance_node != null:
+		signal_entered.instance_node.show_hover_tooltip()
 	if scan_controller != null:
 		scan_controller.begin_hover(signal_entered)
 
@@ -140,3 +144,5 @@ func _on_signal_right_clicked(signal_clicked: ActiveSignal):
 func _on_signal_mouse_exit(signal_exited: ActiveSignal):
 	if scan_controller != null:
 		scan_controller.end_hover(signal_exited)
+	if signal_exited != null and signal_exited.instance_node != null:
+		signal_exited.instance_node.fade_tooltip_body()

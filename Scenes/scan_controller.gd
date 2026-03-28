@@ -42,7 +42,6 @@ func start_signal_scan(target_signal: ActiveSignal):
 
 	target_signal.instance_node.bring_to_front()
 	target_signal.instance_node.show_scanning_tooltip()
-	target_signal.instance_node.show_tooltip()
 	target_signal.instance_node.set_scan_highlight(true)
 
 func handle_lock_toggle(clicked_signal: ActiveSignal):
@@ -110,4 +109,3 @@ func _cleanup_scan_visuals(sig: ActiveSignal):
 	if sig.instance_node != null:
 		sig.instance_node.set_scan_highlight(false)
 		sig.instance_node.refresh_scan_status()
-		sig.instance_node.tooltip_main.set_tooltip_collapsed(sig.is_tooltip_collapsed)

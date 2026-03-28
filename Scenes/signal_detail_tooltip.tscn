@@ -28,6 +28,16 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.8854879, 0.33361515, 0.025840001, 1)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jaqdb"]
+bg_color = Color(0.39215687, 0.21176471, 0.45490196, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_blend = true
+expand_margin_left = 3.0
+expand_margin_right = 3.0
+
 [node name="DetailTooltip" type="PanelContainer" unique_id=337901490]
 self_modulate = Color(1, 1, 1, 0.5)
 z_index = 200
@@ -42,7 +52,7 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_ea3pi")
 script = ExtResource("1_0k24o")
 
-[node name="TooltipHbox" type="HBoxContainer" parent="." unique_id=113857911]
+[node name="TooltipHbox" type="VBoxContainer" parent="." unique_id=231727107]
 layout_mode = 2
 
 [node name="TooltipVBox" type="VBoxContainer" parent="TooltipHbox" unique_id=1209469793]
@@ -136,6 +146,27 @@ visible = false
 layout_mode = 2
 
 [node name="BodyText" type="RichTextLabel" parent="TooltipHbox/BodyBox" unique_id=1795723363]
+layout_mode = 2
+size_flags_vertical = 3
+fit_content = true
+autowrap_mode = 0
+
+[node name="BodyControl" type="Control" parent="." unique_id=1252243392]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+
+[node name="BodyPanel" type="PanelContainer" parent="BodyControl" unique_id=1079680036]
+visible = false
+layout_mode = 0
+offset_top = 8.0
+offset_right = 2.0
+offset_bottom = 10.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_jaqdb")
+
+[node name="BodyText" type="RichTextLabel" parent="BodyControl/BodyPanel" unique_id=1957049013]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 fit_content = true

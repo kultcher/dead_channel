@@ -30,6 +30,8 @@ func _kill(cmd_context):
 func _run(cmd_context):
 	if !cmd_context.active_sig.data.puzzle:
 		cmd_context.log_text.append("RUN " + cmd_context.arg.to_upper() + " failed. Signal is not locked.")
+	elif !cmd_context.active_sig.data.puzzle.is_puzzled_locked:
+		cmd_context.log_text.append("RUN " + cmd_context.arg.to_upper() + " failed. Signal already unlocked.")
 	elif !cmd_context.arg in ["sniff", "fuzz", "decrypt"]:
 		cmd_context.log_text.append("RUN failed. No program named " + cmd_context.arg.to_upper() + " found.")
 	else:
@@ -98,8 +100,8 @@ func _op_disruptor(cmd_context) -> void:
 	if signal_data.disruptor == null or not signal_data.disruptor.enabled:
 		cmd_context.log_text.append("OP failed. " + signal_data.display_name + " has no active disruption profile.")
 		return
-	if signal_data.disruptor.used:
-		cmd_context.log_text.append("OP failed. " + signal_data.display_name + " can only be activated once.")
+	if signal_data.disruptor.uses <= 0:
+		cmd_context.log_text.append("OP failed. " + signal_data.display_name + ": no activations remaining.")
 		return
 	if CommandDispatch.signal_manager == null:
 		cmd_context.log_text.append("OP failed. Signal manager unavailable.")
@@ -144,9 +146,9 @@ func _op_disruptor(cmd_context) -> void:
 		matched_targets += 1
 
 	if matched_targets <= 0:
-		signal_data.disruptor.used = true
+		signal_data.disruptor.uses -= 1
 		cmd_context.log_text.append(signal_data.display_name + " activated. No valid targets in range.")
 		return
 
-	signal_data.disruptor.used = true
+	signal_data.disruptor.uses -= 1
 	cmd_context.log_text.append(signal_data.display_name + " activated. Alerted " + str(matched_targets) + " target(s).")

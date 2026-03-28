@@ -69,7 +69,7 @@ func switch_terminal_session(active_sig: ActiveSignal):
 
 func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 	if not GlobalEvents.is_tutorial_feature_enabled("terminal_commands"):
-		_fail("Sequence break: unexpected signal degradation.\nBuffering... close external communcations and try again.", active_sig)
+		_fail("[b][color=red]SEQUENCE BREAK[/color][/b]: unexpected signal degradation.\nBuffering... [color=cyan]close external communcations[/cyan] and try again.", active_sig)
 		return
 	if _try_special_command(input, active_sig):
 		return

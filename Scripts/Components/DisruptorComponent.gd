@@ -7,7 +7,7 @@ enum DistractionTargets {
 }
 
 @export var enabled: bool = true
-@export var used: bool = false
+@export var uses: int = 1
 @export var investigate_duration_sec: float = -1.0
 @export var horizontal_range_cells: int = 0
 @export var severity: int = 10

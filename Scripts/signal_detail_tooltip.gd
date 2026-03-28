@@ -1,9 +1,11 @@
 extends PanelContainer
 
 
+@onready var tooltip_hbox = $TooltipHbox
 @onready var tt_header = $TooltipHbox/TooltipVBox/HeaderPanel/MarginContainer/HeaderText
-@onready var tt_body_box = $TooltipHbox/BodyBox
-@onready var tt_body = $TooltipHbox/BodyBox/BodyText
+@onready var tt_body_control = $BodyControl
+@onready var tt_body_box = $BodyControl/BodyPanel
+@onready var tt_body = $BodyControl/BodyPanel/BodyText
 @onready var tt_active_scan = $TooltipHbox/TooltipVBox/IconsHBox/ActiveScanPanel
 @onready var tt_scan_icon = $TooltipHbox/TooltipVBox/IconsHBox/ActiveScanPanel/ScanMargin/ActiveScanIcon
 @onready var tt_lock_state = $TooltipHbox/TooltipVBox/IconsHBox/LockStatePanel
@@ -20,13 +22,66 @@ const COLOR_LOCK_OPEN := Color("0096faff")
 const COLOR_LOCK_LOCKED := Color("ff0000ff")
 const COLOR_LOCK_HACKED := Color("0096faff")
 
+var _body_fade_tween: Tween = null
+
+func _ready() -> void:
+	tt_body_box.resized.connect(_queue_realign_body)
+	tt_body.resized.connect(_queue_realign_body)
+	tooltip_hbox.resized.connect(_queue_realign_body)
+	call_deferred("_align_body_panel")
+
 func set_tooltip_collapsed(collapsed: bool):
-	show()
+	_stop_body_fade()
+	tt_body_control.visible = not collapsed
 	tt_body_box.visible = not collapsed
 	tt_body.visible = not collapsed
+	tt_body_box.modulate.a = 1.0 if not collapsed else 0.0
 	tt_active_scan.visible = true
 	tt_lock_state.visible = true
-	#size.x = tooltip_main_initial_x
+	if not collapsed:
+		_queue_realign_body()
+
+func show_body() -> void:
+	_stop_body_fade()
+	tt_body_control.visible = true
+	tt_body_box.visible = true
+	tt_body.visible = true
+	tt_body_box.modulate.a = 1.0
+	_queue_realign_body()
+
+func fade_body_out(duration: float = 3.0) -> void:
+	if not tt_body_box.visible:
+		return
+	_stop_body_fade()
+	_body_fade_tween = create_tween()
+	_body_fade_tween.tween_property(tt_body_box, "modulate:a", 0.0, duration)
+	_body_fade_tween.finished.connect(_on_body_fade_finished, CONNECT_ONE_SHOT)
+
+func _stop_body_fade() -> void:
+	if _body_fade_tween != null and _body_fade_tween.is_valid():
+		_body_fade_tween.kill()
+	_body_fade_tween = null
+
+func _on_body_fade_finished() -> void:
+	_body_fade_tween = null
+	tt_body_control.visible = false
+	tt_body_box.visible = false
+	tt_body.visible = false
+	tt_body_box.modulate.a = 1.0
+
+func _queue_realign_body() -> void:
+	call_deferred("_align_body_panel")
+
+func _align_body_panel() -> void:
+	if tt_body_box == null or tooltip_hbox == null:
+		return
+
+	var target_width = tooltip_hbox.size.x
+	var body_width = tt_body_box.size.x
+	if target_width <= 0.0 or body_width <= 0.0:
+		return
+
+	tt_body_box.position.x = round((target_width - body_width) * 0.5)
 
 func get_lock_state_focus_rect() -> Rect2:
 	if tt_lock_state == null or not tt_lock_state.is_visible_in_tree():

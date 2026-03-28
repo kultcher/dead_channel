@@ -6,7 +6,7 @@ extends Node2D
 # SETTINGS
 @export var BASE_CELLS_PER_SECOND: float = 0.20
 @export var slow_speed_modifier: float = 0.5
-@export var fast_speed_modifier: float = 2.5
+@export var fast_speed_modifier: float = 12.5
 @export var null_spike_time_scale: float = 0.5
 @export var null_spike_transition_duration: float = 0.50
 @export var runner_screen_offset_cells: float = 1
