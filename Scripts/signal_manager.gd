@@ -15,6 +15,15 @@ var signal_queue: Array[ActiveSignal] = []
 
 func _ready():
 	CommandDispatch.signal_manager = self
+	if terminal_window != null:
+		if not terminal_window.session_opened.is_connected(_on_terminal_session_visual_changed):
+			terminal_window.session_opened.connect(_on_terminal_session_visual_changed)
+		if not terminal_window.session_activated.is_connected(_on_terminal_session_visual_changed):
+			terminal_window.session_activated.connect(_on_terminal_session_visual_changed)
+		if not terminal_window.session_deactivated.is_connected(_on_terminal_session_visual_changed):
+			terminal_window.session_deactivated.connect(_on_terminal_session_visual_changed)
+		if not terminal_window.session_closed.is_connected(_on_terminal_session_visual_changed):
+			terminal_window.session_closed.connect(_on_terminal_session_visual_changed)
 	
 #	spawn_signal_data(spawner.create_test_cam("05", 2), 3.5)
 #	spawn_signal_data(spawner.create_test_cam("06", 3), 6.5)
@@ -146,3 +155,11 @@ func _on_signal_mouse_exit(signal_exited: ActiveSignal):
 		scan_controller.end_hover(signal_exited)
 	if signal_exited != null and signal_exited.instance_node != null:
 		signal_exited.instance_node.fade_tooltip_body()
+
+func _on_terminal_session_visual_changed(active_sig: ActiveSignal) -> void:
+	if active_sig == null or active_sig.instance_node == null or terminal_window == null:
+		return
+	active_sig.instance_node.set_session_indicator_state(
+		terminal_window.get_session_visual_state(active_sig)
+	)
+	active_sig.instance_node.refresh_session_indicator_geometry()

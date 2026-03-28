@@ -51,6 +51,11 @@ texture_progress = SubResource("GradientTexture2D_6hws6")
 [node name="TargetIndicator" type="Node2D" parent="." unique_id=533402596]
 script = ExtResource("2_xq7gi")
 
+[node name="IndicatorLine" type="Line2D" parent="TargetIndicator"]
+visible = false
+width = 2.0
+default_color = Color(0.65, 1, 0.72, 1)
+
 [node name="DetailTooltip" parent="." unique_id=337901490 instance=ExtResource("2_ea3pi")]
 anchors_preset = 5
 anchor_left = 0.5

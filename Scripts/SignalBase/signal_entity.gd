@@ -4,6 +4,7 @@
 extends Node2D
 @onready var shape = $Shape
 @onready var signal_icon: Area2D = $SignalIcon
+@onready var target_indicator: Node2D = $TargetIndicator
 
 @onready var scan_radial = $ScanRadial
 @onready var tooltip_main = $DetailTooltip
@@ -27,6 +28,8 @@ signal scan_lock_requested(scanning_signal: ActiveSignal)
 func _ready():
 	scan_radial.visible = false
 	set_process(true)
+	if target_indicator != null and target_indicator.has_method("initialize"):
+		target_indicator.initialize(self)
 
 func setup(signal_wrapper: ActiveSignal):
 	my_data = signal_wrapper.data
@@ -52,6 +55,8 @@ func setup(signal_wrapper: ActiveSignal):
 	if my_data.type == SignalData.Type.GUARD and my_data.mobility != null:
 		set_guard_revealed(false)
 	update_visuals()
+	refresh_session_indicator_geometry()
+	_sync_session_indicator_state()
 	
 	
 func update_visuals():
@@ -122,6 +127,10 @@ func set_guard_revealed(is_revealed: bool) -> void:
 	tooltip_main.visible = is_revealed
 	signal_icon.input_pickable = is_revealed
 	detection_controller.set_overlay_visible(is_revealed)
+	if is_revealed:
+		_sync_session_indicator_state()
+	else:
+		set_session_indicator_state(0)
 
 func set_scan_highlight(active: bool):
 	if active:
@@ -279,6 +288,30 @@ func get_focus_rect() -> Rect2:
 
 	var center := get_global_transform_with_canvas().origin
 	return Rect2(center - (local_size * 0.5), local_size)
+
+func set_session_indicator_state(state: int) -> void:
+	if target_indicator != null and target_indicator.has_method("set_visual_state"):
+		target_indicator.set_visual_state(state)
+
+func refresh_session_indicator_geometry() -> void:
+	if target_indicator == null:
+		return
+	var icon_shape: CollisionShape2D = $SignalIcon/IconCollision
+	var rect_shape := icon_shape.shape as RectangleShape2D
+	var local_size := Vector2(64, 64)
+	if rect_shape != null:
+		local_size = rect_shape.size
+	if target_indicator.has_method("configure_for_icon_size"):
+		target_indicator.configure_for_icon_size(local_size)
+	if target_indicator.has_method("refresh_geometry"):
+		target_indicator.refresh_geometry()
+
+func _sync_session_indicator_state() -> void:
+	var terminal_window = CommandDispatch.terminal_window
+	if terminal_window == null or my_active_sig == null:
+		set_session_indicator_state(0)
+		return
+	set_session_indicator_state(terminal_window.get_session_visual_state(my_active_sig))
 
 
 func show_scanning_tooltip():

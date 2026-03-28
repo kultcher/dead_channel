@@ -18,6 +18,13 @@ const BREAKDOWN_CHARSET := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
 const CONNECTION_FLOW_TOTAL_DURATION := 0.96
 const CONNECTION_FLOW_MAX_STEP_DELAY := 0.08
 
+enum SessionVisualState { NONE, INACTIVE, ACTIVE }
+
+signal session_opened(active_sig: ActiveSignal)
+signal session_activated(active_sig: ActiveSignal)
+signal session_deactivated(active_sig: ActiveSignal)
+signal session_closed(active_sig: ActiveSignal)
+
 @onready var command_line = $TerminalVBox/CmdLineHBox/CommandLine
 @onready var history = $TerminalVBox/TerminalHistory
 @onready var prefix = $TerminalVBox/CmdLineHBox/InputPrefix
@@ -68,16 +75,15 @@ func switch_session(new_sig: ActiveSignal, show_connection_banner: bool = false)
 		print("Same signal")
 		return
 
-	active_signal = new_sig
-
 	# Create new session
 	if new_sig.terminal_session == null:
 		var new_session = TerminalSession.new()
 		new_session.active_signal = new_sig
 		new_session.has_tab = true
 		new_sig.terminal_session = new_session
-		active_session = new_session
 		ensure_tab_for_session(new_session)
+		session_opened.emit(new_sig)
+		_set_active_session(new_session)
 		clear_log()
 		if show_connection_banner:
 			_play_connection_flow(new_sig)
@@ -87,8 +93,12 @@ func switch_session(new_sig: ActiveSignal, show_connection_banner: bool = false)
 		prefix.text = "-" + new_sig.data.system_id + "-["
 
 	# Switch to existing session
-	elif active_signal.terminal_session != null:
-		active_session = active_signal.terminal_session
+	elif new_sig.terminal_session != null:
+		var existing_session := new_sig.terminal_session
+		if not existing_session.has_tab:
+			ensure_tab_for_session(existing_session)
+			session_opened.emit(new_sig)
+		_set_active_session(existing_session)
 		if not active_session.has_tab:
 			ensure_tab_for_session(active_session)
 		if show_connection_banner:
@@ -561,7 +571,7 @@ func _flush_buffered_command(target_sig: ActiveSignal, flow_serial: int) -> void
 
 func restore_session(session: TerminalSession):
 	if active_session == null: return
-	active_session = session
+	_set_active_session(session)
 	if active_session.has_tab == false:
 		ensure_tab_for_session(active_session)
 	var tab_index = _find_tab_for_session(active_session)
@@ -599,6 +609,8 @@ func _on_session_tabs_tab_close_pressed(tab: int) -> void:
 		restore_session(root_session)
 	if session != null:
 		session.has_tab = false
+		if session.active_signal != null:
+			session_closed.emit(session.active_signal)
 	session_tabs.remove_tab(tab)
 
 func hide_tab_for_signal(target_signal: ActiveSignal) -> void:
@@ -614,6 +626,8 @@ func hide_tab_for_signal(target_signal: ActiveSignal) -> void:
 		session.has_tab = false
 		if active_session == session:
 			restore_session(root_session)
+		if target_signal != null:
+			session_closed.emit(target_signal)
 		return
 
 	if session == active_session:
@@ -621,6 +635,7 @@ func hide_tab_for_signal(target_signal: ActiveSignal) -> void:
 		restore_session(root_session)
 
 	session.has_tab = false
+	session_closed.emit(target_signal)
 	session_tabs.remove_tab(tab_index)
 
 func ensure_tab_for_session(session: TerminalSession):
@@ -648,6 +663,45 @@ func _get_tab_session(tab_index: int) -> TerminalSession:
 
 func _set_tab_session(tab_index: int, session: TerminalSession):
 	session_tabs.set_tab_metadata(tab_index, session)
+
+func get_session_visual_state(active_sig: ActiveSignal) -> int:
+	if active_sig == null or active_sig == root_signal:
+		return SessionVisualState.NONE
+	if active_sig.terminal_session == null:
+		return SessionVisualState.NONE
+
+	var session := active_sig.terminal_session
+	if not session.has_tab:
+		return SessionVisualState.NONE
+	if session == active_session:
+		return SessionVisualState.ACTIVE
+	return SessionVisualState.INACTIVE
+
+func get_tab_anchor_global_position(session: TerminalSession) -> Vector2:
+	if session == null:
+		return Vector2(INF, INF)
+	var tab_index := _find_tab_for_session(session)
+	if tab_index == -1:
+		return Vector2(INF, INF)
+	var tab_rect = session_tabs.get_tab_rect(tab_index)
+	var local_anchor = tab_rect.position + Vector2(tab_rect.size.x * 0.5, 0.0)
+	return session_tabs.get_global_transform_with_canvas() * local_anchor
+
+func _set_active_session(session: TerminalSession) -> void:
+	var previous_session := active_session
+	if previous_session == session:
+		active_session = session
+		active_signal = session.active_signal if session != null else root_signal
+		return
+
+	if previous_session != null and previous_session != root_session and previous_session.has_tab and previous_session.active_signal != null:
+		session_deactivated.emit(previous_session.active_signal)
+
+	active_session = session
+	active_signal = session.active_signal if session != null else root_signal
+
+	if active_session != null and active_session != root_session and active_session.has_tab and active_session.active_signal != null:
+		session_activated.emit(active_session.active_signal)
 
 # SIGNALLED FUNCTIONS
 
