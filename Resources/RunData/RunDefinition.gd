@@ -21,6 +21,7 @@ func get_spawns() -> Array[Dictionary]:
 
 # Overrides: lane, display_name, spoof_id, facing_deg, puzzle, ic_modules, add_ic_modules,
 # response, add_response_effects, mobility, patrol_points, detection, detection_patrol_points, disruptor
+# `patrol_points` are authored as offsets relative to this spawn's base cell_index and resolved lane.
 func build_spawn(signal_data: SignalData, cell_index: float, overrides: Dictionary = {}) -> Dictionary:
 	var spawn := {
 		"signal_data": signal_data,
@@ -71,7 +72,7 @@ func build_runtime_signal(spawn: Dictionary) -> SignalData:
 	if spawn.has("mobility"):
 		runtime_signal.mobility = spawn["mobility"].duplicate(true)
 	if spawn.has("patrol_points"):
-		_override_patrol_points(runtime_signal, spawn["patrol_points"])
+		_override_patrol_points(runtime_signal, spawn, spawn["patrol_points"])
 	if spawn.has("disruptor"):
 		runtime_signal.disruptor = spawn["disruptor"].duplicate(true)
 
@@ -143,14 +144,14 @@ func make_response_effect(
 	return effect
 
 func make_patrol_point(
-	cell_x: float,
-	lane: int,
+	cell_offset: float,
+	lane_offset: int,
 	dwell_sec: float = 0.0,
 	facing_deg: float = 180.0
 ) -> MobilityPatrolPoint:
 	var point := MobilityPatrolPoint.new()
-	point.cell_x = cell_x
-	point.lane = lane
+	point.cell_x = cell_offset
+	point.lane = lane_offset
 	point.dwell_sec = dwell_sec
 	point.facing_deg = facing_deg
 	return point
@@ -171,6 +172,7 @@ func make_detection_sweep(point1: Array[float], point2: Array[float], point3: Ar
 		route.append(make_detection_patrol_point(point4[0], point4[1]))
 	return route
 
+# Patrol route points are authored as [cell_offset, lane_offset, dwell_sec, facing_deg].
 func make_patrol_route(point1: Array[float], point2: Array[float], point3: Array[float] = [], point4: Array[float] = []) -> Array[MobilityPatrolPoint]:
 	var route: Array[MobilityPatrolPoint]= []
 	route.append(make_patrol_point(point1[0], int(point1[1]), point1[2], point1[3]))
@@ -181,15 +183,20 @@ func make_patrol_route(point1: Array[float], point2: Array[float], point3: Array
 		route.append(make_patrol_point(point4[0], int(point4[1]), point4[2], point4[3]))
 	return route
 
-func _override_patrol_points(runtime_signal: SignalData, patrol_points: Array[MobilityPatrolPoint]) -> void:
+func _override_patrol_points(runtime_signal: SignalData, spawn: Dictionary, patrol_points: Array[MobilityPatrolPoint]) -> void:
 	if runtime_signal.mobility == null:
 		runtime_signal.mobility = MobilityComponent.new()
 
+	var base_cell_x := float(spawn["cell_index"])
+	var base_lane := runtime_signal.lane
 	runtime_signal.mobility.patrol_points.clear()
 	for point in patrol_points:
 		if point == null:
 			continue
-		runtime_signal.mobility.patrol_points.append(point.duplicate(true))
+		var resolved_point := point.duplicate(true) as MobilityPatrolPoint
+		resolved_point.cell_x = base_cell_x + point.cell_x
+		resolved_point.lane = base_lane + point.lane
+		runtime_signal.mobility.patrol_points.append(resolved_point)
 
 func _override_detection_patrol_points(runtime_signal: SignalData, patrol_points: Array[DetectionPatrolPoint]) -> void:
 	if runtime_signal.detection == null:

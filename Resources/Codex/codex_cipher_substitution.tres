@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CodexEntry" format=3 uid="uid://bw7r0q2ugw3jn"]
+
+[ext_resource type="Texture2D" uid="uid://d2ncxf6v7kmk0" path="res://Visuals/Icons/Simple/horizontal-flip.svg" id="1_oa1iu"]
+[ext_resource type="Script" uid="uid://bcwfqttb2lhqa" path="res://codex_entry.gd" id="2_faaeo"]
+
+[resource]
+script = ExtResource("2_faaeo")
+codex_id = &"cipher_caesar"
+title = "Cipher: Caesar"
+category = "Crytpography"
+extra = "Complexity: 1"
+icon = ExtResource("1_oa1iu")
+body_text = "A simple cipher based on a letter's position in the alphabet. Choose a number. For each letter in the codephrase, shift forward alphabetically by that many positions in the alphabet to get the encoded value. For example, using an Caesar+5 cipher: ABCD -> FGHI"
+metadata/_custom_type_script = "uid://bcwfqttb2lhqa"

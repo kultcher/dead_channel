@@ -224,6 +224,9 @@ func _run_drone_01_intro_sequence():
 	await GlobalEvents.mobile_investigating
 	_release_runner_hold("drone_01_gate")
 
+	# pre-lab gauntlet
+
+
 func _run_null_door_intro_sequence():
 	_enable_feature("terminal_commands", false)
 

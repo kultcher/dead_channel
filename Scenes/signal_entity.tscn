@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bu5j0vtniw7no" path="res://Scripts/SignalBase/signal_entity.gd" id="1_syivg"]
 [ext_resource type="Script" uid="uid://bf3h4o3iodo4" path="res://Scripts/SignalBase/DetectionController.gd" id="2_6hws6"]
 [ext_resource type="PackedScene" uid="uid://dfbl7tsxqd446" path="res://Scenes/signal_detail_tooltip.tscn" id="2_ea3pi"]
+[ext_resource type="Script" uid="uid://dio2n4hwtubvd" path="res://Scenes/signal_target_indicator.gd" id="2_xq7gi"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_syivg"]
 size = Vector2(50, 50)
@@ -46,6 +47,9 @@ fill_mode = 4
 texture_progress = SubResource("GradientTexture2D_6hws6")
 
 [node name="Shape" type="Polygon2D" parent="." unique_id=927938383]
+
+[node name="TargetIndicator" type="Node2D" parent="." unique_id=533402596]
+script = ExtResource("2_xq7gi")
 
 [node name="DetailTooltip" parent="." unique_id=337901490 instance=ExtResource("2_ea3pi")]
 anchors_preset = 5

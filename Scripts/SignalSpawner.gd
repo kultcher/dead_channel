@@ -63,15 +63,8 @@ func create_test_drone(id: String, start_cell: float, lane: int) -> SignalData:
 	var mobility := MobilityComponent.new()
 	mobility.move_speed_cells_per_sec = 0.15
 
-	var p0 := MobilityPatrolPoint.new()
-	p0.cell_x = start_cell
-	p0.lane = lane
-	p0.dwell_sec = 2.0
-
-	var p1 := MobilityPatrolPoint.new()
-	p1.cell_x = start_cell + 1.5
-	p1.lane = lane
-	p1.dwell_sec = 2.0
+	var p0 := _make_absolute_patrol_point(start_cell, lane, 0.0, 0, 2.0)
+	var p1 := _make_absolute_patrol_point(start_cell, lane, 1.5, 0, 2.0)
 
 	mobility.patrol_points = [p0, p1]
 	drone.mobility = mobility
@@ -133,25 +126,10 @@ func create_test_guard(id: String, start_cell: float, lane: int) -> SignalData:
 	var mobility := MobilityComponent.new()
 	mobility.move_speed_cells_per_sec = 0.15
 
-	var p0 := MobilityPatrolPoint.new()
-	p0.cell_x = start_cell
-	p0.lane = lane
-	p0.dwell_sec = 2.0
-
-	var p1 := MobilityPatrolPoint.new()
-	p1.cell_x = start_cell + 1.5
-	p1.lane = clampi(lane, 0, 4)
-	p1.dwell_sec = 2.0
-
-	var p2 := MobilityPatrolPoint.new()
-	p2.cell_x = start_cell + 1.5
-	p2.lane = clampi(lane + 1, 0, 4)
-	p2.dwell_sec = 2.0
-
-	var p3 := MobilityPatrolPoint.new()
-	p3.cell_x = start_cell
-	p3.lane = clampi(lane + 1, 0, 4)
-	p3.dwell_sec = 2.0
+	var p0 := _make_absolute_patrol_point(start_cell, lane, 0.0, 0, 2.0)
+	var p1 := _make_absolute_patrol_point(start_cell, lane, 1.5, 0, 2.0)
+	var p2 := _make_absolute_patrol_point(start_cell, lane, 1.5, 1, 2.0)
+	var p3 := _make_absolute_patrol_point(start_cell, lane, 0.0, 1, 2.0)
 
 	mobility.patrol_points = [p0, p1, p2, p3]
 	guard.mobility = mobility
@@ -172,3 +150,19 @@ func create_test_disruptor(id: String, lane: int) -> SignalData:
 	disruptor.disruptor = disruptor_component
 
 	return disruptor
+
+func _make_absolute_patrol_point(
+	base_cell_x: float,
+	base_lane: int,
+	cell_offset: float,
+	lane_offset: int,
+	dwell_sec: float = 0.0,
+	facing_deg: float = 180.0
+) -> MobilityPatrolPoint:
+	# These test helpers author patrols with offsets, then immediately resolve them.
+	var point := MobilityPatrolPoint.new()
+	point.cell_x = base_cell_x + cell_offset
+	point.lane = clampi(base_lane + lane_offset, 0, 4)
+	point.dwell_sec = dwell_sec
+	point.facing_deg = facing_deg
+	return point

@@ -1,0 +1,74 @@
+{
+  "generic": {
+    "handshake": [
+      "Establishing tunnel... OK",
+      "Negotiating session... OK",
+      "Handshake: SYN > SYN-ACK > ACK (##ms)",
+      "Routing through proxy chain... 3 hops... connected.",
+      "Port scan: ##/tcp open. Establishing link.",
+      "Spoofing MAC address... accepted.",
+      "TLS downgrade... success. Channel open.",
+      "Connecting via relay ####... latency ##ms... OK",
+      "Session key exchanged. Encrypted channel active.",
+      "Piggyback on maintenance port... accepted.",
+      "Auth bypass: null credential injection... OK",
+      "Certificate pinning disabled. Proceeding.",
+      "Tunneling through ####:##... connected."
+    ],
+    "status_universal": [
+      "UPTIME: ####h ##m",
+      "FIRMWARE: v#.#.#",
+      "LAST MAINT: ####-##-##",
+      "NETWORK: secure_subnet",
+      "POWER: MAINS",
+      "ASSET TAG: LOCAL-########"
+    ],
+    "status_camera": [
+      "RECORDING: ACTIVE - buffer at ##%",
+      "FEED: LIVE",
+      "RESOLUTION: 1080p",
+      "NIGHT VISION: AUTO",
+      "MOTION DETECT: ENABLED",
+      "PAN CYCLE: ##s"
+    ],
+    "status_door": [
+      "STATE: LOCKED",
+      "BOLT TYPE: ELECTROMAGNETIC",
+      "AUTH: Tier 2 clearance required",
+      "FIRE PROTOCOL: FAIL-SECURE"
+    ],
+    "status_drone": [
+      "PATROL STATUS: ACTIVE",
+      "BATTERY: ##%",
+      "ALTITUDE: ##m",
+      "ROUTE: STANDARD"
+    ],
+    "status_guard": [
+      "BIOMETRIC LINK: LIVE",
+      "COMMS: ENCRYPTED",
+      "THREAT POSTURE: PATROL",
+      "UPLINK: STABLE"
+    ],
+    "status_terminal": [
+      "ACCESS LEVEL: RESTRICTED",
+      "ACTIVE SESSIONS: 1",
+      "STORAGE: ##% USED",
+      "LAST LOGIN: ####-##-## ##:##"
+    ],
+    "status_disruptor": [
+      "CHARGE STATE: READY",
+      "OUTPUT MODE: PULSE",
+      "SYNC: STANDBY",
+      "RANGE PROFILE: LOCAL"
+    ],
+    "puzzle_hint": [],
+    "error": []
+  },
+  "corp_specific": {
+    "sentinel_corp": {
+      "handshake": [],
+      "puzzle_hint": [],
+      "error": []
+    }
+  }
+}

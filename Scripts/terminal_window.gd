@@ -15,6 +15,9 @@ const NULL_SPIKE_DUMP_2_PATH := "res://Resources/RunData/AuthoredRuns/null_spike
 const NULL_SPIKE_DUMP_3_PATH := "res://Resources/RunData/AuthoredRuns/null_spike_dump3.md"
 const BREAKDOWN_CHARSET := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789[]{}<>/\\|!?@#$%^&*()_+-=;:.,~`¢£¥¤§¶µßøÞþÐðΩΛΨΣЖЯФЫЮдёж漢字仮名アイウエオ░▒▓█"
 
+const CONNECTION_FLOW_TOTAL_DURATION := 0.96
+const CONNECTION_FLOW_MAX_STEP_DELAY := 0.08
+
 @onready var command_line = $TerminalVBox/CmdLineHBox/CommandLine
 @onready var history = $TerminalVBox/TerminalHistory
 @onready var prefix = $TerminalVBox/CmdLineHBox/InputPrefix
@@ -34,6 +37,11 @@ var _last_ghost_quadrant := -1
 var _breakdown_entered_count := 0
 var _collapse_sequence_started := false
 var _main_breakdown_active := false
+var _connection_flow_serial := 0
+var _connection_send_locked := false
+var _buffered_command_text := ""
+var _buffered_command_signal: ActiveSignal = null
+var _buffered_command_flow_serial := -1
 
 func _ready():
 	set_context()
@@ -52,11 +60,11 @@ func _ready():
 	session_tabs.add_tab("root")
 	_set_tab_session(0, root_session)
 
-func switch_session(new_sig: ActiveSignal):
+func switch_session(new_sig: ActiveSignal, show_connection_banner: bool = false):
 	if new_sig == null:
 		print("null signal")
 		return
-	if active_signal == new_sig:
+	if active_signal == new_sig and not show_connection_banner:
 		print("Same signal")
 		return
 
@@ -71,13 +79,24 @@ func switch_session(new_sig: ActiveSignal):
 		active_session = new_session
 		ensure_tab_for_session(new_session)
 		clear_log()
-		print_to_log("New session started with " + new_sig.data.system_id)
+		if show_connection_banner:
+			_play_connection_flow(new_sig)
+		else:
+			print_to_log("New session started with " + new_sig.data.system_id)
 		print_to_root("<Session Log>: Connected to " + new_sig.data.system_id)
 		prefix.text = "-" + new_sig.data.system_id + "-["
 
 	# Switch to existing session
 	elif active_signal.terminal_session != null:
 		active_session = active_signal.terminal_session
+		if not active_session.has_tab:
+			ensure_tab_for_session(active_session)
+		if show_connection_banner:
+			clear_log()
+			active_session.history.clear()
+			_play_connection_flow(new_sig)
+			prefix.text = "-" + active_session.active_signal.data.system_id + "-["
+			return
 		restore_session(active_session)
 
 func failed_connection_feedback(active_sig):
@@ -455,6 +474,91 @@ func _apply_spacing_distortion(text: String, progress: float) -> String:
 func clear_log():
 	history.text = ""
 
+func _print_connection_flow(target_sig: ActiveSignal) -> void:
+	var lines := Jargonizer.build_connection_flow(target_sig)
+	for line in lines:
+		print_to_log(line)
+
+func _play_connection_flow(target_sig: ActiveSignal) -> void:
+	_connection_flow_serial += 1
+	var flow_serial := _connection_flow_serial
+	_connection_send_locked = true
+	_clear_buffered_command()
+	_stream_connection_flow_async(target_sig, flow_serial)
+
+func _stream_connection_flow_async(target_sig: ActiveSignal, flow_serial: int) -> void:
+	var lines := Jargonizer.build_connection_flow(target_sig)
+	if lines.is_empty():
+		_finish_connection_flow(flow_serial, target_sig)
+		return
+
+	var full_text := "\n".join(lines)
+	var total_chars := full_text.length()
+	if total_chars <= 0:
+		_finish_connection_flow(flow_serial, target_sig)
+		return
+
+	var char_delay := CONNECTION_FLOW_TOTAL_DURATION / float(total_chars)
+	char_delay = minf(char_delay, CONNECTION_FLOW_MAX_STEP_DELAY)
+	var base_text = history.text
+	var chars_revealed: float = 0.0
+
+	while chars_revealed < total_chars:
+		if flow_serial != _connection_flow_serial:
+			return
+		if active_session == null or active_session.active_signal != target_sig:
+			_finish_connection_flow(flow_serial, target_sig)
+			return
+
+		var delta := get_process_delta_time()
+		var current_idx := int(chars_revealed)
+		if current_idx < total_chars and full_text[current_idx] == "\n":
+			chars_revealed += 1.0
+			history.text = base_text + full_text.substr(0, int(chars_revealed))
+			await get_tree().create_timer(minf(0.02, maxf(0.001, char_delay * 2.0))).timeout
+			continue
+
+		chars_revealed += delta / maxf(0.001, char_delay)
+		history.text = base_text + full_text.substr(0, int(chars_revealed))
+		await get_tree().process_frame
+
+	if flow_serial == _connection_flow_serial:
+		history.text = base_text + full_text + "\n"
+		active_session.history.append_array(lines)
+	_finish_connection_flow(flow_serial, target_sig)
+
+func _finish_connection_flow(flow_serial: int, target_sig: ActiveSignal) -> void:
+	if flow_serial != _connection_flow_serial:
+		return
+	_connection_send_locked = false
+	_flush_buffered_command(target_sig, flow_serial)
+
+func _clear_buffered_command() -> void:
+	_buffered_command_text = ""
+	_buffered_command_signal = null
+	_buffered_command_flow_serial = -1
+
+func _buffer_command_submit(new_text: String) -> void:
+	_buffered_command_text = new_text
+	_buffered_command_signal = active_signal
+	_buffered_command_flow_serial = _connection_flow_serial
+	command_line.clear()
+
+func _flush_buffered_command(target_sig: ActiveSignal, flow_serial: int) -> void:
+	if _buffered_command_text.is_empty():
+		return
+	if _buffered_command_signal != target_sig:
+		_clear_buffered_command()
+		return
+	if _buffered_command_flow_serial != flow_serial:
+		_clear_buffered_command()
+		return
+
+	var buffered_text := _buffered_command_text
+	_clear_buffered_command()
+	print_to_log("--[ " + buffered_text)
+	CommandDispatch.process_command(buffered_text, active_signal)
+
 func restore_session(session: TerminalSession):
 	if active_session == null: return
 	active_session = session
@@ -548,6 +652,9 @@ func _set_tab_session(tab_index: int, session: TerminalSession):
 # SIGNALLED FUNCTIONS
 
 func _on_command_line_text_submitted(new_text: String) -> void:
+	if _connection_send_locked:
+		_buffer_command_submit(new_text)
+		return
 	print_to_log("--[ " + new_text)
 	CommandDispatch.process_command(new_text, active_signal)
 	command_line.clear()

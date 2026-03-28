@@ -22,7 +22,7 @@ func get_spawns() -> Array[Dictionary]:
 		}),
 		build_spawn(BASIC_DRONE, 6.5, {"system_id": "drone_01", "lane": 3,
 		"add_ic_modules": [make_reboot_module(3)],
-		"patrol_points": make_patrol_route([14.5, 1, 1, 0], [15.5, 1, 1, 0], [15.5, 3, 1, 0], [14.5, 3, 1, 0])}),
+		"patrol_points": make_patrol_route([8.0, -2, 1, 0], [9.0, -2, 1, 0], [9.0, 0, 1, 0], [8.0, 0, 1, 0])}),
 		build_spawn(BASIC_DISRUPTOR, 14.5, {"system_id": "coolant_vent_01", "lane": 4}),
 		#build_spawn(BASIC_DOOR, 19.5, {"system_id": "lab_door",
 			#"lane": 2,
@@ -42,24 +42,24 @@ func get_spawns() -> Array[Dictionary]:
 		#build_spawn(BASIC_CAMERA, 34.5, {"system_id": "cam_06", "lane": 4, "facing_deg": 10}),
 #
 		#build_spawn(COMBAT_DRONE, 36.5, {"system_id": "c_drone_01", "lane": 1,
-			#"patrol_points": make_patrol_route([36.5, 2, 1, 0], [27.5, 2, 1, 0]),
+			#"patrol_points": make_patrol_route([0.0, 1, 1, 0], [-9.0, 1, 1, 0]),
 			#"puzzle": make_sniff_puzzle(1, load("res://Resources/PuzzlePrefabs/killer_drone_puzzle.tres")),
 			#"add_ic_modules": [make_faraday_module(3)]
 		#}),
 		#build_spawn(BASIC_DISRUPTOR, 33.5, {"system_id": "coolant_vent_07", "lane": 3}),
 		#
 		#build_spawn(COMBAT_DRONE, 44.5, {"system_id": "c_drone_02", "lane": 1,
-			#"patrol_points": make_patrol_route([44.5, 0, 3, 0], [44.5, 3, 3, 0]),
+			#"patrol_points": make_patrol_route([0.0, -1, 3, 0], [0.0, 2, 3, 0]),
 			#"add_ic_modules": [make_faraday_module(3)]}),
 #
 		#build_spawn(COMBAT_DRONE, 46.5, {"system_id": "c_drone_03", "lane": 2,
-			#"patrol_points": make_patrol_route([46.5, 1, 3, 0], [46.5, 4, 3, 0]),
+			#"patrol_points": make_patrol_route([0.0, -1, 3, 0], [0.0, 2, 3, 0]),
 			#"puzzle": make_sniff_puzzle(1)}),
 #
 		#build_spawn(BASIC_DISRUPTOR, 47.5, {"system_id": "coolant_vent_08", "lane": 0}),
 #
 		#build_spawn(COMBAT_DRONE, 48.5, {"system_id": "c_drone_04", "lane": 3,
-			#"patrol_points": make_patrol_route([48.5, 1, .5, 0], [48.5, 3, .5, 0]),
+			#"patrol_points": make_patrol_route([0.0, -2, .5, 0], [0.0, 0, .5, 0]),
 			#"add_ic_modules": [make_reboot_module(3)]
 		#}),
 #
@@ -68,12 +68,12 @@ func get_spawns() -> Array[Dictionary]:
 		## final obstacle before door
 		#build_spawn(COMBAT_DRONE, 50.5, {
 			#"system_id": "c_drone_05", "lane": 4,
-			#"patrol_points": make_patrol_route([50.5, 0, 3, 0], [50.5, 4, 3, 0]),
+			#"patrol_points": make_patrol_route([0.0, -4, 3, 0], [0.0, 0, 3, 0]),
 			#"puzzle": make_sniff_puzzle(1)}),
 		#
 		## horizontal patroller
 		#build_spawn(COMBAT_DRONE, 50.5, {"system_id": "c_drone_05", "lane": 2,
-			#"patrol_points": make_patrol_route([50.5, 2, 1, 0], [47.5, 2, 1, 0]),
+			#"patrol_points": make_patrol_route([0.0, 0, 1, 0], [-3.0, 0, 1, 0]),
 			#"add_ic_modules": [make_reboot_module(10)],
 		#}),
 		#

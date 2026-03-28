@@ -30,7 +30,7 @@ func _kill(cmd_context):
 func _run(cmd_context):
 	if !cmd_context.active_sig.data.puzzle:
 		cmd_context.log_text.append("RUN " + cmd_context.arg.to_upper() + " failed. Signal is not locked.")
-	elif !cmd_context.active_sig.data.puzzle.is_puzzled_locked:
+	elif !cmd_context.active_sig.data.puzzle.puzzle_locked:
 		cmd_context.log_text.append("RUN " + cmd_context.arg.to_upper() + " failed. Signal already unlocked.")
 	elif !cmd_context.arg in ["sniff", "fuzz", "decrypt"]:
 		cmd_context.log_text.append("RUN failed. No program named " + cmd_context.arg.to_upper() + " found.")

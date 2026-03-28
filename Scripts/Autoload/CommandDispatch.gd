@@ -57,13 +57,13 @@ const COMMAND_SHORTCUTS = {
 
 const ROOT_CONTEXT_ERROR := "Not applicable on ROOT, connect to a session."
 
-func switch_terminal_session(active_sig: ActiveSignal):
+func switch_terminal_session(active_sig: ActiveSignal, show_connection_banner: bool = false):
 	if active_sig == null:
 		return
 	if not GlobalEvents.is_tutorial_feature_enabled("connect"):
 		return
 	GlobalEvents.signal_connect.emit(active_sig.data)
-	terminal_window.switch_session(active_sig)
+	terminal_window.switch_session(active_sig, show_connection_banner)
 
 # === MAIN ENTRY POINT ===
 
@@ -100,7 +100,7 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 
 	if resolved.has("switch_target"):
 		var switch_target: ActiveSignal = resolved.switch_target
-		switch_terminal_session(switch_target)
+		switch_terminal_session(switch_target, cmd_context.command == "ACCESS")
 		cmd_context.active_sig = switch_target
 
 	if cmd_context.command == "ACCESS":
@@ -254,7 +254,6 @@ func _try_special_command(input: String, active_sig: ActiveSignal) -> bool:
 # === COMMAND HANDLERS ===
 
 func _cmd_access(cmd_context: CommandContext) -> void:
-	cmd_context.log_text.append("ACCESS GRANTED")
 	_finalize_command(cmd_context)
 
 func _cmd_help(active_sig: ActiveSignal) -> void:
