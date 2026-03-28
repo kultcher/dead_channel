@@ -26,12 +26,8 @@ func get_spawns() -> Array[Dictionary]:
 		"patrol_points": make_patrol_route([0.0, -2, 1, 0], [1.0, -2, 1, 0], [1.0, 0, 1, 0], [0.0, 0, 1, 0])}),
 		build_spawn(BASIC_DISRUPTOR, 14.5, {"system_id": "coolant_vent_01", "lane": 4}),
 		
-		# pre-lab gauntlet
-		
-		
-		
-		
-		
+		# pre-lab gauntlet (17.5 - 38.5)
+
 		
 		build_spawn(BASIC_DOOR, 19.5, {"system_id": "lab_door",
 			"lane": 2,
@@ -53,7 +49,7 @@ func get_spawns() -> Array[Dictionary]:
 		build_spawn(COMBAT_DRONE, 36.5, {"system_id": "c_drone_01", "lane": 2,
 			"patrol_points": make_patrol_route([0.0, 0, 1, 0], [-9.0, 0, 1, 0]),
 			"puzzle": make_sniff_puzzle(1, load("res://Resources/PuzzlePrefabs/killer_drone_puzzle.tres")),
-			"add_ic_modules": [make_faraday_module(3)]
+			"add_ic_modules": [make_faraday_module(2)]
 		}),
 		build_spawn(BASIC_DISRUPTOR, 33.5, {"system_id": "coolant_vent_07", "lane": 3}),
 		

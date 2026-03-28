@@ -10,20 +10,60 @@ func get_display_name() -> String:
 # Common helpers from RunDefinition: make_decrypt_puzzle(), make_reboot_module(), make_reboot_ic()
 func get_spawns() -> Array[Dictionary]:
 	return [
-		build_spawn(PANNING_CAMERA, 4.5, {
-			"system_id": "cam_02",
-			"lane": 3,
+		build_spawn(PANNING_CAMERA, 20.5, {
+			"system_id": "cam_03",
+			"lane": 0,
+			"vision_angle_deg": 20,
+			"vision_length_cells": 1,
+			"detection_patrol_points": make_detection_sweep([-1,3], [180,3]),
+			"add_ic_modules": [make_reboot_module(3)]
+		}),
+		build_spawn(PANNING_CAMERA, 23.5, {
+			"system_id": "cam_04",
+			"lane": 4,
+			"vision_angle_deg": 20,
+			"vision_length_cells": 1,
+			"detection_patrol_points": make_detection_sweep([1,3.5], [180,3.5]),
 			"add_ic_modules": [make_reboot_module(10)]
 		}),
 
-		build_spawn(BASIC_DOOR, 5.5, {
-			"lane": 2,
-			"puzzle": make_sniff_puzzle(1),
+		build_spawn(BASIC_DRONE, 25, {"system_id": "drone_02", "lane": 1,
+		"add_ic_modules": [make_reboot_module(10)],
+		"patrol_points": make_patrol_route([0.0, 0, 3, 0], [6.0, 0, 3, 0])}),
+
+		build_spawn(BASIC_CAMERA, 26.5, {
+			"system_id": "cam_05",
+			"lane": 1,
+			"vision_angle_deg": 20,
+			"vision_length_cells": 1,
+			"detection_patrol_points": make_detection_sweep([-1,3.5], [180,3.5]),
+			"add_ic_modules": [make_reboot_module(10)]
 		}),
-		build_spawn(BASIC_DRONE, 6.5, {"system_id": "drone_01", "lane": 3,
-		"add_ic_modules": [make_reboot_module(3)],
-		"patrol_points": make_patrol_route([8.0, -2, 1, 0], [9.0, -2, 1, 0], [9.0, 0, 1, 0], [8.0, 0, 1, 0])}),
-		build_spawn(BASIC_DISRUPTOR, 14.5, {"system_id": "coolant_vent_01", "lane": 4}),
+		build_spawn(PANNING_CAMERA, 29.5, {
+			"system_id": "cam_06",
+			"lane": 4,
+			"vision_angle_deg": 20,
+			"vision_length_cells": 1,
+			"detection_patrol_points": make_detection_sweep([1,3.5], [180,3.5]),
+			"add_ic_modules": [make_reboot_module(3)]
+		}),
+		build_spawn(BASIC_CAMERA, 35.5, {
+			"system_id": "cam_07",
+			"lane": 2,
+			"vision_angle_deg": 20,
+			"vision_length_cells": 1,
+			"add_ic_modules": [make_reboot_module(10), make_bouncer_module(3)]
+		}),
+
+		build_spawn(BASIC_DRONE, 31, {"system_id": "drone_03", "lane": 3,
+		"patrol_points": make_patrol_route([0.0, 0, 3, 0], [-6, 0, 3, 0])}),
+
+		build_spawn(BASIC_DISRUPTOR, 27.5, {"system_id": "coolant_vent_00", "lane": 4}),
+		build_spawn(BASIC_DISRUPTOR, 29.5, {"system_id": "breaker_panel_02", "lane": 0}),
+		build_spawn(BASIC_DISRUPTOR, 31.5, {"system_id": "nano_fabricator_00", "lane": 4}),
+
+
+
 		#build_spawn(BASIC_DOOR, 19.5, {"system_id": "lab_door",
 			#"lane": 2,
 			#"puzzle": make_sniff_puzzle(1, load("res://Resources/PuzzlePrefabs/null_spike_door_puzzle.tres"))

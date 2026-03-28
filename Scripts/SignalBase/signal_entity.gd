@@ -306,6 +306,10 @@ func refresh_session_indicator_geometry() -> void:
 	if target_indicator.has_method("refresh_geometry"):
 		target_indicator.refresh_geometry()
 
+func play_forced_disconnect_feedback() -> void:
+	if target_indicator != null and target_indicator.has_method("play_forced_disconnect_feedback"):
+		await target_indicator.play_forced_disconnect_feedback()
+
 func _sync_session_indicator_state() -> void:
 	var terminal_window = CommandDispatch.terminal_window
 	if terminal_window == null or my_active_sig == null:

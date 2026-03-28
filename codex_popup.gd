@@ -9,6 +9,7 @@ extends PanelContainer
 
 func setup_and_display(codex_id: StringName):
 	var entry = get_resource_from_stringname(codex_id)
+	if entry == null: return
 	title_label.text = entry.title
 	type_label.text = entry.category
 	extra_label.text = entry.extra

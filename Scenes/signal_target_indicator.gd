@@ -6,11 +6,13 @@ const SPAWN_SCALE := 1.5
 const SPAWN_ROTATION_DEG := 45.0
 const TRANSITION_DURATION := 0.5
 const ALPHA_TWEEN_DURATION := 0.18
+const FORCED_DISCONNECT_FEEDBACK_DURATION := 0.22
 
 @export var frame_size: Vector2 = Vector2(74.0, 74.0)
 @export var corner_length: float = 18.0
 @export var line_width: float = 2
 @export var frame_color: Color = Color(0.65, 1.0, 0.72, 1.0)
+@export var forced_disconnect_line_color: Color = Color(1.0, 0.25, 0.25, 1.0)
 @export var active_alpha: float = 1.0
 @export var inactive_alpha: float = 0.35
 @export var frame_padding: Vector2 = Vector2(14.0, 14.0)
@@ -20,6 +22,8 @@ const ALPHA_TWEEN_DURATION := 0.18
 var _owner_entity: Node2D = null
 var _current_state := VisualState.NONE
 var _transition_tween: Tween = null
+var _disconnect_feedback_tween: Tween = null
+var _disconnect_feedback_active := false
 
 func _ready() -> void:
 	frame_size = Vector2(maxf(frame_size.x, 1.0), maxf(frame_size.y, 1.0))
@@ -31,6 +35,7 @@ func _ready() -> void:
 	rotation_degrees = 0.0
 	if indicator_line != null:
 		indicator_line.visible = false
+		indicator_line.top_level = true
 		indicator_line.default_color = frame_color
 	_refresh_processing()
 
@@ -76,6 +81,7 @@ func refresh_geometry() -> void:
 	_refresh_line_geometry()
 
 func _process(_delta: float) -> void:
+	_refresh_line_visuals()
 	_refresh_line_geometry()
 
 func _draw() -> void:
@@ -149,6 +155,7 @@ func _apply_hidden_state() -> void:
 	scale = Vector2.ONE
 	rotation_degrees = 0.0
 	modulate.a = 0.0
+	_disconnect_feedback_active = false
 	if indicator_line != null:
 		indicator_line.visible = false
 	_refresh_processing()
@@ -159,13 +166,15 @@ func _stop_transition_tween() -> void:
 		_transition_tween = null
 
 func _refresh_processing() -> void:
-	set_process(visible and _should_show_line())
+	set_process(visible)
 
 func _refresh_line_visuals() -> void:
 	if indicator_line == null:
 		return
+	if _disconnect_feedback_active:
+		return
 	var line_color := frame_color
-	line_color.a = _get_state_alpha(_current_state)
+	line_color.a = modulate.a
 	indicator_line.default_color = line_color
 	indicator_line.width = line_width
 	indicator_line.visible = _should_show_line()
@@ -192,13 +201,15 @@ func _refresh_line_geometry() -> void:
 		indicator_line.visible = false
 		return
 
-	var local_source := get_global_transform_with_canvas().affine_inverse() * tab_anchor_global
-	var local_target := get_indicator_bottom_local_position()
-	indicator_line.points = PackedVector2Array([local_source, local_target])
+	var global_target := get_indicator_bottom_global_position()
+	indicator_line.points = PackedVector2Array([tab_anchor_global, global_target])
 	indicator_line.visible = true
 
 func get_indicator_bottom_local_position() -> Vector2:
 	return Vector2(0.0, frame_size.y * 0.5)
+
+func get_indicator_bottom_global_position() -> Vector2:
+	return get_global_transform_with_canvas() * get_indicator_bottom_local_position()
 
 func _get_state_alpha(state: int) -> float:
 	match state:
@@ -219,3 +230,34 @@ func _should_show_line() -> bool:
 
 	var terminal_window = CommandDispatch.terminal_window
 	return terminal_window != null and terminal_window.show_inactive_session_lines
+
+func play_forced_disconnect_feedback() -> void:
+	if indicator_line == null:
+		return
+	if not _should_show_line():
+		return
+
+	if _disconnect_feedback_tween != null:
+		_disconnect_feedback_tween.kill()
+
+	_disconnect_feedback_active = true
+	var line_color := forced_disconnect_line_color
+	line_color.a = modulate.a
+	indicator_line.visible = true
+	indicator_line.default_color = line_color
+	var faded_color := line_color
+	faded_color.a = 0.0
+	_disconnect_feedback_tween = create_tween()
+	var color_tween := _disconnect_feedback_tween.tween_property(
+		indicator_line,
+		"default_color",
+		faded_color,
+		FORCED_DISCONNECT_FEEDBACK_DURATION
+	)
+	color_tween.set_trans(Tween.TRANS_SINE)
+	color_tween.set_ease(Tween.EASE_IN)
+	await _disconnect_feedback_tween.finished
+	_disconnect_feedback_tween = null
+	_disconnect_feedback_active = false
+	if indicator_line != null:
+		indicator_line.visible = false

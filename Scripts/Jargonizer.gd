@@ -57,6 +57,9 @@ static func build_connection_flow(active_sig: ActiveSignal, corp_id: String = ""
 	for puzzle_line in _build_puzzle_hint_block(active_sig):
 		lines.append(puzzle_line)
 
+	for ic_line in _build_ic_connection_block(active_sig):
+		lines.append(ic_line)
+
 	#lines.append(_build_installed_line(active_sig))
 	return lines
 
@@ -255,6 +258,11 @@ static func _build_puzzle_hint_block(active_sig: ActiveSignal) -> Array[String]:
 			lines.append(hint_line)
 
 	return lines
+
+static func _build_ic_connection_block(active_sig: ActiveSignal) -> Array[String]:
+	if active_sig == null or active_sig.data == null or active_sig.data.ic_modules == null:
+		return []
+	return active_sig.data.ic_modules.get_connection_flow_lines(active_sig)
 
 static func _collect_installed_modules(active_sig: ActiveSignal) -> Array[String]:
 	var modules: Array[String] = []

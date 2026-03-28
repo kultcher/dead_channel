@@ -117,6 +117,11 @@ func make_faraday_module(max_runner_distance_cells: float = 2.0) -> FaradayModul
 	module.max_runner_distance_cells = max_runner_distance_cells
 	return module
 
+func make_bouncer_module(bounce_time: float = 3.0) -> BouncerModule:
+	var module := BouncerModule.new()
+	module.time_to_disconnect = bounce_time
+	return module
+
 func make_reboot_ic(reboot_time: float = 5.0) -> ICComponent:
 	return make_ic([make_reboot_module(reboot_time)])
 

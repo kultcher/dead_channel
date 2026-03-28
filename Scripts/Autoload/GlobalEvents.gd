@@ -14,6 +14,7 @@ signal cell_reached(cell: int)
 signal signal_scanned(signal_data: SignalData, scan_depth)
 signal signal_scan_complete(signal_data: SignalData)
 signal signal_connect(data: SignalData)
+
 signal signal_hacked(data: SignalData, success: bool)
 signal signal_killed(active_sig: ActiveSignal)
 signal mobile_investigating(active_sig: ActiveSignal)

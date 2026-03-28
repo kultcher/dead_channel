@@ -18,8 +18,17 @@ func bind_to_context(signal_data: SignalData, terminal_ref: Control):
 func interrupts_commands(_cmd_context: CommandContext) -> bool:
 	return false
 
+func on_connect(active_sig: ActiveSignal):
+	pass
+
+func on_session_closed(active_sig: ActiveSignal):
+	pass
+
 func on_disabled(active_sig: ActiveSignal):
 	pass
 
 func on_enabled(active_sig: ActiveSignal):
 	pass
+
+func get_connection_flow_lines(_active_sig: ActiveSignal) -> Array[String]:
+	return []

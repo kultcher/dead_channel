@@ -87,11 +87,11 @@ x watch out for disabled terminal before null_lab
 
 
 Not Yet Implemented (priority):
+- Programs and RAM
 - Robust heat implementation with difficulty scaling
 - Advanced Signal functions/behaviors
 - fuzz minigame
 - More and more advanced IC
-- Programs and RAM
 
 Not Yet Implemented (long-term):
 - guard alert behaviors expanded

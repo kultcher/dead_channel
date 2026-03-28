@@ -29,6 +29,14 @@ func command_intercept(cmd_context: CommandContext):
 			return true
 	return false
 
+func notify_connected(active_sig: ActiveSignal):
+	for module in modules:
+		module.on_connect(active_sig)
+
+func notify_session_closed(active_sig: ActiveSignal):
+	for module in modules:
+		module.on_session_closed(active_sig)
+
 func notify_enabled(active_sig: ActiveSignal):
 	for module in modules:
 		module.on_enabled(active_sig)
@@ -36,3 +44,11 @@ func notify_enabled(active_sig: ActiveSignal):
 func notify_disabled(active_sig: ActiveSignal):
 	for module in modules:
 		module.on_disabled(active_sig)
+
+func get_connection_flow_lines(active_sig: ActiveSignal) -> Array[String]:
+	var lines: Array[String] = []
+	for module in modules:
+		if module == null:
+			continue
+		lines.append_array(module.get_connection_flow_lines(active_sig))
+	return lines

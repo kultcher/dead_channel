@@ -224,7 +224,18 @@ func _run_drone_01_intro_sequence():
 	await GlobalEvents.mobile_investigating
 	_release_runner_hold("drone_01_gate")
 
-	# pre-lab gauntlet
+	await _wait_for_cell(17.5)
+
+	_set_objective("- Help Blackjack through the gauntlet
+- Use the <- and -> arrow keys to have Blackjack slow down or sleep up
+- Press F1 if you need a refresher on terminal commands")
+	await _show_dialogue([
+		"Long corridor coming up, lots of cameras and a few drones. No more hand-holding, kid. Let's see what you've got.",
+	],)
+
+	# pre-lab gauntlet (17.5 - 38.5)
+
+
 
 
 func _run_null_door_intro_sequence():

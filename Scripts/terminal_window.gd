@@ -550,6 +550,8 @@ func _finish_connection_flow(flow_serial: int, target_sig: ActiveSignal) -> void
 		return
 	_connection_send_locked = false
 	_flush_buffered_command(target_sig, flow_serial)
+	if target_sig != null and target_sig.data != null and target_sig.data.ic_modules != null:
+		target_sig.data.ic_modules.notify_connected(target_sig)
 
 func _clear_buffered_command() -> void:
 	_buffered_command_text = ""
@@ -613,13 +615,9 @@ func _on_session_tabs_tab_clicked(tab: int) -> void:
 func _on_session_tabs_tab_close_pressed(tab: int) -> void:
 	if tab == 0: return
 	var session = _get_tab_session(tab)
-	if session == active_session:
-		restore_session(root_session)
-	if session != null:
-		session.has_tab = false
-		if session.active_signal != null:
-			session_closed.emit(session.active_signal)
-	session_tabs.remove_tab(tab)
+	if session == null:
+		return
+	_close_session_tab(session, session.active_signal)
 
 func hide_tab_for_signal(target_signal: ActiveSignal) -> void:
 	if target_signal == null or target_signal.terminal_session == null:
@@ -631,20 +629,13 @@ func hide_tab_for_signal(target_signal: ActiveSignal) -> void:
 
 	var tab_index := _find_tab_for_session(session)
 	if tab_index == -1:
-		session.has_tab = false
-		if active_session == session:
-			restore_session(root_session)
-		if target_signal != null:
-			session_closed.emit(target_signal)
+		_close_session_tab(session, target_signal)
 		return
 
 	if session == active_session:
 		print_to_root("<Session Log>: WARNING: " + target_signal.data.system_id + " no longer in range. Dropping to root.")
-		restore_session(root_session)
-
-	session.has_tab = false
-	session_closed.emit(target_signal)
-	session_tabs.remove_tab(tab_index)
+	_close_session_tab(session, target_signal)
+	return
 
 func ensure_tab_for_session(session: TerminalSession):
 	var existing_index = _find_tab_for_session(session)
@@ -711,6 +702,43 @@ func _set_active_session(session: TerminalSession) -> void:
 	if active_session != null and active_session != root_session and active_session.has_tab and active_session.active_signal != null:
 		session_activated.emit(active_session.active_signal)
 
+func force_disconnect_signal(target_signal: ActiveSignal, reason_lines: Array[String] = []) -> void:
+	if target_signal == null or target_signal.terminal_session == null:
+		return
+
+	var session := target_signal.terminal_session
+	for line in reason_lines:
+		if line.is_empty():
+			continue
+		session.history.append(line)
+		if session == active_session:
+			print_unlogged(line)
+		print_to_root(line)
+
+	if target_signal.data != null:
+		print_to_root("<Session Log>: " + target_signal.data.system_id + " connection terminated.")
+
+	if target_signal.instance_node != null and target_signal.instance_node.has_method("play_forced_disconnect_feedback"):
+		await target_signal.instance_node.play_forced_disconnect_feedback()
+
+	_close_session_tab(session, target_signal)
+
+func _close_session_tab(session: TerminalSession, target_signal: ActiveSignal) -> void:
+	if session == null:
+		return
+
+	var tab_index := _find_tab_for_session(session)
+	if active_session == session:
+		restore_session(root_session)
+
+	session.has_tab = false
+	if target_signal != null and target_signal.data != null and target_signal.data.ic_modules != null:
+		target_signal.data.ic_modules.notify_session_closed(target_signal)
+	if target_signal != null:
+		session_closed.emit(target_signal)
+	if tab_index != -1:
+		session_tabs.remove_tab(tab_index)
+
 # SIGNALLED FUNCTIONS
 
 func _on_command_line_text_submitted(new_text: String) -> void:
@@ -731,5 +759,3 @@ func _on_command_error(error_msg: String, signal_context: ActiveSignal = null) -
 	if signal_context != active_signal:
 		return
 	print_to_log("!! ERROR: " + error_msg)
-
-	
