@@ -62,6 +62,18 @@ Short-term TODO:
 - Rework UI
 - add target signal highlight
 - add ciphers and on-solve trigger to codex
+- finalize early jargonizer
+
+
+Polish TODO:
+- Add "drop to root" session log messages on passive signals that despawn
+- Cleanup cutscene controller (hardcode textures)
+- Split out tutorial script and logic
+- guard comms pulses
+- Add a cleaner way to update scan tooltips (array?)
+- Adjust delay behavior to ResponseEffect instead of detection?
+- Fix guard facing override
+
 
 Verify:
 x add sequence break protection on drone_02 coolant vent
@@ -73,15 +85,6 @@ x decrypt: fix the behavior where if it auto-fills, it waits until next cycle to
 x sniff: on miss can hit a null? scroll off?
 x watch out for disabled terminal before null_lab
 
-
-
-Polish TODO:
-- Cleanup cutscene controller (hardcode textures)
-- Split out tutorial script and logic
-- guard comms pulses
-- Add a cleaner way to update scan tooltips (array?)
-- Adjust delay behavior to ResponseEffect instead of detection?
-- Fix guard facing override
 
 Not Yet Implemented (priority):
 - Robust heat implementation with difficulty scaling

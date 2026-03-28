@@ -9,7 +9,7 @@ const ALPHA_TWEEN_DURATION := 0.18
 
 @export var frame_size: Vector2 = Vector2(74.0, 74.0)
 @export var corner_length: float = 18.0
-@export var line_width: float = 2.0
+@export var line_width: float = 2
 @export var frame_color: Color = Color(0.65, 1.0, 0.72, 1.0)
 @export var active_alpha: float = 1.0
 @export var inactive_alpha: float = 0.35
@@ -159,19 +159,21 @@ func _stop_transition_tween() -> void:
 		_transition_tween = null
 
 func _refresh_processing() -> void:
-	set_process(_current_state == VisualState.ACTIVE and visible)
+	set_process(visible and _should_show_line())
 
 func _refresh_line_visuals() -> void:
 	if indicator_line == null:
 		return
-	indicator_line.default_color = frame_color
+	var line_color := frame_color
+	line_color.a = _get_state_alpha(_current_state)
+	indicator_line.default_color = line_color
 	indicator_line.width = line_width
-	indicator_line.visible = _current_state == VisualState.ACTIVE and visible
+	indicator_line.visible = _should_show_line()
 
 func _refresh_line_geometry() -> void:
 	if indicator_line == null:
 		return
-	if _current_state != VisualState.ACTIVE or not visible:
+	if not _should_show_line():
 		indicator_line.visible = false
 		return
 
@@ -206,3 +208,14 @@ func _get_state_alpha(state: int) -> float:
 			return inactive_alpha
 		_:
 			return 0.0
+
+func _should_show_line() -> bool:
+	if not visible:
+		return false
+	if _current_state == VisualState.ACTIVE:
+		return true
+	if _current_state != VisualState.INACTIVE:
+		return false
+
+	var terminal_window = CommandDispatch.terminal_window
+	return terminal_window != null and terminal_window.show_inactive_session_lines

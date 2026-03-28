@@ -24,6 +24,7 @@ signal session_opened(active_sig: ActiveSignal)
 signal session_activated(active_sig: ActiveSignal)
 signal session_deactivated(active_sig: ActiveSignal)
 signal session_closed(active_sig: ActiveSignal)
+signal session_line_display_mode_changed()
 
 @onready var command_line = $TerminalVBox/CmdLineHBox/CommandLine
 @onready var history = $TerminalVBox/TerminalHistory
@@ -31,6 +32,13 @@ signal session_closed(active_sig: ActiveSignal)
 @onready var title_bar = $TerminalVBox/TitleBar
 @onready var title_text = $TerminalVBox/TitleBar/TitleHBox/TitleText
 @onready var session_tabs = $TerminalVBox/TitleBar/TitleHBox/SessionTabs
+
+@export var show_inactive_session_lines := true:
+	set(value):
+		if show_inactive_session_lines == value:
+			return
+		show_inactive_session_lines = value
+		session_line_display_mode_changed.emit()
 
 var active_signal: ActiveSignal		# assigned by window_manager
 var active_session: TerminalSession
@@ -694,11 +702,11 @@ func _set_active_session(session: TerminalSession) -> void:
 		active_signal = session.active_signal if session != null else root_signal
 		return
 
-	if previous_session != null and previous_session != root_session and previous_session.has_tab and previous_session.active_signal != null:
-		session_deactivated.emit(previous_session.active_signal)
-
 	active_session = session
 	active_signal = session.active_signal if session != null else root_signal
+
+	if previous_session != null and previous_session != root_session and previous_session.has_tab and previous_session.active_signal != null:
+		session_deactivated.emit(previous_session.active_signal)
 
 	if active_session != null and active_session != root_session and active_session.has_tab and active_session.active_signal != null:
 		session_activated.emit(active_session.active_signal)

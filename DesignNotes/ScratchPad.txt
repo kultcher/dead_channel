@@ -36,6 +36,7 @@ visual ideas:
 
 	relay signal: force multiplier that buffs other signals
 
+
 	Stealing credentials from guards/terminals, escalating credentials
 	Access-locked terminals still solvable, credentials let you shortcut
 	Credentials decay over time?
@@ -48,6 +49,9 @@ visual ideas:
 	- linked nodes
 
 	Signal properties instead of or in addition to processes: modify camera FOV, etc.
+
+	- ALERT SIGNALS: special, off-timeline signals that spawn guards and do other bad stuff
+
 
 	T1 ice: reboot, punish, lockout
 	ICE classes: 
@@ -62,9 +66,10 @@ visual ideas:
 	guards "comms pulse" to get brief location hints
 	- Heat effects program cleanup times
 	- "flicker" IC: randomly blinks out of the timeline view
-	Solo/Bogart: Ice cancels all other connections
-	Efficiency: punishes you for inactive sessions
-
+	- Solo/Bogart: Ice cancels all other connections
+	- Efficiency: punishes you for inactive sessions
+	- Shy: Hides scan details after a delay or can only be seen while
+	- bouncer: temporarily kicks you out of the session... maybe ALL sessions?
 
 	- Null Spike let's the player see "secret connections" or hidden signals
 	Luxon IC: mutate, evolve
