@@ -4,6 +4,7 @@ enum SourceType { DISTRACTION, RUNNER_BREACH, OTHER }
 
 @export var source_type: SourceType = SourceType.OTHER
 @export var target_signal_id: String = ""
+@export var target_instance_id: int = 0
 @export var target_cell_x: float = 0.0
 @export var target_lane: int = 2
 @export var priority: int = 10

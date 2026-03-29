@@ -130,6 +130,8 @@ func _run_cam_01_sequence() -> void:
 		"Simple as. Just watch your heat. KILL is noisy, and more network noise means more attention from the system.",
 		"Runners don't like attention. For you, it might just mean more ICE. For us, it tends to come with bullet holes."
 	], "", window_manager.get_control_focus_rect(heat_tracker), Vector2(50, 350), true, 5, "door_walk_and_talk")
+	_set_objective("Wait for Blackjack to move ahead")
+
 
 func _run_door_01_sequence() -> void:
 	await _wait_for_cell(6)
@@ -145,7 +147,7 @@ func _run_door_01_sequence() -> void:
 	
 	await _show_dialogue([
 		"Locked, obviously. Different locks require different keys.",
-		"This one auth-locked. Means the credentials are floating around the network, we just need to sniff out the right data. Run your Sniff program."
+		"This one auth-locked. Means the credentials are floating around the network, we just need to sniff out the right data. RUN sniff in your terminal to find it."
 	], "door_01")
 	_set_objective("Left click the door_01 signal to connect, then type RUN sniff in the terminal to run the Sniff program.")
 
@@ -201,7 +203,7 @@ func _run_cam_02_intro_sequence() -> void:
 func _run_drone_01_intro_sequence():
 	# TODO: Build into tutorial run def at some point
 	var vent = _get_active_signal("coolant_vent_01")
-	vent.disruptor.uses = 5
+	vent.data.disruptor.set_uses(5)
 	await _wait_for_cell(13)
 	# NOTE: Something preventing this hold?
 	_acquire_runner_hold("drone_01_gate")
@@ -224,16 +226,15 @@ func _run_drone_01_intro_sequence():
 	await GlobalEvents.mobile_investigating
 	_release_runner_hold("drone_01_gate")
 
-	await _wait_for_cell(17.5)
-
-	_set_objective("- Help Blackjack through the gauntlet
+	await _wait_for_cell(16.5)
+	await _set_objective("- Help Blackjack through the gauntlet
 - Use the <- and -> arrow keys to have Blackjack slow down or sleep up
 - Press F1 if you need a refresher on terminal commands")
 	await _show_dialogue([
 		"Long corridor coming up, lots of cameras and a few drones. No more hand-holding, kid. Let's see what you've got.",
-	],)
+	], "", Rect2(), Vector2(), false, 17.5)
 
-	# pre-lab gauntlet (17.5 - 38.5)
+	# pre-lab gauntlet (38.5 - 59.5)
 
 
 
@@ -241,16 +242,16 @@ func _run_drone_01_intro_sequence():
 func _run_null_door_intro_sequence():
 	_enable_feature("terminal_commands", false)
 
-	await _wait_for_cell(17)
+	await _wait_for_cell(38)
 	await _show_dialogue([
 		"Phew. All right. I think we're past the hard part. Coming up on... some kind of clean lab? Let's have a look.",
 		"Sniff out that door's key, like last time."
-	], "lab_door", Rect2(), Vector2(), false, 19, "null_lab_leadup")
+	], "lab_door", Rect2(), Vector2(), false, 40, "null_lab_leadup")
 	_set_objective("- Connect to the lab_door signal and RUN sniff to unlock it\n- Once unlocked, use OP to open the door")
 
 	window_manager.auto_focus_puzzles = false
 
-	await _wait_for_cell(19)
+	await _wait_for_cell(40)
 	_acquire_runner_hold("lab_door_gate_01")
 
 	_enable_feature("terminal_commands", true)
@@ -268,19 +269,19 @@ func _run_null_door_intro_sequence():
 	# preventing sequence break by decrypting terminal early
 	_enable_feature("terminal_commands", false)
 
-	await _wait_for_cell(21.5)
+	await _wait_for_cell(42.5)
 
 	_acquire_runner_hold("null_terminal_gate_01")
 
 	await _show_dialogue([
 		"...",
 		"What the fuck...?",
-	], "", Rect2(), Vector2(750, 300), true, 22.5, "null_lab_leadup")
+	], "", Rect2(), Vector2(750, 300), true, 43.5, "null_lab_leadup")
 	_release_runner_hold("null_terminal_gate_01")
 
 
 func _run_lab_reveal_sequence() -> void:
-	await _wait_for_cell(25)
+	await _wait_for_cell(46)
 	_acquire_runner_hold("null_terminal_gate_02")
 	await _show_dialogue([
 		"Some kind of cyberware... like a datajack interface? An... adapter?",
@@ -289,6 +290,7 @@ func _run_lab_reveal_sequence() -> void:
 		"You need to come inside and see this."
 	], "", Rect2(), Vector2(750,300), true)
 
+	GlobalEvents.heat_changed.emit(0)
 	window_manager.objective_tracker.hide()
 
 	await get_tree().create_timer(1).timeout
@@ -297,7 +299,7 @@ func _run_lab_reveal_sequence() -> void:
 	await cutscene_controller.play_reverse_glitch_transition(2.0)
 
 	await _show_dialogue([
-		"Been going through the specs on this thing. They called it a... *the* \"Null Spike.\"",
+		"Been going through the specs on this thing. They called it a... [i][b]the[/b][/i] \"Null Spike.\"",
 		"It's... I'm reading this in English, kid. They wrote specs in English and never shared this with us.",
 		"...",
 		"You're too young to remember, but the AIs starting to speak their own language before they left. One we didn't... maybe couldn't understand.",
@@ -360,7 +362,7 @@ func _run_alarm_sequence():
 
 	await get_tree().create_timer(2).timeout
 	
-	_set_runner_cell(26.5)
+	_set_runner_cell(47.5)
 	_get_active_signal("lab_exit").set_door_locked(false)
 	_get_active_signal("lab_exit").disable_signal()
 
@@ -376,20 +378,20 @@ func _run_alarm_sequence():
 	
 	_get_active_signal("coolant_vent_07").disable_signal()
 		
-	await _wait_for_cell(28.5)
+	await _wait_for_cell(49.5)
 	_enable_feature("terminal_commands", true)
 
 	await _show_dialogue([
 		"Clip, they woke up angry. Can hear 'em clanking.",
 		"Incoming. See what you can do, kid."
-	], "", Rect2(), Vector2(750,300), true, 29.5)
+	], "", Rect2(), Vector2(750,300), true, 50.5)
 	window_manager.objective_tracker.show()
 
 	_set_objective("Try to stop the combat drone")
 
-	await _wait_for_cell(29.5)
+	await _wait_for_cell(50.5)
 	c_drone.mobility.move_speed_cells_per_sec = .25
-	await _wait_for_cell(30.5)
+	await _wait_for_cell(51.5)
 
 	var temp_dialogue = await _show_dialogue([
 		"Clip me. It's fast. And armed. And probably ICEd."
@@ -419,7 +421,7 @@ func _run_alarm_sequence():
 	_release_runner_hold("post_combat")
 
 func _run_pre_gauntlet_sequence():
-	await _wait_for_cell(35.5)
+	await _wait_for_cell(56.5)
 	_acquire_runner_hold("pre_gauntlet_01")
 
 	await _show_dialogue([
@@ -443,7 +445,7 @@ func _run_pre_gauntlet_sequence():
 	timeline_manager.clear_view_offset(1.0)
 
 	_release_runner_hold("pre_gauntlet_01")
-	await _wait_for_cell(36)
+	await _wait_for_cell(57)
 	_acquire_runner_hold("pre_gauntlet_02")
 
 	_enable_feature("terminal_commands", false)
@@ -474,7 +476,7 @@ func _run_pre_gauntlet_sequence():
 	_release_runner_hold("pre_gauntlet_02")
 
 func _run_gauntlet_sequence():
-	await _wait_for_cell(38.5)
+	await _wait_for_cell(59.5)
 	_acquire_runner_hold("pre_gauntlet_03")
 	_show_dialogue([
 		"This is it. Cross your fingers and hit the Spike.\nReady when you are."
@@ -493,20 +495,20 @@ func _run_gauntlet_sequence():
 	await null_spike_sync_sequence()
 	_enable_feature("null_spike", false)
 
-	await _wait_for_cell(47.5)
+	await _wait_for_cell(68.5)
 
 	#NOTE: Delay logic temporarily hacky
 	_show_dialogue([
 		"H  o  l  y\n    s  h  i  t  .  .  ."
 	], "", Rect2(), Vector2(50,300), true)
 
-	await _wait_for_cell(49.5)
+	await _wait_for_cell(70.5)
 
 	_show_dialogue([
 		"Y  o  u  '  r  e\n    a  c  t  u  a  l  l  y\n    d  o  i  n  g    i  t  .  .  ."
 	],  "", Rect2(), Vector2(50,300), true)
 
-	await _wait_for_cell(52)
+	await _wait_for_cell(73)
 	_acquire_runner_hold("end")
 
 	_show_dialogue([
@@ -593,7 +595,7 @@ func _prepare_debug_stage_drone_01() -> void:
 func _prepare_debug_stage_null_door() -> void:
 	_set_cutscene_black_screen(false)
 	window_manager.auto_focus_puzzles = false
-	_set_runner_cell(16.9)
+	_set_runner_cell(37.9)
 	_enable_feature("scan")
 	_enable_feature("connect")
 	_enable_feature("terminal_commands")
@@ -602,7 +604,7 @@ func _prepare_debug_stage_lab_reveal() -> void:
 	signal_manager.hide_signals()
 	_set_cutscene_black_screen(false)
 	window_manager.auto_focus_puzzles = false
-	_set_runner_cell(24.9)
+	_set_runner_cell(45.9)
 	_mark_signal_scanned("lab_door")
 	_mark_door_unlocked("lab_door")
 	_enable_feature("scan")
@@ -615,7 +617,7 @@ func _prepare_debug_stage_terminal_dump() -> void:
 	signal_manager.hide_signals()
 	_set_cutscene_black_screen(false)
 	window_manager.auto_focus_puzzles = false
-	_set_runner_cell(25.0)
+	_set_runner_cell(46.0)
 	_acquire_runner_hold("null_terminal_gate_02")
 	_mark_signal_scanned("lab_door")
 	_mark_door_unlocked("lab_door")
@@ -646,11 +648,11 @@ func _prepare_debug_pre_gauntlet() -> void:
 	_enable_feature("terminal_commands")
 	_enable_feature("null_spike", false)
 	_get_active_signal("c_drone_01").disable_signal()
-	_set_runner_cell(34.9)
+	_set_runner_cell(55.9)
 
 func _prepare_debug_gauntlet() -> void:
 	_prepare_debug_pre_gauntlet()
-	_set_runner_cell(38.0)
+	_set_runner_cell(59.0)
 	
 func _set_cutscene_black_screen(enabled: bool) -> void:
 	if cutscene_controller == null:
@@ -900,7 +902,7 @@ func _cam_02_kill_or_hustle(active_signal: ActiveSignal) -> String:
 
 func _runner_detected_dialogue():
 	# NOTE: Might need to add cell gating here to keep this from firing later
-	if timeline_manager.current_cell_pos > 20: return
+	if timeline_manager.current_cell_pos > 41: return
 	_show_dialogue([
 		"Agh, it pinged me. Shouldn't be a problem. Quick glances don't build much heat."
 		], "", Rect2(), Vector2(750, 300), true, -1, "", 3

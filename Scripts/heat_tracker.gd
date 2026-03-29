@@ -9,6 +9,11 @@ var null_spike_scaler: float
 
 func _ready():
 	GlobalEvents.heat_increased.connect(modify_heat)
+	GlobalEvents.heat_changed.connect(set_heat)
+
+
+func set_heat(amount: float):
+	value = amount
 
 func modify_heat(amount:float, source: String):
 	value += amount

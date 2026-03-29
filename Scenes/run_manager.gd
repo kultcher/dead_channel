@@ -12,7 +12,6 @@ var current_run: RunDefinition
 
 func _ready():
 	start_run()
-	if current_run.get_display_name() == "test": timeline_manager.current_cell_pos = 15
 
 func _process(delta: float):
 	pass

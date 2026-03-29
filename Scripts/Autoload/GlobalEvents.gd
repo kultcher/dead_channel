@@ -19,6 +19,7 @@ signal signal_hacked(data: SignalData, success: bool)
 signal signal_killed(active_sig: ActiveSignal)
 signal mobile_investigating(active_sig: ActiveSignal)
 signal heat_increased(amount, source)
+signal heat_changed(amount)
 
 signal runner_detected(active_sig: ActiveSignal)
 signal runners_damaged(amount: float)

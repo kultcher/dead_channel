@@ -229,13 +229,15 @@ func make_disruptor(
 	investigate_duration_sec: float = -1.0,
 	horizontal_range_cells: int = 0,
 	severity: int = 10,
-	ttl_sec: float = -1.0
+	ttl_sec: float = -1.0,
+	max_alert_targets: int = 1
 ) -> DisruptorComponent:
 	var disruptor := DisruptorComponent.new()
 	disruptor.investigate_duration_sec = investigate_duration_sec
 	disruptor.horizontal_range_cells = horizontal_range_cells
 	disruptor.severity = severity
 	disruptor.ttl_sec = ttl_sec
+	disruptor.max_alert_targets = max_alert_targets
 	return disruptor
 
 func _append_ic_modules(runtime_signal: SignalData, modules_to_add: Array) -> void:

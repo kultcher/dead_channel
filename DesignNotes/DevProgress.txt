@@ -55,29 +55,32 @@ Development Progress
 - Migrated scan tooltips to icon-based
 - Jargonizer first pass implemented
 
+3/28/2026:
+- Tutorial polish
+
 Short-term TODO:
-- switch to variable # of targets for alerts
-- add death state
-- Maybe Add extra gauntlet before lab
+- tutorial: add explanation of signal icons
+- tutorial: speed up final gauntlet drones
+- tutorial: add death state
 - Rework UI
-- add target signal highlight
-- add ciphers and on-solve trigger to codex
+    - heat bar to bottom
+    - signal detail cutout
+    - RUN toolbar?
 - finalize early jargonizer
 
-
 Polish TODO:
+- add ciphers and on-solve trigger to codex
 - Add "drop to root" session log messages on passive signals that despawn
 - Cleanup cutscene controller (hardcode textures)
 - Split out tutorial script and logic
 - guard comms pulses
 - Add a cleaner way to update scan tooltips (array?)
 - Adjust delay behavior to ResponseEffect instead of detection?
-- Fix guard facing override
-
+- Fix guard facing override??
+- fix weird glitchiness after terminal dump sequence
 
 Verify:
 x add sequence break protection on drone_02 coolant vent
-x clear puzzle on disconnect
 x check sequence break on early puzzle solve (add an out if puzzle is solved)
 x make sure you can't run a puzzle twice
 x check sequence break on early cam_02 kill (add scan objective)
@@ -87,8 +90,8 @@ x watch out for disabled terminal before null_lab
 
 
 Not Yet Implemented (priority):
-- Programs and RAM
 - Robust heat implementation with difficulty scaling
+- Programs and RAM
 - Advanced Signal functions/behaviors
 - fuzz minigame
 - More and more advanced IC

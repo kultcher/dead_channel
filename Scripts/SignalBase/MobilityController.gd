@@ -207,6 +207,8 @@ func _on_guard_alert_raised(alert: GuardAlertData) -> void:
 		return
 	if _mobility == null:
 		return
+	if alert.target_instance_id != 0 and active_sig.get_instance_id() != alert.target_instance_id:
+		return
 	if alert.target_signal_id != "" and active_sig.data.system_id != alert.target_signal_id:
 		return
 	if _current_alert != null:

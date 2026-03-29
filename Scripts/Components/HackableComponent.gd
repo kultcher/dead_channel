@@ -100,7 +100,7 @@ func _op_disruptor(cmd_context) -> void:
 	if signal_data.disruptor == null or not signal_data.disruptor.enabled:
 		cmd_context.log_text.append("OP failed. " + signal_data.display_name + " has no active disruption profile.")
 		return
-	if signal_data.disruptor.uses <= 0:
+	if signal_data.disruptor.get_uses() <= 0:
 		cmd_context.log_text.append("OP failed. " + signal_data.display_name + ": no activations remaining.")
 		return
 	if CommandDispatch.signal_manager == null:
@@ -115,6 +115,8 @@ func _op_disruptor(cmd_context) -> void:
 		source_lane = cmd_context.active_sig.runtime_lane
 
 	var range_cells := maxi(0, signal_data.disruptor.horizontal_range_cells)
+	var max_alert_targets := maxi(1, signal_data.disruptor.max_alert_targets)
+	var alerted_targets: int = 0
 	var matched_targets: int = 0
 	for other_sig in CommandDispatch.signal_manager.signal_queue:
 		if other_sig == null or other_sig.data == null:
@@ -135,6 +137,7 @@ func _op_disruptor(cmd_context) -> void:
 		var alert := GuardAlertData.new()
 		alert.source_type = GuardAlertData.SourceType.DISTRACTION
 		alert.target_signal_id = other_sig.data.system_id
+		alert.target_instance_id = other_sig.get_instance_id()
 		alert.target_cell_x = source_cell
 		alert.target_lane = source_lane
 		alert.priority = signal_data.disruptor.severity
@@ -144,6 +147,9 @@ func _op_disruptor(cmd_context) -> void:
 		alert.emitted_time_sec = Time.get_ticks_msec() / 1000.0
 		GlobalEvents.guard_alert_raised.emit(alert)
 		matched_targets += 1
+		alerted_targets += 1
+		if alerted_targets >= max_alert_targets:
+			break
 
 	if matched_targets <= 0:
 		signal_data.disruptor.uses -= 1

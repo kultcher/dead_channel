@@ -13,7 +13,7 @@ enum Type { NONE, SNIFF, FUZZ, DECRYPT }
 
 var puzzle_dict = {
 	Type.NONE: "Open",
-	Type.SNIFF: "Locked",
+	Type.SNIFF: "Unauthorized",
 	Type.DECRYPT: "Encrypted",
 	Type.FUZZ: "Vulnerable"
 }
