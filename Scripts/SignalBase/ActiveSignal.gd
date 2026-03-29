@@ -7,6 +7,19 @@ var data: SignalData
 var start_cell_index: float
 var instance_node: Node2D = null # Visual
 
+enum TooltipIconState {
+	UNKNOWN_SCAN,
+	UNKNOWN_LOCK,
+	SCANNING,
+	PARTIAL,
+	COMPLETE,
+	OPEN,
+	LOCKED,
+	HACKED,
+	NO_IC,
+	ACTIVE_IC
+}
+
 class ScanLayer:
 	var name: String         # Internal ID (e.g. "TYPE", "IC_CLOAK")
 	var duration: float      # How long to unlock this specific layer
@@ -111,3 +124,41 @@ func build_ic_layer(difficulty_modifier: float = 1.0):
 	l4.duration = 0.5
 	l4.description = "IC: " + data.ic_modules.get_desc()
 	scan_layers.append(l4)
+
+func get_revealed_scan_descriptions() -> Array[String]:
+	var revealed_lines: Array[String] = []
+	for layer in scan_layers:
+		if layer.revealed:
+			revealed_lines.append(layer.description)
+	return revealed_lines
+
+func is_scan_layer_revealed(layer_name: String) -> bool:
+	for layer in scan_layers:
+		if layer.name == layer_name:
+			return layer.revealed
+	return false
+
+func get_scan_status_icon_state() -> int:
+	if is_being_scanned and current_scan_index < scan_layers.size():
+		return TooltipIconState.SCANNING
+	if scan_layers.is_empty() or current_scan_index >= scan_layers.size():
+		return TooltipIconState.COMPLETE
+	if current_scan_index > 0:
+		return TooltipIconState.PARTIAL
+	return TooltipIconState.UNKNOWN_SCAN
+
+func get_lock_status_icon_state() -> int:
+	if not is_scan_layer_revealed("ACCESS"):
+		return TooltipIconState.UNKNOWN_LOCK
+	if data == null or data.puzzle == null:
+		return TooltipIconState.OPEN
+	if data.puzzle.puzzle_locked:
+		return TooltipIconState.LOCKED
+	return TooltipIconState.HACKED
+
+func get_ic_status_icon_state() -> int:
+	if not is_scan_layer_revealed("IC"):
+		return TooltipIconState.UNKNOWN_SCAN
+	if data == null or data.ic_modules == null or data.ic_modules.modules.size() <= 0:
+		return TooltipIconState.NO_IC
+	return TooltipIconState.ACTIVE_IC

@@ -160,10 +160,8 @@ func scan_cleanup():
 func initialize_tooltip():
 	tooltip_main.tt_header.text = my_data.display_name
 
-	var layers = my_active_sig.scan_layers
-	for layer in layers:
-		if layer.revealed:
-			append_tooltip(layer.description)
+	for description in my_active_sig.get_revealed_scan_descriptions():
+		append_tooltip(description)
 
 func append_tooltip(info: String):
 	tooltip_main.tt_body.text += info + "\n"
@@ -186,79 +184,34 @@ func fade_tooltip_body():
 		return
 	tooltip_main.show_body()
 
-func _is_access_layer_revealed() -> bool:
-	if my_active_sig == null:
-		return false
-	for layer in my_active_sig.scan_layers:
-		if layer.name == "ACCESS":
-			return layer.revealed
-	return false
-
-func _is_ic_layer_revealed() -> bool:
-	if my_active_sig == null:
-		return false
-	for layer in my_active_sig.scan_layers:
-		if layer.name == "IC":
-			return layer.revealed
-	return false
-
-
 func refresh_status_panels():
 	refresh_scan_status()
 	refresh_lock_status()
 	refresh_ic_status()
 
-enum IconState { UNKNOWN_SCAN, UNKNOWN_LOCK, SCANNING, PARTIAL, COMPLETE, OPEN, LOCKED, HACKED, NO_IC, ACTIVE_IC }
-
 func refresh_scan_status():
 	if my_active_sig == null:
 		return
-
-	if my_active_sig.is_being_scanned and my_active_sig.current_scan_index < my_active_sig.scan_layers.size():
-		tooltip_main.set_panel_state(tooltip_main.tt_scan_icon, IconState.SCANNING)
-		return
-
-	if my_active_sig.scan_layers.is_empty() or my_active_sig.current_scan_index >= my_active_sig.scan_layers.size():
-		tooltip_main.set_panel_state(tooltip_main.tt_scan_icon, IconState.COMPLETE)
-		return
-
-	if my_active_sig.current_scan_index > 0:
-		tooltip_main.set_panel_state(tooltip_main.tt_scan_icon, IconState.PARTIAL)
-		return
-
-	tooltip_main.set_panel_state(tooltip_main.tt_scan_icon, IconState.UNKNOWN_SCAN)
+	tooltip_main.set_panel_state(
+		tooltip_main.tt_scan_icon,
+		my_active_sig.get_scan_status_icon_state()
+	)
 
 func refresh_lock_status():
 	if my_active_sig == null:
 		return
-
-	if not _is_access_layer_revealed():
-		tooltip_main.set_panel_state(tooltip_main.tt_lock_icon, IconState.UNKNOWN_LOCK)
-		return
-
-	if my_data == null or my_data.puzzle == null:
-		tooltip_main.set_panel_state(tooltip_main.tt_lock_icon, IconState.OPEN)
-		return
-
-	if my_data.puzzle.puzzle_locked:
-		tooltip_main.set_panel_state(tooltip_main.tt_lock_icon, IconState.LOCKED)
-		return
-
-	tooltip_main.set_panel_state(tooltip_main.tt_lock_icon, IconState.HACKED)
+	tooltip_main.set_panel_state(
+		tooltip_main.tt_lock_icon,
+		my_active_sig.get_lock_status_icon_state()
+	)
 
 func refresh_ic_status():
-	if not _is_ic_layer_revealed(): return
-
 	if my_active_sig == null:
 		return
-
-	if my_data.ic_modules.modules.size() <= 0:
-		tooltip_main.set_panel_state(tooltip_main.tt_ic_icon, IconState.NO_IC)
+	var ic_state := my_active_sig.get_ic_status_icon_state()
+	if ic_state == ActiveSignal.TooltipIconState.UNKNOWN_SCAN:
 		return
-
-	elif my_data.ic_modules.modules.size() > 0:
-		tooltip_main.set_panel_state(tooltip_main.tt_ic_icon, IconState.ACTIVE_IC)
-		return
+	tooltip_main.set_panel_state(tooltip_main.tt_ic_icon, ic_state)
 
 func bring_to_front():
 	var parent = get_parent()

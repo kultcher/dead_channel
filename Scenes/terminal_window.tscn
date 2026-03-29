@@ -3,10 +3,17 @@
 [ext_resource type="Script" uid="uid://bm803e3nvucc8" path="res://Scripts/terminal_window.gd" id="1_3t686"]
 [ext_resource type="Theme" uid="uid://discgqqbkpb5x" path="res://Resources/StyleBox/MainTheme.tres" id="1_tmyac"]
 [ext_resource type="StyleBox" uid="uid://chg2qawtivc2b" path="res://Resources/StyleBox/TitleBarStyleBox.tres" id="3_5arnc"]
+[ext_resource type="Theme" uid="uid://83f6f0fn04lu" path="res://Visuals/Themes/terminal_detail_panel.tres" id="4_j8ogv"]
+[ext_resource type="Texture2D" uid="uid://6lbtnhkjsdik" path="res://Visuals/Icons/Simple/magnifying-glass.svg" id="4_y5w5a"]
+[ext_resource type="Texture2D" uid="uid://ce1a7oxkca27p" path="res://Visuals/Icons/Simple/plain-padlock.svg" id="5_j8ogv"]
+[ext_resource type="Texture2D" uid="uid://c3ms3ej17r37l" path="res://Visuals/Icons/Simple/shield.svg" id="6_tybek"]
 
 [sub_resource type="SystemFont" id="SystemFont_k17vg"]
 font_names = PackedStringArray("OCR A")
 subpixel_positioning = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tybek"]
+bg_color = Color(0.23753911, 0.23753914, 0.23753902, 1)
 
 [node name="TerminalWindow" type="PanelContainer" unique_id=340148133]
 anchors_preset = 15
@@ -86,6 +93,87 @@ caret_blink = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 2.0
+
+[node name="PanelContainer" type="PanelContainer" parent="TerminalVBox" unique_id=276162669]
+visible = false
+layout_mode = 2
+
+[node name="SignalDetailHBox" type="HBoxContainer" parent="TerminalVBox" unique_id=2093821680]
+layout_mode = 2
+theme_override_constants/separation = -1
+
+[node name="ScanPanel" type="PanelContainer" parent="TerminalVBox/SignalDetailHBox" unique_id=781614483]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_j8ogv")
+theme_type_variation = &"partial_scan"
+theme_override_styles/panel = SubResource("StyleBoxFlat_tybek")
+
+[node name="ScanCenterBox" type="CenterContainer" parent="TerminalVBox/SignalDetailHBox/ScanPanel" unique_id=1140552815]
+layout_mode = 2
+
+[node name="ScanHBox" type="HBoxContainer" parent="TerminalVBox/SignalDetailHBox/ScanPanel/ScanCenterBox" unique_id=954897454]
+layout_mode = 2
+
+[node name="ScanIcon" type="TextureRect" parent="TerminalVBox/SignalDetailHBox/ScanPanel/ScanCenterBox/ScanHBox" unique_id=724258475]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("4_y5w5a")
+expand_mode = 1
+
+[node name="ScanLabel" type="Label" parent="TerminalVBox/SignalDetailHBox/ScanPanel/ScanCenterBox/ScanHBox" unique_id=1295830602]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Scan: Unscanned"
+
+[node name="LockPanel" type="PanelContainer" parent="TerminalVBox/SignalDetailHBox" unique_id=449943229]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_j8ogv")
+theme_override_styles/panel = SubResource("StyleBoxFlat_tybek")
+
+[node name="LockCenterBox" type="CenterContainer" parent="TerminalVBox/SignalDetailHBox/LockPanel" unique_id=1899630045]
+layout_mode = 2
+
+[node name="LockHBox" type="HBoxContainer" parent="TerminalVBox/SignalDetailHBox/LockPanel/LockCenterBox" unique_id=227112128]
+layout_mode = 2
+
+[node name="LockIcon" type="TextureRect" parent="TerminalVBox/SignalDetailHBox/LockPanel/LockCenterBox/LockHBox" unique_id=1174163902]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("5_j8ogv")
+expand_mode = 1
+
+[node name="LockLabel" type="Label" parent="TerminalVBox/SignalDetailHBox/LockPanel/LockCenterBox/LockHBox" unique_id=928512669]
+layout_mode = 2
+size_flags_horizontal = 2
+text = "Lock: Unverified"
+
+[node name="ICPanel" type="PanelContainer" parent="TerminalVBox/SignalDetailHBox" unique_id=1473270183]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_j8ogv")
+theme_override_styles/panel = SubResource("StyleBoxFlat_tybek")
+
+[node name="ICCenterBox" type="CenterContainer" parent="TerminalVBox/SignalDetailHBox/ICPanel" unique_id=1491789137]
+layout_mode = 2
+
+[node name="ICHBox" type="HBoxContainer" parent="TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox" unique_id=2079817797]
+layout_mode = 2
+
+[node name="ICIcon" type="TextureRect" parent="TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox" unique_id=1472273879]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("6_tybek")
+expand_mode = 1
+
+[node name="ICLabel" type="Label" parent="TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox" unique_id=89262697]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "IC: Unknown"
 
 [connection signal="tab_clicked" from="TerminalVBox/TitleBar/TitleHBox/SessionTabs" to="." method="_on_session_tabs_tab_clicked"]
 [connection signal="tab_close_pressed" from="TerminalVBox/TitleBar/TitleHBox/SessionTabs" to="." method="_on_session_tabs_tab_close_pressed"]

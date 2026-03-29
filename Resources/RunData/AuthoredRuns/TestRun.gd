@@ -10,7 +10,7 @@ func get_display_name() -> String:
 # Common helpers from RunDefinition: make_decrypt_puzzle(), make_reboot_module(), make_reboot_ic()
 func get_spawns() -> Array[Dictionary]:
 	return [
-		build_spawn(PANNING_CAMERA, 20.5, {
+		build_spawn(PANNING_CAMERA, 4.5, {
 			"system_id": "cam_03",
 			"lane": 0,
 			"vision_angle_deg": 20,

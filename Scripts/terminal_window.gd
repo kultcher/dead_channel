@@ -33,6 +33,20 @@ signal session_line_display_mode_changed()
 @onready var title_text = $TerminalVBox/TitleBar/TitleHBox/TitleText
 @onready var session_tabs = $TerminalVBox/TitleBar/TitleHBox/SessionTabs
 
+@onready var scan_panel = $TerminalVBox/SignalDetailHBox/ScanPanel
+@onready var scan_icon = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanCenterBox/ScanHBox/ScanIcon
+@onready var scan_label = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanCenterBox/ScanHBox/ScanLabel
+
+@onready var lock_panel = $TerminalVBox/SignalDetailHBox/LockPanel
+@onready var lock_icon = $TerminalVBox/SignalDetailHBox/LockPanel/LockCenterBox/LockHBox/LockIcon
+@onready var lock_label = $TerminalVBox/SignalDetailHBox/LockPanel/LockCenterBox/LockHBox/LockLabel
+
+@onready var ic_panel = $TerminalVBox/SignalDetailHBox/ICPanel
+@onready var ic_icon = $TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox/ICIcon
+@onready var ic_label = $TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox/ICLabel
+
+
+
 @export var show_inactive_session_lines := true:
 	set(value):
 		if show_inactive_session_lines == value:
