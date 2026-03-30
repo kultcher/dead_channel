@@ -10,15 +10,39 @@ func get_display_name() -> String:
 # Common helpers from RunDefinition: make_decrypt_puzzle(), make_reboot_module(), make_reboot_ic()
 func get_spawns() -> Array[Dictionary]:
 	return [
-		build_spawn(PANNING_CAMERA, 4.5, {
+
+		build_spawn(BASIC_CAMERA, 4.5, {
+			"system_id": "cam_05",
+			"lane": 2,
+			"vision_angle_deg": 30,
+			"vision_length_cells": 1,
+			"add_ic_modules": [make_reboot_module(10)]
+		}),
+		build_spawn(PANNING_CAMERA, 5.5, {
 			"system_id": "cam_03",
 			"lane": 0,
 			"vision_angle_deg": 20,
 			"vision_length_cells": 1,
 			"detection_patrol_points": make_detection_sweep([-1,3], [180,3]),
-			"add_ic_modules": [make_reboot_module(3)]
+			"add_ic_modules": [make_reboot_module(3), make_faraday_module(3)]
 		}),
-		build_spawn(PANNING_CAMERA, 23.5, {
+		build_spawn(PANNING_CAMERA, 6.5, {
+			"system_id": "cam_04",
+			"lane": 1,
+			"vision_angle_deg": 20,
+			"vision_length_cells": 1,
+			"detection_patrol_points": make_detection_sweep([-1,3], [180,3]),
+			"add_ic_modules": [make_reboot_module(3), make_faraday_module(3)]
+		}),
+
+
+
+		build_spawn(BASIC_DOOR, 12.5, {
+			"lane": 2,
+			"puzzle": make_sniff_puzzle(1),
+		}),
+
+		build_spawn(PANNING_CAMERA, 12.5, {
 			"system_id": "cam_04",
 			"lane": 4,
 			"vision_angle_deg": 20,

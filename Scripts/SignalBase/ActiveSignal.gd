@@ -3,6 +3,15 @@
 
 class_name ActiveSignal extends RefCounted
 
+const COLOR_STATUS_UNKNOWN := Color("613d82ff")
+const COLOR_STATUS_SCANNING := Color("009632ff")
+const COLOR_STATUS_COMPLETE := Color("00fa64ff")
+const COLOR_STATUS_PARTIAL := Color("c1a126")
+
+const COLOR_LOCK_OPEN := Color("0096faff")
+const COLOR_LOCK_LOCKED := Color("ff0000ff")
+const COLOR_LOCK_HACKED := Color("0096faff")
+
 var data: SignalData
 var start_cell_index: float
 var instance_node: Node2D = null # Visual
@@ -119,11 +128,21 @@ func build_puzzle_layer(difficulty_modifier: float = 1.0):
 
 func build_ic_layer(difficulty_modifier: float = 1.0):
 	if data.ic_modules == null: return
-	var l4 = ScanLayer.new()
-	l4.name = "IC"
-	l4.duration = 0.5
-	l4.description = "IC: " + data.ic_modules.get_desc()
-	scan_layers.append(l4)
+	if data.ic_modules.modules.is_empty():
+		var no_ic_layer = ScanLayer.new()
+		no_ic_layer.name = "IC"
+		no_ic_layer.duration = 0.5 * difficulty_modifier
+		no_ic_layer.description = "IC: None"
+		scan_layers.append(no_ic_layer)
+		return
+	for module in data.ic_modules.modules:
+		if module == null:
+			continue
+		var ic_layer = ScanLayer.new()
+		ic_layer.name = "IC"
+		ic_layer.duration = 0.5 * difficulty_modifier
+		ic_layer.description = "IC: " + module.get_desc()
+		scan_layers.append(ic_layer)
 
 func get_revealed_scan_descriptions() -> Array[String]:
 	var revealed_lines: Array[String] = []
@@ -132,11 +151,42 @@ func get_revealed_scan_descriptions() -> Array[String]:
 			revealed_lines.append(layer.description)
 	return revealed_lines
 
+func get_revealed_scan_descriptions_for_layer(layer_name: String) -> Array[String]:
+	var revealed_lines: Array[String] = []
+	for layer in scan_layers:
+		if layer.name == layer_name and layer.revealed:
+			revealed_lines.append(layer.description)
+	return revealed_lines
+
 func is_scan_layer_revealed(layer_name: String) -> bool:
 	for layer in scan_layers:
 		if layer.name == layer_name:
 			return layer.revealed
 	return false
+
+func get_total_scan_layer_count() -> int:
+	return scan_layers.size()
+
+func get_revealed_scan_layer_count() -> int:
+	var revealed_count := 0
+	for layer in scan_layers:
+		if layer.revealed:
+			revealed_count += 1
+	return revealed_count
+
+func get_scan_layer_count(layer_name: String) -> int:
+	var layer_count := 0
+	for layer in scan_layers:
+		if layer.name == layer_name:
+			layer_count += 1
+	return layer_count
+
+func get_revealed_scan_layer_count_for(layer_name: String) -> int:
+	var revealed_count := 0
+	for layer in scan_layers:
+		if layer.name == layer_name and layer.revealed:
+			revealed_count += 1
+	return revealed_count
 
 func get_scan_status_icon_state() -> int:
 	if is_being_scanned and current_scan_index < scan_layers.size():
@@ -162,3 +212,92 @@ func get_ic_status_icon_state() -> int:
 	if data == null or data.ic_modules == null or data.ic_modules.modules.size() <= 0:
 		return TooltipIconState.NO_IC
 	return TooltipIconState.ACTIVE_IC
+
+func get_scan_status_label_text() -> String:
+	var scan_state := get_scan_status_icon_state()
+	match scan_state:
+		TooltipIconState.SCANNING:
+			return "Scan: SCANNING"
+		TooltipIconState.PARTIAL:
+			return "Scan: PARTIAL"
+		TooltipIconState.COMPLETE:
+			return "Scan: COMPLETE"
+	return "Scan: UNSCANNED"
+
+func get_lock_status_label_text() -> String:
+	if not is_scan_layer_revealed("ACCESS"):
+		return "Lock: Unverified"
+	if data == null:
+		return "Lock: Unknown"
+	if data.puzzle != null:
+		return "Lock: " + data.puzzle.get_desc()
+	return "Lock: Open"
+
+func get_ic_status_detail_text() -> String:
+	if not is_scan_layer_revealed("IC"):
+		return "IC: Unknown"
+	var revealed_ic_lines := get_revealed_scan_descriptions_for_layer("IC")
+	if revealed_ic_lines.is_empty():
+		return "IC: Unknown"
+	var descriptions: Array[String] = []
+	for line in revealed_ic_lines:
+		var parts := line.split(":", false, 1)
+		if parts.size() > 1:
+			descriptions.append(parts[1].strip_edges())
+		else:
+			descriptions.append(line.strip_edges())
+	return "IC: " + " | ".join(descriptions)
+
+func get_ic_scan_progress_value() -> float:
+	var total_ic_layers = max(1, get_scan_layer_count("IC"))
+	var revealed_ic_layers := float(get_revealed_scan_layer_count_for("IC"))
+	if is_being_scanned and current_scan_index < scan_layers.size():
+		var current_layer = scan_layers[current_scan_index]
+		if current_layer.name == "IC" and current_layer.duration > 0.0:
+			var current_fraction := clampf(current_layer_progress / current_layer.duration, 0.0, 1.0)
+			return minf(float(total_ic_layers), revealed_ic_layers + current_fraction)
+	return revealed_ic_layers
+
+func get_ic_scan_progress_max() -> int:
+	return max(1, get_scan_layer_count("IC"))
+
+func get_ic_progress_color() -> Color:
+	if not is_scan_layer_revealed("IC") and not (is_being_scanned and current_scan_index < scan_layers.size() and scan_layers[current_scan_index].name == "IC"):
+		return COLOR_STATUS_UNKNOWN
+	if data == null or data.ic_modules == null or data.ic_modules.modules.size() <= 0:
+		return COLOR_STATUS_COMPLETE
+	return COLOR_LOCK_LOCKED
+
+func get_ic_status_label_text() -> String:
+	return get_ic_status_detail_text()
+
+func get_scan_status_color() -> Color:
+	var scan_state := get_scan_status_icon_state()
+	match scan_state:
+		TooltipIconState.SCANNING:
+			return COLOR_STATUS_SCANNING
+		TooltipIconState.PARTIAL:
+			return COLOR_STATUS_PARTIAL
+		TooltipIconState.COMPLETE:
+			return COLOR_STATUS_COMPLETE
+	return COLOR_STATUS_UNKNOWN
+
+func get_lock_status_color() -> Color:
+	var lock_state := get_lock_status_icon_state()
+	match lock_state:
+		TooltipIconState.OPEN:
+			return COLOR_LOCK_OPEN
+		TooltipIconState.LOCKED:
+			return COLOR_LOCK_LOCKED
+		TooltipIconState.HACKED:
+			return COLOR_LOCK_HACKED
+	return COLOR_STATUS_UNKNOWN
+
+func get_ic_status_color() -> Color:
+	var ic_state := get_ic_status_icon_state()
+	match ic_state:
+		TooltipIconState.NO_IC:
+			return COLOR_STATUS_COMPLETE
+		TooltipIconState.ACTIVE_IC:
+			return COLOR_LOCK_LOCKED
+	return COLOR_STATUS_UNKNOWN

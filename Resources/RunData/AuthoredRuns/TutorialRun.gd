@@ -27,6 +27,7 @@ func get_spawns() -> Array[Dictionary]:
 		build_spawn(BASIC_DISRUPTOR, 14.5, {"system_id": "coolant_vent_01", "lane": 4}),
 		
 		# pre-lab gauntlet (38.5 - 59.5)
+		# top-lane panning camera, dodgeable with timing
 		build_spawn(PANNING_CAMERA, 20.5, {
 			"system_id": "cam_03",
 			"lane": 0,
@@ -35,6 +36,7 @@ func get_spawns() -> Array[Dictionary]:
 			"detection_patrol_points": make_detection_sweep([-1,3], [180,3]),
 			"add_ic_modules": [make_reboot_module(3)]
 		}),
+		# bottom-lane panning camera, dodgeable with timing
 		build_spawn(PANNING_CAMERA, 23.5, {
 			"system_id": "cam_04",
 			"lane": 4,
@@ -44,6 +46,7 @@ func get_spawns() -> Array[Dictionary]:
 			"add_ic_modules": [make_reboot_module(10)]
 		}),
 
+		# long-distance patrol drone
 		build_spawn(BASIC_DRONE, 25, {"system_id": "drone_02", "lane": 1,
 		"add_ic_modules": [make_reboot_module(10)],
 		"patrol_points": make_patrol_route([0.0, 0, 3, 0], [6.0, 0, 3, 0])}),
@@ -64,6 +67,7 @@ func get_spawns() -> Array[Dictionary]:
 			"detection_patrol_points": make_detection_sweep([1,3.5], [180,3.5]),
 			"add_ic_modules": [make_reboot_module(3)]
 		}),
+		# middle-lane front facing camera, can't be avoided without hacking
 		build_spawn(BASIC_CAMERA, 35.5, {
 			"system_id": "cam_07",
 			"lane": 2,

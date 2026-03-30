@@ -6,6 +6,12 @@
 extends PanelContainer
 
 const GHOST_TERMINAL_SCENE := preload("res://Scenes/ghost_terminal.tscn")
+const MAGNIFYING_GLASS_ICON := preload("res://Visuals/Icons/Simple/magnifying-glass.svg")
+const CHECK_MARK_ICON := preload("res://Visuals/Icons/Simple/check-mark.svg")
+const PADLOCK_ICON := preload("res://Visuals/Icons/Simple/padlock.svg")
+const PADLOCK_OPEN_ICON := preload("res://Visuals/Icons/Simple/padlock-open.svg")
+const CANCEL_ICON := preload("res://Visuals/Icons/Simple/cancel.svg")
+const SHIELD_ICON := preload("res://Visuals/Icons/Simple/shield.svg")
 const GHOST_SPAWN_THRESHOLDS := [0.15, 0.35, 0.45, 0.55, 0.6, 0.65]
 const GHOST_MARGIN := 48.0
 const GHOST_MIN_SEPARATION := 280.0
@@ -34,14 +40,18 @@ signal session_line_display_mode_changed()
 @onready var session_tabs = $TerminalVBox/TitleBar/TitleHBox/SessionTabs
 
 @onready var scan_panel = $TerminalVBox/SignalDetailHBox/ScanPanel
-@onready var scan_icon = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanCenterBox/ScanHBox/ScanIcon
-@onready var scan_label = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanCenterBox/ScanHBox/ScanLabel
+@onready var scan_progress = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanProgress
+@onready var scan_icon = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanProgress/ScanCenterBox/ScanHBox/ScanIcon
+@onready var scan_label = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanProgress/ScanCenterBox/ScanHBox/ScanLabel
 
 @onready var lock_panel = $TerminalVBox/SignalDetailHBox/LockPanel
-@onready var lock_icon = $TerminalVBox/SignalDetailHBox/LockPanel/LockCenterBox/LockHBox/LockIcon
-@onready var lock_label = $TerminalVBox/SignalDetailHBox/LockPanel/LockCenterBox/LockHBox/LockLabel
+@onready var lock_icon = $TerminalVBox/SignalDetailHBox/LockPanel/CenterContainer/LockHBox/LockIcon
+@onready var lock_label = $TerminalVBox/SignalDetailHBox/LockPanel/CenterContainer/LockHBox/LockLabel
+@onready var toolbox_button = $TerminalVBox/SignalDetailHBox/LockPanel/LockPanelButton
+@onready var toolbox_panel = $TerminalVBox/SignalDetailHBox/LockPanel/LockPanelButton/LockToolboxControl/ToolboxPanel
 
 @onready var ic_panel = $TerminalVBox/SignalDetailHBox/ICPanel
+@onready var ic_progress = $TerminalVBox/SignalDetailHBox/ICPanel/ICProgress
 @onready var ic_icon = $TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox/ICIcon
 @onready var ic_label = $TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox/ICLabel
 
@@ -71,6 +81,9 @@ var _connection_send_locked := false
 var _buffered_command_text := ""
 var _buffered_command_signal: ActiveSignal = null
 var _buffered_command_flow_serial := -1
+var _scan_panel_tint: Color = Color.TRANSPARENT
+var _lock_panel_tint: Color = Color.TRANSPARENT
+var _ic_panel_tint: Color = Color.TRANSPARENT
 
 func _ready():
 	set_context()
@@ -78,6 +91,10 @@ func _ready():
 	CommandDispatch.terminal_window = self
 	CommandDispatch.command_complete.connect(_on_command_complete)
 	CommandDispatch.command_error.connect(_on_command_error)
+	GlobalEvents.signal_scanned.connect(_on_signal_scanned)
+	GlobalEvents.signal_scan_complete.connect(_on_signal_scan_complete)
+	GlobalEvents.puzzle_solved.connect(_on_signal_state_changed)
+	GlobalEvents.puzzle_failed.connect(_on_signal_state_changed)
 	root_session = TerminalSession.new()
 	# Dummy signal for root session
 	root_signal = ActiveSignal.new()
@@ -88,6 +105,11 @@ func _ready():
 	root_signal.terminal_session = root_session
 	session_tabs.add_tab("root")
 	_set_tab_session(0, root_session)
+	_refresh_signal_detail_panel()
+
+func _process(_delta: float) -> void:
+	if active_signal != null and active_signal != root_signal:
+		_refresh_signal_detail_panel()
 
 func switch_session(new_sig: ActiveSignal, show_connection_banner: bool = false):
 	if new_sig == null:
@@ -113,6 +135,7 @@ func switch_session(new_sig: ActiveSignal, show_connection_banner: bool = false)
 			print_to_log("New session started with " + new_sig.data.system_id)
 		print_to_root("<Session Log>: Connected to " + new_sig.data.system_id)
 		prefix.text = "-" + new_sig.data.system_id + "-["
+		prefix.add_theme_color_override("font_color", new_sig.data.visuals.fill_color)
 
 	# Switch to existing session
 	elif new_sig.terminal_session != null:
@@ -609,6 +632,7 @@ func restore_session(session: TerminalSession):
 		prefix.text = "- root -["
 	else:
 		prefix.text = "-" + active_session.active_signal.data.system_id + "-["
+	_refresh_signal_detail_panel()
 
 func set_context():	# add args later
 	history.text = Jargonizer.get_handshake()
@@ -705,6 +729,7 @@ func _set_active_session(session: TerminalSession) -> void:
 	if previous_session == session:
 		active_session = session
 		active_signal = session.active_signal if session != null else root_signal
+		_refresh_signal_detail_panel()
 		return
 
 	active_session = session
@@ -715,6 +740,7 @@ func _set_active_session(session: TerminalSession) -> void:
 
 	if active_session != null and active_session != root_session and active_session.has_tab and active_session.active_signal != null:
 		session_activated.emit(active_session.active_signal)
+	_refresh_signal_detail_panel()
 
 func force_disconnect_signal(target_signal: ActiveSignal, reason_lines: Array[String] = []) -> void:
 	if target_signal == null or target_signal.terminal_session == null:
@@ -752,6 +778,135 @@ func _close_session_tab(session: TerminalSession, target_signal: ActiveSignal) -
 		session_closed.emit(target_signal)
 	if tab_index != -1:
 		session_tabs.remove_tab(tab_index)
+	_refresh_signal_detail_panel()
+
+# Signal Detail Panels
+
+func _refresh_signal_detail_panel() -> void:
+	if active_signal == null or active_signal == root_signal or active_signal.data == null:
+		_apply_default_detail_panel_state()
+		return
+
+	_refresh_scan_panel(active_signal)
+	_refresh_lock_panel(active_signal)
+	_refresh_ic_panel(active_signal)
+
+func _apply_default_detail_panel_state() -> void:
+	scan_progress.max_value = 1.0
+	scan_progress.value = 0.0
+	scan_progress.self_modulate = ActiveSignal.COLOR_STATUS_UNKNOWN
+	scan_icon.texture = MAGNIFYING_GLASS_ICON
+	scan_icon.self_modulate = ActiveSignal.COLOR_STATUS_UNKNOWN
+	scan_label.text = "Scan: Unscanned"
+	scan_label.self_modulate = ActiveSignal.COLOR_STATUS_UNKNOWN
+	_apply_panel_tint(scan_panel, ActiveSignal.COLOR_STATUS_UNKNOWN, "_scan_panel_tint")
+
+	lock_icon.texture = PADLOCK_ICON
+	lock_icon.self_modulate = ActiveSignal.COLOR_STATUS_UNKNOWN
+	lock_label.text = "Lock: Unverified"
+	lock_label.self_modulate = ActiveSignal.COLOR_STATUS_UNKNOWN
+	_apply_panel_tint(lock_panel, ActiveSignal.COLOR_STATUS_UNKNOWN, "_lock_panel_tint")
+
+	ic_progress.max_value = 1.0
+	ic_progress.value = 0.0
+	ic_progress.self_modulate = ActiveSignal.COLOR_STATUS_UNKNOWN
+	ic_icon.texture = SHIELD_ICON
+	ic_icon.self_modulate = ActiveSignal.COLOR_STATUS_UNKNOWN
+	ic_label.text = "IC: Unknown"
+	ic_label.self_modulate = ActiveSignal.COLOR_STATUS_UNKNOWN
+	_apply_panel_tint(ic_panel, ActiveSignal.COLOR_STATUS_UNKNOWN, "_ic_panel_tint")
+
+func _refresh_scan_panel(target_sig: ActiveSignal) -> void:
+	var total_layers = max(1, target_sig.get_total_scan_layer_count())
+	var revealed_layers := target_sig.get_revealed_scan_layer_count()
+	var display_value := float(revealed_layers)
+	if target_sig.is_being_scanned and target_sig.current_scan_index < target_sig.scan_layers.size():
+		var current_layer = target_sig.scan_layers[target_sig.current_scan_index]
+		var current_fraction := 0.0
+		if current_layer.duration > 0.0:
+			current_fraction = clampf(target_sig.current_layer_progress / current_layer.duration, 0.0, 1.0)
+		display_value = minf(float(total_layers), float(revealed_layers) + current_fraction)
+
+	var scan_color := target_sig.get_scan_status_color()
+	scan_progress.max_value = total_layers
+	scan_progress.value = display_value
+	scan_progress.self_modulate = scan_color
+	scan_icon.texture = CHECK_MARK_ICON if target_sig.get_scan_status_icon_state() == ActiveSignal.TooltipIconState.COMPLETE else MAGNIFYING_GLASS_ICON
+	scan_icon.self_modulate = scan_color
+	scan_label.text = target_sig.get_scan_status_label_text()
+	scan_label.self_modulate = scan_color
+	_apply_panel_tint(scan_panel, scan_color, "_scan_panel_tint")
+
+func _refresh_lock_panel(target_sig: ActiveSignal) -> void:
+	var lock_state := target_sig.get_lock_status_icon_state()
+	var lock_color := target_sig.get_lock_status_color()
+	match lock_state:
+		ActiveSignal.TooltipIconState.UNKNOWN_LOCK:
+			toolbox_button.disabled = true
+			return
+		ActiveSignal.TooltipIconState.OPEN, ActiveSignal.TooltipIconState.HACKED:
+			lock_icon.texture = PADLOCK_OPEN_ICON
+			toolbox_button.disabled = true
+		_:
+			lock_icon.texture = PADLOCK_ICON
+			toolbox_button.disabled = false
+	lock_icon.self_modulate = lock_color
+	lock_label.text = target_sig.get_lock_status_label_text()
+	lock_label.self_modulate = lock_color
+	_apply_panel_tint(lock_panel, lock_color, "_lock_panel_tint")
+
+func _refresh_ic_panel(target_sig: ActiveSignal) -> void:
+	var ic_state := target_sig.get_ic_status_icon_state()
+	var ic_color := target_sig.get_ic_status_color()
+	var ic_progress_color := target_sig.get_ic_progress_color()
+	match ic_state:
+		ActiveSignal.TooltipIconState.NO_IC:
+			ic_icon.texture = CANCEL_ICON
+		ActiveSignal.TooltipIconState.ACTIVE_IC:
+			ic_icon.texture = SHIELD_ICON
+		_:
+			ic_icon.texture = SHIELD_ICON
+	ic_progress.max_value = target_sig.get_ic_scan_progress_max()
+	ic_progress.value = target_sig.get_ic_scan_progress_value()
+	ic_progress.self_modulate = ic_progress_color
+	ic_icon.self_modulate = ic_color
+	ic_label.text = target_sig.get_ic_status_detail_text()
+	ic_label.self_modulate = ic_color
+	_apply_panel_tint(ic_panel, ic_color, "_ic_panel_tint")
+
+func _apply_panel_tint(panel: PanelContainer, accent: Color, cache_field: String) -> void:
+	if panel == null:
+		return
+	if get(cache_field) == accent:
+		return
+	var base_style := panel.get_theme_stylebox("panel")
+	if not (base_style is StyleBoxFlat):
+		return
+	var style := (base_style as StyleBoxFlat).duplicate()
+	style.bg_color = Color(
+		clampf(accent.r * 0.18, 0.05, 1.0),
+		clampf(accent.g * 0.18, 0.05, 1.0),
+		clampf(accent.b * 0.18, 0.05, 1.0),
+		1.0
+	)
+	style.border_color = accent
+	panel.add_theme_stylebox_override("panel", style)
+	set(cache_field, accent)
+
+func _on_signal_scanned(signal_data: SignalData, _scan_depth) -> void:
+	if active_signal == null or active_signal == root_signal or signal_data != active_signal.data:
+		return
+	_refresh_signal_detail_panel()
+
+func _on_signal_scan_complete(signal_data: SignalData) -> void:
+	if active_signal == null or active_signal == root_signal or signal_data != active_signal.data:
+		return
+	_refresh_signal_detail_panel()
+
+func _on_signal_state_changed(signal_data) -> void:
+	if active_signal == null or active_signal == root_signal or signal_data != active_signal.data:
+		return
+	_refresh_signal_detail_panel()
 
 # SIGNALLED FUNCTIONS
 
@@ -773,3 +928,45 @@ func _on_command_error(error_msg: String, signal_context: ActiveSignal = null) -
 	if signal_context != active_signal:
 		return
 	print_to_log("!! ERROR: " + error_msg)
+
+var toolbox_open: bool = false
+
+func _on_lock_center_box_pressed() -> void:
+	_toggle_toolbox()
+
+func _toggle_toolbox():
+	if !toolbox_open:
+		_open_toolbox()
+	else:
+		_close_toolbox()
+	
+func _open_toolbox():
+	var panel_shift = toolbox_panel.position.y + toolbox_panel.size.y
+	var tween = create_tween()
+	toolbox_panel.z_index = 0
+	toolbox_panel.show()
+	toolbox_open = true
+	tween.tween_property(toolbox_panel, "position:y", -panel_shift, .1)
+	await tween.finished
+	tween.kill()
+
+func _close_toolbox():
+	var panel_shift = toolbox_panel.position.y + toolbox_panel.size.y
+	var tween = create_tween()
+	toolbox_panel.z_index = 0
+	tween.tween_property(toolbox_panel, "position:y", panel_shift, .1)
+	await tween.finished
+	tween.kill()
+	toolbox_panel.z_index = -20
+	toolbox_panel.hide()
+	toolbox_open = false
+
+
+func _on_sniff_button_pressed() -> void:
+	_close_toolbox()
+	print("sniff")
+
+
+func _on_decrypt_button_pressed() -> void:
+	_close_toolbox()
+	print("decrypt")

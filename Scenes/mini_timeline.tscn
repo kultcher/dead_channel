@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://capen3ifwsuq8"]
+
+[ext_resource type="Script" uid="uid://der0p2e1p4dwe" path="res://Scripts/mini_timeline.gd" id="1_rtvrb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_32yaf"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+
+[node name="MiniTimeline" type="PanelContainer" unique_id=1003075896]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1780.0
+offset_bottom = -984.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_32yaf")
+script = ExtResource("1_rtvrb")
+
+[node name="MiniTimelineGrid" type="GridContainer" parent="." unique_id=1302086880]
+layout_mode = 2
+columns = 4
+
+[node name="MiniSignalPanel" type="PanelContainer" parent="MiniTimelineGrid" unique_id=108603728]
+custom_minimum_size = Vector2(32, 16)
+layout_mode = 2
+size_flags_horizontal = 4

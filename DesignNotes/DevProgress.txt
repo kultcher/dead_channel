@@ -58,6 +58,10 @@ Development Progress
 3/28/2026:
 - Tutorial polish
 
+3/31/2026:
+- Added terminal detail panels and toolbox
+- Added mini-timeline prototype
+
 Short-term TODO:
 - tutorial: add explanation of signal icons
 - tutorial: speed up final gauntlet drones

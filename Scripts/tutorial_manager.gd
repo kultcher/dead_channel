@@ -137,6 +137,9 @@ func _run_door_01_sequence() -> void:
 	await _wait_for_cell(6)
 	_acquire_runner_hold("door_01_gate")
 
+	window_manager.auto_focus_puzzles = true
+
+
 	await _show_dialogue([
 		"All right, facility door in sight. Give it a scan, if you haven't already."
 	], "door_01")
@@ -160,6 +163,7 @@ func _run_door_01_sequence() -> void:
 
 	await _wait_for_puzzle_solved("door_01")
 	window_manager.clear_focus_overlay()
+	window_manager.auto_focus_puzzles = false
 
 	await _show_dialogue([
 		"Now you've got access, but you still need to unlock the door in realspace.",

@@ -19,7 +19,7 @@ var codex_popup = preload("res://Scenes/codex_popup.tscn")
 @export var default_spawn_offset := Vector2(75, 300)
 @export var puzzle_spawn_position := Vector2(760, 430)
 @export var cascade_step := Vector2(25, 25)  # Each window offsets by this amount
-@export var auto_focus_puzzles := true
+@export var auto_focus_puzzles := false
 
 var window_count := 0
 var _active_puzzle_windows: Dictionary = {}

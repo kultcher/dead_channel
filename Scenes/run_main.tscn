@@ -23,6 +23,8 @@
 [ext_resource type="Script" uid="uid://cbv73pnuu78pw" path="res://Scripts/cutscene_controller.gd" id="18_3xdhw"]
 [ext_resource type="Texture2D" uid="uid://bilm8u1f271kd" path="res://Visuals/NullSpikeKeyPH.png" id="20_26ak2"]
 [ext_resource type="Texture2D" uid="uid://0s1a4ceed6us" path="res://Visuals/glitch_screen2.png" id="21_1rh14"]
+[ext_resource type="PackedScene" uid="uid://capen3ifwsuq8" path="res://Scenes/mini_timeline.tscn" id="24_2sj47"]
+[ext_resource type="Script" uid="uid://der0p2e1p4dwe" path="res://scripts/mini_timeline.gd" id="25_34l5d"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k8c5c"]
 border_width_left = 5
@@ -50,18 +52,20 @@ shader_parameter/glow_tint = Color(0.75, 1, 1, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_85m8a"]
 gradient = SubResource("Gradient_882wi")
-height = 256
+width = 1920
+height = 32
 fill_from = Vector2(0, 1)
-fill_to = Vector2(0, 0)
+fill_to = Vector2(0, 0.042735044)
 
 [sub_resource type="Gradient" id="Gradient_4qt4q"]
 colors = PackedColorArray(0.7490196, 0.99607843, 0, 1, 1, 0, 0, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_jx6wh"]
 gradient = SubResource("Gradient_4qt4q")
-height = 256
+width = 1920
+height = 32
 fill_from = Vector2(0, 1)
-fill_to = Vector2(0, 0)
+fill_to = Vector2(1, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_o0pqt"]
 shader = ExtResource("13_d5u5a")
@@ -101,10 +105,11 @@ shader_parameter/glow_tint = Color(0.75, 1, 1, 1)
 
 [node name="RunManager" type="Node" parent="." unique_id=973638613]
 script = ExtResource("1_4q6c1")
-level_script_path = "uid://cweechpdcw3v"
+level_script_path = "uid://c610jeckedhsu"
 
 [node name="TutorialManager" type="Node" parent="." unique_id=755181945]
 script = ExtResource("2_r51ll")
+debug_skip_to_stage = "drone_01"
 
 [node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
 position = Vector2(0, 50)
@@ -190,23 +195,21 @@ offset_right = -102.0
 offset_bottom = -111.0
 
 [node name="HeatTracker" type="TextureProgressBar" parent="." unique_id=1028315604]
-offset_left = 25.0
-offset_top = 775.0
-offset_right = 89.0
-offset_bottom = 1031.0
+offset_top = 1048.0
+offset_right = 1920.0
+offset_bottom = 1080.0
 max_value = 5000.0
 step = 0.1
-fill_mode = 3
 texture_under = SubResource("GradientTexture2D_85m8a")
 texture_progress = SubResource("GradientTexture2D_jx6wh")
 script = ExtResource("6_85m8a")
 
 [node name="HeatDebug" type="Label" parent="HeatTracker" unique_id=1874187724]
 layout_mode = 0
-offset_left = 68.0
-offset_top = 184.0
-offset_right = 133.0
-offset_bottom = 235.0
+offset_left = 33.0
+offset_top = -74.0
+offset_right = 98.0
+offset_bottom = -23.0
 tooltip_text = "Test"
 
 [node name="TerminalWindow" parent="." unique_id=340148133 instance=ExtResource("7_4qt4q")]
@@ -285,3 +288,10 @@ visible = false
 material = SubResource("ShaderMaterial_d4ye1")
 layout_mode = 2
 mouse_filter = 2
+
+[node name="MiniTimeline" parent="." unique_id=471502649 instance=ExtResource("24_2sj47")]
+offset_left = 176.0
+offset_top = 841.0
+offset_right = 316.0
+offset_bottom = 937.0
+script = ExtResource("25_34l5d")
