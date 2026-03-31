@@ -10,22 +10,12 @@ func try_command(cmd_context):
 		cmd_context.log_text.append("No response. Signal disabled.")
 		return
 	match cmd_context.command:
-		"KILL": _kill(cmd_context)
 		"RUN": _run(cmd_context)
 		"OP": _op(cmd_context)
 		"SPOOF": _spoof(cmd_context)
 		"PROBE": _probe(cmd_context)
 		"LINK": _link(cmd_context)
 
-func _kill(cmd_context):
-	if cmd_context.active_sig.data.type == SignalData.Type.DOOR:
-		cmd_context.status = CommandContext.CommandStatus.FAILURE
-		cmd_context.log_text.append("KILL failed. No active process to kill on signal type: DOOR.")
-	cmd_context.active_sig.disable_signal()
-	var name = cmd_context.active_sig.data.system_id
-	cmd_context.log_text.append("Shutting down " + name + "...")
-	GlobalEvents.signal_killed.emit(cmd_context.active_sig)
-	GlobalEvents.heat_increased.emit(500, "Shutting down " + name + ".")
 
 func _run(cmd_context):
 	if !cmd_context.active_sig.data.puzzle:

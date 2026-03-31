@@ -268,13 +268,8 @@ func _cmd_help(active_sig: ActiveSignal) -> void:
 
 func _try_command(cmd_context: CommandContext) -> void:
 	print("Command Dispatch trying command: " + cmd_context.command)
-	var ic_modules = cmd_context.active_sig.data.ic_modules
-	if ic_modules != null:
-		var stopped = ic_modules.command_intercept(cmd_context)
-		if stopped:
-			_interrupt_command(cmd_context)
-			return
-	cmd_context.active_sig.data.hackable.try_command(cmd_context)
+	var action_context := ActionResolver.build_action_from_command(cmd_context)
+	ActionResolver.resolve_action(action_context)
 	_finalize_command(cmd_context)
 
 func _interrupt_command(_cmd_context: CommandContext):

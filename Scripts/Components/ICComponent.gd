@@ -23,6 +23,12 @@ func get_desc():
 func add_module(module: Resource):
 	modules.append(module)
 
+func process_action(action_context: ActionContext) -> void:
+	for module in modules:
+		if module == null:
+			continue
+		module.process_action(action_context)
+
 func command_intercept(cmd_context: CommandContext):
 	for module in modules:
 		if module != null and module.interrupts_commands(cmd_context):
