@@ -16,6 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://cjra5kvci873p" path="res://Scenes/objective_tracker.tscn" id="9_2sk7x"]
 [ext_resource type="Shader" uid="uid://b1a4mcnowuyg8" path="res://Shaders/null_spike_sync.gdshader" id="9_d4ye1"]
 [ext_resource type="PackedScene" uid="uid://c7mm45bo2fmyv" path="res://Scenes/help_overlay.tscn" id="10_ki4rb"]
+[ext_resource type="PackedScene" uid="uid://dukcnubgwjffs" path="res://Scenes/program_dock.tscn" id="11_34l5d"]
 [ext_resource type="Texture2D" uid="uid://bsp50rqqai1yc" path="res://Visuals/digital_background.png" id="12_0p2ub"]
 [ext_resource type="Shader" uid="uid://c16vuww6jgbkf" path="res://Shaders/circuits.gdshader" id="13_d5u5a"]
 [ext_resource type="Texture2D" uid="uid://b77pho6a4a6dm" path="res://Visuals/digital_toplayer.png" id="14_d5u5a"]
@@ -187,7 +188,11 @@ offset_bottom = 700.0
 z_index = 5
 layout_mode = 1
 offset_right = 1126.0
-offset_bottom = 328.0
+offset_bottom = 345.0
+
+[node name="ProgramDock" parent="WorkspaceAnchor" unique_id=1620614055 instance=ExtResource("11_34l5d")]
+layout_mode = 1
+offset_left = -72.0
 
 [node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
 script = ExtResource("5_wudor")
@@ -195,6 +200,7 @@ script = ExtResource("5_wudor")
 [node name="FocusOverlay" parent="WindowManager" unique_id=2047983454 instance=ExtResource("8_4ll5g")]
 
 [node name="ObjectiveTracker" parent="WindowManager" unique_id=1310032324 instance=ExtResource("9_2sk7x")]
+visible = false
 offset_left = 1144.0
 offset_top = 750.0
 offset_right = 1457.0
@@ -253,6 +259,8 @@ texture = ExtResource("14_d5u5a")
 [node name="CutsceneController" type="PanelContainer" parent="." unique_id=2057820020]
 z_index = 10
 custom_minimum_size = Vector2(1920, 1080)
+offset_right = 1920.0
+offset_bottom = 1080.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 2
@@ -296,13 +304,12 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="MiniTimeline" parent="." unique_id=471502649 instance=ExtResource("24_2sj47")]
-offset_left = 176.0
-offset_top = 841.0
-offset_right = 316.0
-offset_bottom = 937.0
+offset_left = 194.0
+offset_top = 891.0
+offset_right = 334.0
+offset_bottom = 987.0
 
 [node name="TempQuitButton" type="Button" parent="." unique_id=1582544449]
-anchors_preset = -1
 offset_left = 1820.0
 offset_right = 1920.0
 text = "QUIT"

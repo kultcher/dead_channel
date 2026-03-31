@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://dukcnubgwjffs"]
+
+[ext_resource type="Texture2D" uid="uid://cx2um530ae5b1" path="res://Visuals/Icons/Simple/square.svg" id="1_23cnp"]
+[ext_resource type="Texture2D" uid="uid://d1wyllxrkjv3t" path="res://Visuals/Icons/Simple/ninja-heroic-stance.svg" id="2_oe8xx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pnir0"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.99309915, 0.2826732, 0.6011844, 1)
+
+[node name="ProgramDock" type="PanelContainer" unique_id=1620614055]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -124.0
+offset_bottom = 163.0
+grow_horizontal = 0
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_pnir0")
+
+[node name="DockHBox" type="HBoxContainer" parent="." unique_id=137830995]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="CellVBox" type="VBoxContainer" parent="DockHBox" unique_id=22368297]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ActiveProgramProgress" type="ProgressBar" parent="DockHBox/CellVBox" unique_id=1919201990]
+layout_mode = 2
+size_flags_vertical = 2
+size_flags_stretch_ratio = 0.2
+
+[node name="ActiveProgramButton" type="TextureButton" parent="DockHBox/CellVBox" unique_id=62802417]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+texture_normal = ExtResource("1_23cnp")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="DockedProgramButton" type="TextureButton" parent="DockHBox/CellVBox" unique_id=780897113]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+tooltip_text = "Assassin"
+texture_normal = ExtResource("2_oe8xx")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="RAMPanel" type="PanelContainer" parent="DockHBox" unique_id=210626006]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RAMProgress" type="ProgressBar" parent="DockHBox/RAMPanel" unique_id=1328865624]
+layout_mode = 2
+size_flags_vertical = 1

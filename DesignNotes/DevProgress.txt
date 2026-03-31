@@ -61,9 +61,16 @@ Development Progress
 3/31/2026:
 - Added terminal detail panels and toolbox
 - Added mini-timeline prototype
+- Migrated to action pipeline for commands, IC and programs
+- Scaffolding in place for programs
 
 Short-term TODO:
 - disruptors with no uses should disable themselves
+- Robust heat implementation with difficulty scaling
+- out-of-timeline alert/alarms
+- Programs and RAM: finish UI, implement assassin and RAM logic. Scan?
+- More and more advanced IC
+
 
 Polish TODO:
 - end sequence z-index stuff
@@ -93,12 +100,9 @@ x watch out for disabled terminal before null_lab
 
 Not Yet Implemented (priority):
 - finalize early jargonizer
-- Robust heat implementation with difficulty scaling
-- out-of-timeline alert/alarms
-- Programs and RAM
 - Advanced Signal functions/behaviors
 - fuzz minigame
-- More and more advanced IC
+- basic procgen
 
 Not Yet Implemented (long-term):
 - guard alert behaviors expanded
