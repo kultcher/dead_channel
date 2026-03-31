@@ -63,25 +63,21 @@ Development Progress
 - Added mini-timeline prototype
 
 Short-term TODO:
-- tutorial: add explanation of signal icons
-- tutorial: speed up final gauntlet drones
-- tutorial: add death state
-- Rework UI
-    - heat bar to bottom
-    - signal detail cutout
-    - RUN toolbar?
-- finalize early jargonizer
+
 
 Polish TODO:
+- Add chatlog/bark UI
 - add ciphers and on-solve trigger to codex
 - Add "drop to root" session log messages on passive signals that despawn
 - Cleanup cutscene controller (hardcode textures)
+- Convert authoring to fluent builder paradigm
 - Split out tutorial script and logic
 - guard comms pulses
 - Add a cleaner way to update scan tooltips (array?)
 - Adjust delay behavior to ResponseEffect instead of detection?
 - Fix guard facing override??
 - fix weird glitchiness after terminal dump sequence
+- add proper esc menu
 
 Verify:
 x add sequence break protection on drone_02 coolant vent
@@ -94,7 +90,9 @@ x watch out for disabled terminal before null_lab
 
 
 Not Yet Implemented (priority):
+- finalize early jargonizer
 - Robust heat implementation with difficulty scaling
+- out-of-timeline alert/alarms
 - Programs and RAM
 - Advanced Signal functions/behaviors
 - fuzz minigame

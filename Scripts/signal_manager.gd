@@ -5,7 +5,7 @@ extends Node2D
 
 @onready var timeline_manager = $"../TimelineManager"
 @onready var window_manager = $"../../WindowManager"
-@onready var terminal_window = $"../../TerminalWindow"
+@onready var terminal_window = $"../../WorkspaceAnchor/TerminalWindow"
 @onready var scan_controller = $"../ScanController"
 @onready var spawner = SignalSpawner.new()
 

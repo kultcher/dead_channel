@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://xixqn1eoufp7"]
+
+[node name="GameOver" type="ConfirmationDialog" unique_id=63971867]
+process_mode = 3
+oversampling_override = 1.0
+title = "Run failed!"
+initial_position = 1
+size = Vector2i(222, 100)
+visible = true
+ok_button_text = "Retry"
+cancel_button_text = "Quit"
+
+[node name="PromptLabel" type="Label" parent="." unique_id=767356546]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 214.0
+offset_bottom = 51.0
+text = "Retry?"
+horizontal_alignment = 1

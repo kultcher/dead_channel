@@ -17,6 +17,12 @@ func get_spawns() -> Array[Dictionary]:
 			"vision_angle_deg": 24,
 			"vision_length_cells": 1.0,
 		}),
+
+		build_spawn(BASIC_TERMINAL, 7.5, {
+			"system_id": "archive_terminal_01",
+			"lane": 0,
+			"puzzle": make_decrypt_puzzle(1),
+		}),
 		build_spawn(BASIC_DOOR, 7.5, {
 			"system_id": "door_01",
 			"lane": 2,

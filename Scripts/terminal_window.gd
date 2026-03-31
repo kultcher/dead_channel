@@ -87,7 +87,7 @@ var _ic_panel_tint: Color = Color.TRANSPARENT
 
 func _ready():
 	set_context()
-	command_line.grab_focus()
+	_focus_command_line()
 	CommandDispatch.terminal_window = self
 	CommandDispatch.command_complete.connect(_on_command_complete)
 	CommandDispatch.command_error.connect(_on_command_error)
@@ -105,6 +105,7 @@ func _ready():
 	root_signal.terminal_session = root_session
 	session_tabs.add_tab("root")
 	_set_tab_session(0, root_session)
+	_refresh_prefix()
 	_refresh_signal_detail_panel()
 
 func _process(_delta: float) -> void:
@@ -116,7 +117,8 @@ func switch_session(new_sig: ActiveSignal, show_connection_banner: bool = false)
 		print("null signal")
 		return
 	if active_signal == new_sig and not show_connection_banner:
-		print("Same signal")
+		_refresh_prefix()
+		_focus_command_line()
 		return
 
 	# Create new session
@@ -134,8 +136,8 @@ func switch_session(new_sig: ActiveSignal, show_connection_banner: bool = false)
 		else:
 			print_to_log("New session started with " + new_sig.data.system_id)
 		print_to_root("<Session Log>: Connected to " + new_sig.data.system_id)
-		prefix.text = "-" + new_sig.data.system_id + "-["
-		prefix.add_theme_color_override("font_color", new_sig.data.visuals.fill_color)
+		_refresh_prefix()
+		_focus_command_line()
 
 	# Switch to existing session
 	elif new_sig.terminal_session != null:
@@ -143,6 +145,8 @@ func switch_session(new_sig: ActiveSignal, show_connection_banner: bool = false)
 		if not existing_session.has_tab:
 			ensure_tab_for_session(existing_session)
 			session_opened.emit(new_sig)
+		else:
+			_select_tab_for_session(existing_session)
 		_set_active_session(existing_session)
 		if not active_session.has_tab:
 			ensure_tab_for_session(active_session)
@@ -150,7 +154,8 @@ func switch_session(new_sig: ActiveSignal, show_connection_banner: bool = false)
 			clear_log()
 			active_session.history.clear()
 			_play_connection_flow(new_sig)
-			prefix.text = "-" + active_session.active_signal.data.system_id + "-["
+			_refresh_prefix()
+			_focus_command_line()
 			return
 		restore_session(active_session)
 
@@ -621,17 +626,13 @@ func restore_session(session: TerminalSession):
 	_set_active_session(session)
 	if active_session.has_tab == false:
 		ensure_tab_for_session(active_session)
-	var tab_index = _find_tab_for_session(active_session)
-	if tab_index != -1:
-		session_tabs.current_tab = tab_index
+	_select_tab_for_session(active_session)
 	clear_log()
 	for s in session.history:
 		history.text += s + "\n"
 	print_unlogged("---Reconnecting---\n")
-	if session == root_session:
-		prefix.text = "- root -["
-	else:
-		prefix.text = "-" + active_session.active_signal.data.system_id + "-["
+	_refresh_prefix()
+	_focus_command_line()
 	_refresh_signal_detail_panel()
 
 func set_context():	# add args later
@@ -695,6 +696,11 @@ func _find_tab_for_session(session: TerminalSession) -> int:
 			return i
 	return -1
 
+func _select_tab_for_session(session: TerminalSession) -> void:
+	var tab_index := _find_tab_for_session(session)
+	if tab_index != -1:
+		session_tabs.current_tab = tab_index
+
 func _get_tab_session(tab_index: int) -> TerminalSession:
 	return session_tabs.get_tab_metadata(tab_index)
 
@@ -729,6 +735,7 @@ func _set_active_session(session: TerminalSession) -> void:
 	if previous_session == session:
 		active_session = session
 		active_signal = session.active_signal if session != null else root_signal
+		_refresh_prefix()
 		_refresh_signal_detail_panel()
 		return
 
@@ -740,6 +747,7 @@ func _set_active_session(session: TerminalSession) -> void:
 
 	if active_session != null and active_session != root_session and active_session.has_tab and active_session.active_signal != null:
 		session_activated.emit(active_session.active_signal)
+	_refresh_prefix()
 	_refresh_signal_detail_panel()
 
 func force_disconnect_signal(target_signal: ActiveSignal, reason_lines: Array[String] = []) -> void:
@@ -929,6 +937,29 @@ func _on_command_error(error_msg: String, signal_context: ActiveSignal = null) -
 		return
 	print_to_log("!! ERROR: " + error_msg)
 
+func _refresh_prefix() -> void:
+	if prefix == null:
+		return
+	if active_session == null or active_signal == null or active_signal == root_signal:
+		prefix.text = "- root -["
+		prefix.remove_theme_color_override("font_color")
+		return
+	prefix.text = "-" + active_signal.data.system_id + "-["
+	if active_signal.data != null and active_signal.data.visuals != null:
+		prefix.add_theme_color_override("font_color", active_signal.data.visuals.fill_color)
+	else:
+		prefix.remove_theme_color_override("font_color")
+
+func _focus_command_line() -> void:
+	if command_line == null:
+		return
+	command_line.grab_focus()
+	command_line.caret_column = command_line.text.length()
+
+#####	
+# TOOLBOX stuff	
+#####
+
 var toolbox_open: bool = false
 
 func _on_lock_center_box_pressed() -> void:
@@ -961,12 +992,14 @@ func _close_toolbox():
 	toolbox_panel.hide()
 	toolbox_open = false
 
-
 func _on_sniff_button_pressed() -> void:
+	command_line.grab_focus()
+	command_line.text = "RUN sniff"
+	_on_command_line_text_submitted(command_line.text)
 	_close_toolbox()
-	print("sniff")
-
 
 func _on_decrypt_button_pressed() -> void:
+	command_line.grab_focus()
+	command_line.text = "RUN decrypt"
+	_on_command_line_text_submitted(command_line.text)
 	_close_toolbox()
-	print("decrypt")

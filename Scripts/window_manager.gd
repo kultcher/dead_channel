@@ -6,12 +6,14 @@ extends CanvasLayer
 var sniff = preload("res://Scenes/sniff.tscn")
 #var fuzz = preload("res://Scenes/fuzz.tscn")
 var decrypt = preload("res://Scenes/decrypt.tscn")
+var game_over_scene = preload("res://Scenes/game_over.tscn")
 var dialogue_window_scene = preload("res://Scenes/dialogue_window.tscn")
 var codex_popup = preload("res://Scenes/codex_popup.tscn")
 
+@onready var run_manager = $"../RunManager"
+@onready var tutorial_manager = $"../TutorialManager"
 @onready var timeline_manager = $"../SignalTimeline/TimelineManager"
 @onready var signal_manager = $"../SignalTimeline/SignalManager"
-@onready var terminal_window = preload("res://Scenes/terminal_window.tscn")
 @onready var focus_overlay = $FocusOverlay
 @onready var objective_tracker = get_node_or_null("ObjectiveTracker")
 @onready var help_overlay = get_node_or_null("HelpOverlay")
@@ -23,11 +25,13 @@ var codex_popup = preload("res://Scenes/codex_popup.tscn")
 
 var window_count := 0
 var _active_puzzle_windows: Dictionary = {}
+var _game_over_dialog: ConfirmationDialog = null
 
 func _ready():
 	CommandDispatch.window_manager = self
 	GlobalEvents.puzzle_started.connect(_puzzle_started)
 	GlobalEvents.show_codex_popup.connect(_show_codex_popup)
+	GlobalEvents.runner_died.connect(_on_runner_died)
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	set_process_input(true)
 	if help_overlay != null:
@@ -107,6 +111,67 @@ func _show_codex_popup(codex_id: StringName, signal_data: SignalData):
 		popup.position = signal_instance.position + Vector2(-110, 150)
 	add_child(popup)
 	popup.setup_and_display(codex_id)
+
+func _on_runner_died() -> void:
+	if _game_over_dialog != null and is_instance_valid(_game_over_dialog):
+		return
+
+	get_tree().paused = true
+
+	var dialog := game_over_scene.instantiate() as ConfirmationDialog
+	if dialog == null:
+		return
+
+	_game_over_dialog = dialog
+	dialog.process_mode = Node.PROCESS_MODE_ALWAYS
+	dialog.confirmed.connect(_on_game_over_retry, CONNECT_ONE_SHOT)
+	var cancel_button := dialog.get_cancel_button()
+	if cancel_button != null:
+		cancel_button.pressed.connect(_on_game_over_quit, CONNECT_ONE_SHOT)
+	if dialog.has_signal("canceled"):
+		dialog.canceled.connect(_on_game_over_quit, CONNECT_ONE_SHOT)
+	dialog.close_requested.connect(_on_game_over_quit, CONNECT_ONE_SHOT)
+	dialog.tree_exited.connect(_on_game_over_dialog_closed, CONNECT_ONE_SHOT)
+	add_child(dialog)
+	move_child(dialog, get_child_count() - 1)
+	dialog.popup_centered()
+
+func _on_game_over_retry() -> void:
+	var restart_from_gauntlet = run_manager != null and run_manager.get_run_id() == "tutorial"
+	_restart_current_scene(restart_from_gauntlet)
+
+func _on_game_over_quit() -> void:
+	get_tree().paused = false
+	get_tree().quit()
+
+func _on_game_over_dialog_closed() -> void:
+	_game_over_dialog = null
+
+func _restart_current_scene(restart_from_gauntlet: bool) -> void:
+	var current_scene := get_tree().current_scene
+	if current_scene == null:
+		get_tree().paused = false
+		return
+
+	var scene_path := current_scene.scene_file_path
+	var packed_scene := load(scene_path) as PackedScene
+	if packed_scene == null:
+		get_tree().paused = false
+		return
+
+	var new_scene := packed_scene.instantiate()
+	if new_scene == null:
+		get_tree().paused = false
+		return
+
+	var new_tutorial_manager = new_scene.get_node_or_null("TutorialManager")
+	if new_tutorial_manager != null:
+		new_tutorial_manager.debug_skip_to_stage = "gauntlet" if restart_from_gauntlet else "full"
+
+	get_tree().paused = false
+	get_tree().root.add_child(new_scene)
+	get_tree().current_scene = new_scene
+	current_scene.queue_free()
 
 
 func show_tutorial_dialogue(

@@ -24,7 +24,6 @@
 [ext_resource type="Texture2D" uid="uid://bilm8u1f271kd" path="res://Visuals/NullSpikeKeyPH.png" id="20_26ak2"]
 [ext_resource type="Texture2D" uid="uid://0s1a4ceed6us" path="res://Visuals/glitch_screen2.png" id="21_1rh14"]
 [ext_resource type="PackedScene" uid="uid://capen3ifwsuq8" path="res://Scenes/mini_timeline.tscn" id="24_2sj47"]
-[ext_resource type="Script" uid="uid://der0p2e1p4dwe" path="res://scripts/mini_timeline.gd" id="25_34l5d"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k8c5c"]
 border_width_left = 5
@@ -105,11 +104,11 @@ shader_parameter/glow_tint = Color(0.75, 1, 1, 1)
 
 [node name="RunManager" type="Node" parent="." unique_id=973638613]
 script = ExtResource("1_4q6c1")
-level_script_path = "uid://c610jeckedhsu"
+level_script_path = "uid://cweechpdcw3v"
 
 [node name="TutorialManager" type="Node" parent="." unique_id=755181945]
 script = ExtResource("2_r51ll")
-debug_skip_to_stage = "drone_01"
+debug_skip_to_stage = "gauntlet"
 
 [node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
 position = Vector2(0, 50)
@@ -176,6 +175,20 @@ offset_right = 1920.0
 offset_bottom = 334.0
 mouse_filter = 2
 
+[node name="WorkspaceAnchor" type="Control" parent="." unique_id=52976337]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 350.0
+offset_top = 700.0
+offset_right = 350.0
+offset_bottom = 700.0
+
+[node name="TerminalWindow" parent="WorkspaceAnchor" unique_id=340148133 instance=ExtResource("7_4qt4q")]
+z_index = 5
+layout_mode = 1
+offset_right = 1126.0
+offset_bottom = 328.0
+
 [node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
 script = ExtResource("5_wudor")
 
@@ -184,8 +197,8 @@ script = ExtResource("5_wudor")
 [node name="ObjectiveTracker" parent="WindowManager" unique_id=1310032324 instance=ExtResource("9_2sk7x")]
 offset_left = 1144.0
 offset_top = 750.0
-offset_right = 1480.0
-offset_bottom = 1012.0
+offset_right = 1457.0
+offset_bottom = 980.0
 
 [node name="HelpOverlay" parent="WindowManager" unique_id=1226732366 instance=ExtResource("10_ki4rb")]
 visible = false
@@ -206,18 +219,11 @@ script = ExtResource("6_85m8a")
 
 [node name="HeatDebug" type="Label" parent="HeatTracker" unique_id=1874187724]
 layout_mode = 0
-offset_left = 33.0
-offset_top = -74.0
-offset_right = 98.0
-offset_bottom = -23.0
+offset_left = 1700.0
+offset_top = -75.0
+offset_right = 1765.0
+offset_bottom = -24.0
 tooltip_text = "Test"
-
-[node name="TerminalWindow" parent="." unique_id=340148133 instance=ExtResource("7_4qt4q")]
-z_index = 5
-offset_left = 357.0
-offset_top = 700.0
-offset_right = 1483.0
-offset_bottom = 1028.0
 
 [node name="SniffWindow" parent="." unique_id=650256936 instance=ExtResource("8_jx6wh")]
 visible = false
@@ -294,4 +300,11 @@ offset_left = 176.0
 offset_top = 841.0
 offset_right = 316.0
 offset_bottom = 937.0
-script = ExtResource("25_34l5d")
+
+[node name="TempQuitButton" type="Button" parent="." unique_id=1582544449]
+anchors_preset = -1
+offset_left = 1820.0
+offset_right = 1920.0
+text = "QUIT"
+
+[connection signal="button_down" from="TempQuitButton" to="RunManager" method="_on_temp_quit_button_button_down"]

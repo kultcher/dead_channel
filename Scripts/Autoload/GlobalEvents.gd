@@ -23,6 +23,7 @@ signal heat_changed(amount)
 
 signal runner_detected(active_sig: ActiveSignal)
 signal runners_damaged(amount: float)
+signal runner_died()
 signal runners_stopped()
 signal runners_resumed()
 signal runner_slowdown()

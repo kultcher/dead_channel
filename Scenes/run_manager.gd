@@ -34,3 +34,7 @@ func get_display_name() -> String:
 	if current_run == null:
 		return ""
 	return current_run.get_display_name()
+
+
+func _on_temp_quit_button_button_down() -> void:
+	get_tree().quit()

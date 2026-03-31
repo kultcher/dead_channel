@@ -9,7 +9,7 @@ const NULL_SPIKE_SYNC_PATH := "res://Resources/RunData/AuthoredRuns/null_spike_s
 
 @onready var timeline_manager = $"../SignalTimeline/TimelineManager"
 @onready var signal_manager = $"../SignalTimeline/SignalManager"
-@onready var terminal_window = $"../TerminalWindow"
+@onready var terminal_window = $"../WorkspaceAnchor/TerminalWindow"
 @onready var run_manager = $"../RunManager"
 @onready var window_manager = $"../WindowManager"
 
@@ -152,7 +152,7 @@ func _run_door_01_sequence() -> void:
 		"Locked, obviously. Different locks require different keys.",
 		"This one auth-locked. Means the credentials are floating around the network, we just need to sniff out the right data. RUN sniff in your terminal to find it."
 	], "door_01")
-	_set_objective("Left click the door_01 signal to connect, then type RUN sniff in the terminal to run the Sniff program.")
+	_set_objective("- Left click the door_01 signal to connect, then type RUN sniff in the terminal to run the Sniff program.\nWhen connected to a locked signal, you can also click on the Lock status panel below the terminal to pull up a clickable list of unlocking programs.")
 
 	await _wait_for_puzzle_started(PuzzleComponent.Type.SNIFF)
 
@@ -434,8 +434,12 @@ func _run_pre_gauntlet_sequence():
 
 	await get_tree().create_timer(.5).timeout
 
-
 	await timeline_manager.set_view_offset_cells(10, 2.0)
+
+	# speed up gauntlet drones
+	for sig in signal_manager.signal_queue:
+		if sig.data.display_name.contains("c_drone"):
+			sig.data.detection.turn_speed_deg_per_sec = 270.0
 
 	await _show_dialogue([
 		"...",
@@ -652,10 +656,16 @@ func _prepare_debug_pre_gauntlet() -> void:
 	_enable_feature("terminal_commands")
 	_enable_feature("null_spike", false)
 	_get_active_signal("c_drone_01").disable_signal()
+
+	# speed up gauntlet drones
+	for sig in signal_manager.signal_queue:
+		if sig.data.display_name.contains("c_drone"):
+			sig.data.detection.turn_speed_deg_per_sec = 270.0
 	_set_runner_cell(55.9)
 
 func _prepare_debug_gauntlet() -> void:
 	_prepare_debug_pre_gauntlet()
+
 	_set_runner_cell(59.0)
 	
 func _set_cutscene_black_screen(enabled: bool) -> void:
