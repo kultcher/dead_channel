@@ -10,7 +10,13 @@ func get_desc():
 func get_codex_id():
 	return &"codex_bouncer"
 
-func on_connect(active_sig: ActiveSignal):
+func postprocess_action(action_context: ActionContext) -> void:
+	if action_context == null or not action_context.was_successful():
+		return
+	if action_context.action_type != ActionContext.ActionType.ACCESS_SIGNAL:
+		return
+
+	var active_sig := action_context.primary_target
 	_clear_timer()
 	if active_sig == null or active_sig.terminal_session == null:
 		return
@@ -39,17 +45,21 @@ func _on_disconnect_timer_timeout(active_sig: ActiveSignal) -> void:
 		return
 	if not active_sig.terminal_session.has_tab:
 		return
-	if CommandDispatch.terminal_window == null:
-		return
 
 	var reason_lines: Array[String] = [
 		"[b][color=red]BOUNCER[/color][/b]: Session timer expired.",
 		"Connection forcibly terminated."
 	]
-	CommandDispatch.terminal_window.force_disconnect_signal(
+	var action := ActionContext.create_system_action(
+		ActionContext.ActionType.DISCONNECT_SESSION,
 		active_sig,
-		reason_lines
+		ActionContext.SourceType.IC_MODULE
 	)
+	action.add_tag(&"ic")
+	action.add_tag(&"bouncer")
+	action.set_metadata(&"codex_id", get_codex_id())
+	action.set_metadata(&"reason_lines", reason_lines)
+	ActionResolver.enqueue_action(action)
 
 func _clear_timer() -> void:
 	if timer != null and is_instance_valid(timer):

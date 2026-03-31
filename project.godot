@@ -25,6 +25,7 @@ GlobalEvents="*uid://dpxrdgggbs7x0"
 CommandDispatch="*uid://bpcqwqydjiyf8"
 PlayerData="*uid://8dq15r6f28dc"
 ActionResolver="*uid://8a2pnxybffiv"
+ProgramManager="*res://Scripts/Autoload/ProgramManager.gd"
 
 [debug]
 

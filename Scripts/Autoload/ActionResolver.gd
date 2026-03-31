@@ -4,6 +4,9 @@ signal action_started(action_context: ActionContext)
 signal action_resolved(action_context: ActionContext)
 signal action_failed(action_context: ActionContext)
 
+var _pending_actions: Array[ActionContext] = []
+var _is_processing_actions := false
+
 func build_action_from_command(cmd_context: CommandContext) -> ActionContext:
 	var action := ActionContext.from_command(cmd_context)
 	if cmd_context == null:
@@ -27,9 +30,11 @@ func build_action_from_command(cmd_context: CommandContext) -> ActionContext:
 					SignalData.Type.DISRUPTOR:
 						action.action_type = ActionContext.ActionType.ACTIVATE_DISRUPTOR
 					_:
-						action.action_type = ActionContext.ActionType.LEGACY_COMMAND
+						action.action_type = ActionContext.ActionType.UNKNOWN
+						action.fail("Invalid context, no operation available.")
 			else:
-				action.action_type = ActionContext.ActionType.LEGACY_COMMAND
+				action.action_type = ActionContext.ActionType.UNKNOWN
+				action.fail("Invalid context, no operation available.")
 		"RUN":
 			action.action_type = ActionContext.ActionType.LAUNCH_PUZZLE
 		"ACCESS":
@@ -38,8 +43,10 @@ func build_action_from_command(cmd_context: CommandContext) -> ActionContext:
 			action.set_metadata(&"show_connection_banner", true)
 		"HELP":
 			action.action_type = ActionContext.ActionType.SHOW_HELP
+			action.add_tag(&"terminal")
 		_:
-			action.action_type = ActionContext.ActionType.LEGACY_COMMAND
+			action.action_type = ActionContext.ActionType.UNKNOWN
+			action.fail("Unsupported action.")
 
 	return action
 
@@ -47,20 +54,46 @@ func resolve_action(action_context: ActionContext) -> ActionContext:
 	if action_context == null:
 		return null
 
+	enqueue_action(action_context)
+	return action_context
+
+func enqueue_action(action_context: ActionContext) -> ActionContext:
+	if action_context == null:
+		return null
+
+	_pending_actions.append(action_context)
+	if not _is_processing_actions:
+		_drain_action_queue()
+	return action_context
+
+func _drain_action_queue() -> void:
+	if _is_processing_actions:
+		return
+
+	_is_processing_actions = true
+	while not _pending_actions.is_empty():
+		var action_context = _pending_actions.pop_front()
+		_resolve_single_action(action_context)
+	_is_processing_actions = false
+
+func _resolve_single_action(action_context: ActionContext) -> void:
+	if action_context == null:
+		return
+
 	action_context.mark_processing()
 	action_started.emit(action_context)
 
 	_run_preprocessors(action_context)
 	if action_context.was_unsuccessful():
 		_emit_terminal_outcome(action_context)
-		return action_context
+		return
 
 	_apply_core_effect(action_context)
 	_run_postprocessors(action_context)
 	_emit_terminal_outcome(action_context)
-	return action_context
 
 func _run_preprocessors(action_context: ActionContext) -> void:
+	ProgramManager.preprocess_action(action_context)
 	var target := action_context.primary_target
 	if target == null or target.data == null or target.data.ic_modules == null:
 		return
@@ -73,10 +106,18 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 	match action_context.action_type:
 		ActionContext.ActionType.ACCESS_SIGNAL:
 			_apply_access_signal(action_context)
+		ActionContext.ActionType.SHOW_HELP:
+			_apply_show_help(action_context)
 		ActionContext.ActionType.PROBE_SIGNAL:
 			_apply_probe_signal(action_context)
+		ActionContext.ActionType.ADD_HEAT:
+			_apply_add_heat(action_context)
 		ActionContext.ActionType.DISABLE_SIGNAL:
 			_apply_disable_signal(action_context)
+		ActionContext.ActionType.ENABLE_SIGNAL:
+			_apply_enable_signal(action_context)
+		ActionContext.ActionType.DISCONNECT_SESSION:
+			_apply_disconnect_session(action_context)
 		ActionContext.ActionType.TOGGLE_DOOR_LOCK:
 			_apply_toggle_door_lock(action_context)
 		ActionContext.ActionType.LAUNCH_PUZZLE:
@@ -84,10 +125,14 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 		ActionContext.ActionType.ACTIVATE_DISRUPTOR:
 			_apply_activate_disruptor(action_context)
 		_:
-			_apply_legacy_command(action_context)
+			action_context.fail("Unsupported action.")
 
-func _run_postprocessors(_action_context: ActionContext) -> void:
-	pass
+func _run_postprocessors(action_context: ActionContext) -> void:
+	ProgramManager.postprocess_action(action_context)
+	var target := action_context.primary_target
+	if target == null or target.data == null or target.data.ic_modules == null:
+		return
+	target.data.ic_modules.postprocess_action(action_context)
 
 func _apply_access_signal(action_context: ActionContext) -> void:
 	var target := action_context.primary_target
@@ -98,6 +143,11 @@ func _apply_access_signal(action_context: ActionContext) -> void:
 	var show_connection_banner := bool(action_context.get_metadata(&"show_connection_banner", false))
 	CommandDispatch.switch_terminal_session(target, show_connection_banner)
 	action_context.succeed()
+
+func _apply_show_help(action_context: ActionContext) -> void:
+	if CommandDispatch.window_manager != null:
+		CommandDispatch.window_manager.show_help_overlay()
+	action_context.succeed("Opening terminal reference.")
 
 func _ensure_target_is_responding(action_context: ActionContext) -> bool:
 	var target := action_context.primary_target
@@ -114,6 +164,10 @@ func _apply_probe_signal(action_context: ActionContext) -> void:
 		return
 	action_context.succeed()
 
+func _apply_add_heat(action_context: ActionContext) -> void:
+	GlobalEvents.heat_increased.emit(action_context.heat_delta, str(action_context.get_metadata(&"heat_source", "")))
+	action_context.succeed()
+
 func _apply_disable_signal(action_context: ActionContext) -> void:
 	if not _ensure_target_is_responding(action_context):
 		return
@@ -127,7 +181,43 @@ func _apply_disable_signal(action_context: ActionContext) -> void:
 	action_context.succeed("Shutting down " + target.data.system_id + "...")
 	GlobalEvents.signal_killed.emit(target)
 	if action_context.heat_delta != 0.0:
-		GlobalEvents.heat_increased.emit(action_context.heat_delta, "Shutting down " + target.data.system_id + ".")
+		_queue_heat_action(
+			action_context.heat_delta,
+			"Shutting down " + target.data.system_id + ".",
+			target,
+			action_context.source_type
+		)
+
+func _apply_enable_signal(action_context: ActionContext) -> void:
+	var target := action_context.primary_target
+	if target == null or target.data == null:
+		action_context.fail("Invalid context, no signal available.")
+		return
+	if not target.is_disabled:
+		action_context.succeed()
+		return
+
+	target.enable_signal()
+	action_context.succeed()
+
+func _apply_disconnect_session(action_context: ActionContext) -> void:
+	var target := action_context.primary_target
+	if target == null:
+		action_context.fail("Invalid context, no signal available.")
+		return
+	if CommandDispatch.terminal_window == null:
+		action_context.fail("Terminal window unavailable.")
+		return
+	if target.terminal_session == null or not target.terminal_session.has_tab:
+		action_context.succeed()
+		return
+
+	var reason_lines: Array[String] = []
+	var raw_reason_lines = action_context.get_metadata(&"reason_lines", [])
+	for line in raw_reason_lines:
+		reason_lines.append(str(line))
+	CommandDispatch.terminal_window.force_disconnect_signal(target, reason_lines)
+	action_context.succeed()
 
 func _apply_toggle_door_lock(action_context: ActionContext) -> void:
 	if not _ensure_target_is_responding(action_context):
@@ -261,26 +351,6 @@ func _apply_activate_disruptor(action_context: ActionContext) -> void:
 
 	action_context.succeed(signal_data.display_name + " activated. Alerted " + str(matched_targets) + " target(s).")
 
-func _apply_legacy_command(action_context: ActionContext) -> void:
-	var cmd_context := action_context.command_context
-	if cmd_context == null:
-		action_context.fail("Invalid action context.")
-		return
-	if cmd_context.active_sig == null or cmd_context.active_sig.data == null or cmd_context.active_sig.data.hackable == null:
-		action_context.fail("Invalid context, no operation available.")
-		return
-
-	cmd_context.log_text.clear()
-	cmd_context.status = CommandContext.CommandStatus.PROCESS
-	cmd_context.active_sig.data.hackable.try_command(cmd_context)
-	for line in cmd_context.log_text:
-		action_context.append_log(line)
-	match cmd_context.status:
-		CommandContext.CommandStatus.FAILURE:
-			action_context.status = ActionContext.Status.FAILURE
-		_:
-			action_context.status = ActionContext.Status.SUCCESS
-
 func _emit_terminal_outcome(action_context: ActionContext) -> void:
 	if action_context == null:
 		return
@@ -300,3 +370,13 @@ func _emit_terminal_outcome(action_context: ActionContext) -> void:
 		action_failed.emit(action_context)
 	else:
 		action_resolved.emit(action_context)
+
+func _queue_heat_action(amount: float, source_text: String, target: ActiveSignal = null, source_type: int = ActionContext.SourceType.SYSTEM) -> void:
+	var heat_action := ActionContext.create_system_action(
+		ActionContext.ActionType.ADD_HEAT,
+		target,
+		source_type
+	)
+	heat_action.heat_delta = amount
+	heat_action.set_metadata(&"heat_source", source_text)
+	enqueue_action(heat_action)

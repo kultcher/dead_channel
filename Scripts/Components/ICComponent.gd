@@ -29,11 +29,11 @@ func process_action(action_context: ActionContext) -> void:
 			continue
 		module.process_action(action_context)
 
-func command_intercept(cmd_context: CommandContext):
+func postprocess_action(action_context: ActionContext) -> void:
 	for module in modules:
-		if module != null and module.interrupts_commands(cmd_context):
-			return true
-	return false
+		if module == null:
+			continue
+		module.postprocess_action(action_context)
 
 func notify_connected(active_sig: ActiveSignal):
 	for module in modules:

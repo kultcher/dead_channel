@@ -63,9 +63,11 @@ Development Progress
 - Added mini-timeline prototype
 
 Short-term TODO:
-
+- disruptors with no uses should disable themselves
 
 Polish TODO:
+- end sequence z-index stuff
+- lab door sequence break
 - Add chatlog/bark UI
 - add ciphers and on-solve trigger to codex
 - Add "drop to root" session log messages on passive signals that despawn

@@ -84,10 +84,6 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 	cmd_context.arg = parsed.args[0] if not parsed.args.is_empty() else ""
 	cmd_context.active_sig = active_sig
 
-	if cmd_context.command == "HELP":
-		_cmd_help(active_sig)
-		return
-
 	var usage_error := _validate_command_usage(cmd_context.command, parsed.args)
 	if usage_error != "":
 		_fail(usage_error, active_sig)
@@ -248,38 +244,11 @@ func _try_special_command(input: String, active_sig: ActiveSignal) -> bool:
 	_finalize_command(cmd_context)
 	return true
 
-# === COMMAND HANDLERS ===
-
-func _cmd_access(cmd_context: CommandContext) -> void:
-	_finalize_command(cmd_context)
-
-func _cmd_help(active_sig: ActiveSignal) -> void:
-	if window_manager != null:
-		window_manager.show_help_overlay()
-
-	var cmd_context = CommandContext.new()
-	cmd_context.active_sig = active_sig
-	cmd_context.command = "HELP"
-	cmd_context.log_text.append("Opening terminal reference.")
-	_finalize_command(cmd_context)
-
 func _try_command(cmd_context: CommandContext) -> void:
 	print("Command Dispatch trying command: " + cmd_context.command)
 	var action_context := ActionResolver.build_action_from_command(cmd_context)
 	ActionResolver.resolve_action(action_context)
 	_finalize_command(cmd_context)
-
-func _interrupt_command(_cmd_context: CommandContext):
-	if _cmd_context == null:
-		return
-	if _cmd_context.status == CommandContext.CommandStatus.FAILURE and not _cmd_context.log_text.is_empty():
-		_fail(_cmd_context.log_text[0], _cmd_context.active_sig)
-		return
-	if not _cmd_context.log_text.is_empty():
-		command_complete.emit(_cmd_context)
-		return
-	if _cmd_context.active_sig != null:
-		_fail("Command interrupted.", _cmd_context.active_sig)
 
 func _finalize_command(cmd_context: CommandContext):
 	if cmd_context.status == CommandContext.CommandStatus.FAILURE:

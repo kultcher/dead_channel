@@ -108,7 +108,7 @@ level_script_path = "uid://2c2k0eym4x47"
 
 [node name="TutorialManager" type="Node" parent="." unique_id=755181945]
 script = ExtResource("2_r51ll")
-debug_skip_to_stage = "door_01"
+debug_skip_to_stage = "gauntlet"
 
 [node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]
 position = Vector2(0, 50)

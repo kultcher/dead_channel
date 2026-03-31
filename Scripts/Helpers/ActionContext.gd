@@ -5,11 +5,13 @@ enum ActionType {
 	ACCESS_SIGNAL,
 	SHOW_HELP,
 	PROBE_SIGNAL,
+	ADD_HEAT,
 	DISABLE_SIGNAL,
+	ENABLE_SIGNAL,
+	DISCONNECT_SESSION,
 	TOGGLE_DOOR_LOCK,
 	LAUNCH_PUZZLE,
-	ACTIVATE_DISRUPTOR,
-	LEGACY_COMMAND
+	ACTIVATE_DISRUPTOR
 }
 
 enum SourceType {
@@ -57,6 +59,18 @@ static func from_command(cmd_context: CommandContext) -> ActionContext:
 		action.primary_target = cmd_context.active_sig
 		for flag in cmd_context.flags:
 			action.flags.append(str(flag))
+	return action
+
+static func create_system_action(
+	type: ActionType,
+	target: ActiveSignal = null,
+	source: SourceType = SourceType.SYSTEM
+) -> ActionContext:
+	var action := ActionContext.new()
+	action.action_type = type
+	action.source_type = source
+	action.source_signal = target
+	action.primary_target = target
 	return action
 
 func add_tag(tag: StringName) -> void:

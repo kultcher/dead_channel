@@ -51,6 +51,13 @@ signal puzzle_started(active_signal: ActiveSignal, puzzle_type: PuzzleComponent.
 signal puzzle_failed(signal_data)
 signal puzzle_solved(signal_data)
 
+# PROGRAM EVENTS
+signal program_total_ram_changed(total_ram: int)
+signal program_ram_changed(used_ram: int, total_ram: int)
+signal program_installed(program_instance: ProgramInstance)
+signal program_removed(program_instance: ProgramInstance)
+signal program_state_changed(program_instance: ProgramInstance, old_state: int, new_state: int)
+
 
 var _runner_holds: Dictionary = {}
 var _runner_hold_counter: int = 0
