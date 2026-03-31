@@ -34,6 +34,8 @@ func build_action_from_command(cmd_context: CommandContext) -> ActionContext:
 			action.action_type = ActionContext.ActionType.LAUNCH_PUZZLE
 		"ACCESS":
 			action.action_type = ActionContext.ActionType.ACCESS_SIGNAL
+			action.add_tag(&"terminal")
+			action.set_metadata(&"show_connection_banner", true)
 		"HELP":
 			action.action_type = ActionContext.ActionType.SHOW_HELP
 		_:
@@ -69,6 +71,8 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 		return
 
 	match action_context.action_type:
+		ActionContext.ActionType.ACCESS_SIGNAL:
+			_apply_access_signal(action_context)
 		ActionContext.ActionType.PROBE_SIGNAL:
 			_apply_probe_signal(action_context)
 		ActionContext.ActionType.DISABLE_SIGNAL:
@@ -84,6 +88,16 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 
 func _run_postprocessors(_action_context: ActionContext) -> void:
 	pass
+
+func _apply_access_signal(action_context: ActionContext) -> void:
+	var target := action_context.primary_target
+	if target == null or target.data == null:
+		action_context.fail("Invalid context, no signal available.")
+		return
+
+	var show_connection_banner := bool(action_context.get_metadata(&"show_connection_banner", false))
+	CommandDispatch.switch_terminal_session(target, show_connection_banner)
+	action_context.succeed()
 
 func _ensure_target_is_responding(action_context: ActionContext) -> bool:
 	var target := action_context.primary_target

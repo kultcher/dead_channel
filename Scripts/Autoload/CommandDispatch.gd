@@ -100,14 +100,11 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 
 	if resolved.has("switch_target"):
 		var switch_target: ActiveSignal = resolved.switch_target
-		switch_terminal_session(switch_target, cmd_context.command == "ACCESS")
 		cmd_context.active_sig = switch_target
+		if cmd_context.command != "ACCESS":
+			switch_terminal_session(switch_target, false)
 
-	if cmd_context.command == "ACCESS":
-		_cmd_access(cmd_context)
-		return
-
-	if cmd_context.command != "RUN" and _is_puzzle_locked(cmd_context.active_sig):
+	if cmd_context.command != "RUN" and cmd_context.command != "ACCESS" and _is_puzzle_locked(cmd_context.active_sig):
 		_fail("ACCESS DENIED", cmd_context.active_sig)
 		return
 

@@ -26,6 +26,9 @@ func process_action(action_context: ActionContext) -> void:
 		for line in action_context.command_context.log_text:
 			action_context.append_log(line)
 
+func blocks_action(_action_context: ActionContext) -> bool:
+	return false
+
 func interrupts_commands(_cmd_context: CommandContext) -> bool:
 	return false
 
