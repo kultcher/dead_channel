@@ -77,6 +77,9 @@ Short-term TODO:
 - Programs: Custom tooltips
 
 Polish TODO:
+Code:
+- Split out tutorial script and logic
+Game:
 - end sequence z-index stuff
 - lab door sequence break
 - Add chatlog/bark UI
@@ -84,7 +87,6 @@ Polish TODO:
 - Add "drop to root" session log messages on passive signals that despawn
 - Cleanup cutscene controller (hardcode textures)
 - Convert authoring to fluent builder paradigm
-- Split out tutorial script and logic
 - guard comms pulses
 - Add a cleaner way to update scan tooltips (array?)
 - Adjust delay behavior to ResponseEffect instead of detection?
@@ -104,24 +106,32 @@ x watch out for disabled terminal before null_lab
 
 Not Yet Implemented (priority):
 - finalize early jargonizer
-- Advanced Signal functions/behaviors
+- guard comms pings
+- New signals: hazards, terminals, motion sensors, cyberguards, turrets
 - fuzz minigame
 - basic procgen
+- Terminal: SPOOF, PROBE
 
 Not Yet Implemented (long-term):
+Core:
+- expanded jargonizer
+- credentials
 - guard alert behaviors expanded
 - guard "combat" expanded
 - distraction terminals expanded
-- "Jargonizer" - for generating flavorful but semi-random terminal noise
-- Networked signals
-- credentials
-- guard radio "shadows"
+- Terminal: LINK
+
+
+Metagame:
 - Runner stats
 - Runner chatter
 - Runner-initiated events
 - Distinct corporate identities
 - Management layer
 - Consumables
+
+Stretch:
+- Networked signals
 - Split Lanes
 - White Hats
 - expanded "Combat" mode

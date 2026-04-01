@@ -51,7 +51,7 @@ texture_progress = SubResource("GradientTexture2D_6hws6")
 [node name="TargetIndicator" type="Node2D" parent="." unique_id=533402596]
 script = ExtResource("2_xq7gi")
 
-[node name="IndicatorLine" type="Line2D" parent="TargetIndicator"]
+[node name="IndicatorLine" type="Line2D" parent="TargetIndicator" unique_id=823593591]
 visible = false
 top_level = true
 width = 2.0

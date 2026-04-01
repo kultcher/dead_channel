@@ -171,9 +171,9 @@ script = ExtResource("7_k8c5c")
 
 [node name="NullSpikeSyncOverlay" type="ColorRect" parent="SignalTimeline" unique_id=1398397070]
 material = SubResource("ShaderMaterial_2sj47")
-offset_top = -23.0
+offset_top = -25.0
 offset_right = 1920.0
-offset_bottom = 334.0
+offset_bottom = 332.0
 mouse_filter = 2
 
 [node name="WorkspaceAnchor" type="Control" parent="." unique_id=52976337]
