@@ -1,5 +1,127 @@
 class_name RunDefinition extends RefCounted
 
+class SpawnBuilder extends RefCounted:
+	var _run: RunDefinition
+	var _spawn: Dictionary
+
+	func _init(run_definition: RunDefinition, signal_data: SignalData, cell_index: float) -> void:
+		_run = run_definition
+		_spawn = {
+			"signal_data": signal_data,
+			"cell_index": cell_index,
+		}
+
+	func id(system_id: String) -> SpawnBuilder:
+		_spawn["system_id"] = system_id
+		return self
+
+	func display_name(name: String) -> SpawnBuilder:
+		_spawn["display_name"] = name
+		return self
+
+	func spoof_id(value: String) -> SpawnBuilder:
+		_spawn["spoof_id"] = value
+		return self
+
+	func lane(value: int) -> SpawnBuilder:
+		_spawn["lane"] = value
+		return self
+
+	func facing(value: float) -> SpawnBuilder:
+		_spawn["facing_deg"] = value
+		return self
+
+	func vision(angle_deg: float, length_cells: float, watch_offset_cells: float = INF) -> SpawnBuilder:
+		var detection := _get_or_create_detection_override()
+		detection.vision_angle_deg = angle_deg
+		detection.vision_length_cells = length_cells
+		if not is_inf(watch_offset_cells):
+			detection.watch_offset_cells = watch_offset_cells
+		return self
+
+	func watch_offset(value: float) -> SpawnBuilder:
+		var detection := _get_or_create_detection_override()
+		detection.watch_offset_cells = value
+		return self
+
+	func turn_speed(deg_per_sec: float) -> SpawnBuilder:
+		var detection := _get_or_create_detection_override()
+		detection.turn_speed_deg_per_sec = deg_per_sec
+		return self
+
+	func move_speed(cells_per_sec: float) -> SpawnBuilder:
+		var mobility := _get_or_create_mobility_override()
+		mobility.move_speed_cells_per_sec = cells_per_sec
+		return self
+
+	func detection_sweep(point1: Array[float], point2: Array[float], point3: Array[float] = [], point4: Array[float] = []) -> SpawnBuilder:
+		_spawn["detection_patrol_points"] = _run.make_detection_sweep(point1, point2, point3, point4)
+		return self
+
+	func patrol(point1: Array[float], point2: Array[float], point3: Array[float] = [], point4: Array[float] = []) -> SpawnBuilder:
+		_spawn["patrol_points"] = _run.make_patrol_route(point1, point2, point3, point4)
+		return self
+
+	func add_ic(name: StringName, difficulty: int) -> SpawnBuilder:
+		return _add_ic_module(_run.build_ic(name, difficulty))
+
+	func add_ic_custom(name: StringName, params: Dictionary) -> SpawnBuilder:
+		return _add_ic_module(_run.build_custom_ic(name, params))
+
+	func add_puzzle(name: StringName, difficulty: int) -> SpawnBuilder:
+		_spawn["puzzle"] = _run.build_puzzle(name, difficulty)
+		return self
+
+	func add_puzzle_custom(name: StringName, params: Dictionary) -> SpawnBuilder:
+		_spawn["puzzle"] = _run.build_custom_puzzle(name, params)
+		return self
+
+	func build() -> Dictionary:
+		return _spawn.duplicate(true)
+
+	func _add_ic_module(module: Resource) -> SpawnBuilder:
+		if module == null:
+			return self
+		var ic := _get_or_create_ic_override()
+		ic.add_module(module)
+		return self
+
+	func _get_or_create_detection_override() -> DetectionComponent:
+		if _spawn.has("detection") and _spawn["detection"] != null:
+			return _spawn["detection"]
+		var signal_data := _spawn["signal_data"] as SignalData
+		var detection: DetectionComponent
+		if signal_data != null and signal_data.detection != null:
+			detection = signal_data.detection.duplicate(true) as DetectionComponent
+		else:
+			detection = DetectionComponent.new()
+		_spawn["detection"] = detection
+		return detection
+
+	func _get_or_create_mobility_override() -> MobilityComponent:
+		if _spawn.has("mobility") and _spawn["mobility"] != null:
+			return _spawn["mobility"]
+		var signal_data := _spawn["signal_data"] as SignalData
+		var mobility: MobilityComponent
+		if signal_data != null and signal_data.mobility != null:
+			mobility = signal_data.mobility.duplicate(true) as MobilityComponent
+		else:
+			mobility = MobilityComponent.new()
+		_spawn["mobility"] = mobility
+		return mobility
+
+	func _get_or_create_ic_override() -> ICComponent:
+		if _spawn.has("ic_modules") and _spawn["ic_modules"] != null:
+			return _spawn["ic_modules"]
+		var signal_data := _spawn["signal_data"] as SignalData
+		var ic: ICComponent
+		if signal_data != null and signal_data.ic_modules != null:
+			ic = signal_data.ic_modules.duplicate(true) as ICComponent
+		else:
+			ic = ICComponent.new()
+		_spawn["ic_modules"] = ic
+		return ic
+
 const BASIC_CAMERA := preload("res://Resources/SignalPrefabs/basic_camera.tres")
 const BASIC_DRONE := preload("res://Resources/SignalPrefabs/basic_drone.tres")
 const BASIC_DOOR := preload("res://Resources/SignalPrefabs/basic_door.tres")
@@ -19,19 +141,8 @@ func get_display_name() -> String:
 func get_spawns() -> Array[Dictionary]:
 	return []
 
-# Overrides: lane, display_name, spoof_id, facing_deg, puzzle, ic_modules, add_ic_modules,
-# response, add_response_effects, mobility, patrol_points, detection, detection_patrol_points, disruptor
-# `patrol_points` are authored as offsets relative to this spawn's base cell_index and resolved lane.
-func build_spawn(signal_data: SignalData, cell_index: float, overrides: Dictionary = {}) -> Dictionary:
-	var spawn := {
-		"signal_data": signal_data,
-		"cell_index": cell_index,
-	}
-
-	for key in overrides.keys():
-		spawn[key] = overrides[key]
-
-	return spawn
+func spawn(signal_data: SignalData, cell_index: float) -> SpawnBuilder:
+	return SpawnBuilder.new(self, signal_data, cell_index)
 
 func build_runtime_signal(spawn: Dictionary) -> SignalData:
 	var signal_data: SignalData = spawn["signal_data"]
@@ -51,22 +162,10 @@ func build_runtime_signal(spawn: Dictionary) -> SignalData:
 		runtime_signal.puzzle = spawn["puzzle"].duplicate(true)
 	if spawn.has("ic_modules"):
 		runtime_signal.ic_modules = spawn["ic_modules"].duplicate(true)
-	if spawn.has("add_ic_modules"):
-		_append_ic_modules(runtime_signal, spawn["add_ic_modules"])
 	if spawn.has("response"):
 		runtime_signal.response = spawn["response"].duplicate(true)
-	if spawn.has("add_response_effects"):
-		_append_response_effects(runtime_signal, spawn["add_response_effects"])
 	if spawn.has("detection"):
 		runtime_signal.detection = spawn["detection"].duplicate(true)
-	if runtime_signal.detection != null and spawn.has("vision_angle_deg"):
-		runtime_signal.detection.vision_angle_deg = float(spawn["vision_angle_deg"])
-	if runtime_signal.detection != null and spawn.has("vision_length_cells"):
-		runtime_signal.detection.vision_length_cells = float(spawn["vision_length_cells"])
-	if runtime_signal.detection != null and spawn.has("watch_offset_cells"):
-		runtime_signal.detection.watch_offset_cells = float(spawn["watch_offset_cells"])
-	if runtime_signal.detection != null and spawn.has("detection_threat_state"):
-		runtime_signal.detection.threat_state = int(spawn["detection_threat_state"])
 	if spawn.has("detection_patrol_points"):
 		_override_detection_patrol_points(runtime_signal, spawn["detection_patrol_points"])
 	if spawn.has("mobility"):
@@ -122,11 +221,56 @@ func make_bouncer_module(bounce_time: float = 3.0) -> BouncerModule:
 	module.time_to_disconnect = bounce_time
 	return module
 
-func make_reboot_ic(reboot_time: float = 5.0) -> ICComponent:
-	return make_ic([make_reboot_module(reboot_time)])
+func build_ic(name: StringName, difficulty: int) -> Resource:
+	var ic_name := String(name).to_lower()
+	match ic_name:
+		"reboot":
+			var reboot_times := [3.0, 5.0, 10.0, 15.0]
+			return make_reboot_module(_pick_difficulty_value(reboot_times, difficulty))
+		"faraday":
+			var faraday_ranges := [1.5, 2.0, 3.0, 4.0]
+			return make_faraday_module(_pick_difficulty_value(faraday_ranges, difficulty))
+		"bouncer":
+			var bouncer_times := [2.0, 3.0, 4.0, 5.0]
+			return make_bouncer_module(_pick_difficulty_value(bouncer_times, difficulty))
+	return null
 
-func make_faraday_ic(max_runner_distance_cells: float = 2.0) -> ICComponent:
-	return make_ic([make_faraday_module(max_runner_distance_cells)])
+func build_custom_ic(name: StringName, params: Dictionary) -> Resource:
+	var ic_name := String(name).to_lower()
+	match ic_name:
+		"reboot":
+			return make_reboot_module(float(params.get("reboot_time", 5.0)))
+		"faraday":
+			return make_faraday_module(float(params.get("max_runner_distance_cells", 2.0)))
+		"bouncer":
+			return make_bouncer_module(float(params.get("time_to_disconnect", 3.0)))
+	return null
+
+func build_puzzle(name: StringName, difficulty: int) -> PuzzleComponent:
+	var puzzle_name := String(name).to_lower()
+	match puzzle_name:
+		"sniff":
+			return make_sniff_puzzle(difficulty)
+		"fuzz":
+			return make_fuzz_puzzle(difficulty)
+		"decrypt":
+			return make_decrypt_puzzle(difficulty)
+	return null
+
+func build_custom_puzzle(name: StringName, params: Dictionary) -> PuzzleComponent:
+	var puzzle_name := String(name).to_lower()
+	var difficulty := int(params.get("difficulty", 1))
+	match puzzle_name:
+		"sniff":
+			var sniff_config = params.get("config", null) as SniffPuzzleConfig
+			return make_sniff_puzzle(difficulty, sniff_config)
+		"fuzz":
+			return make_fuzz_puzzle(difficulty)
+		"decrypt":
+			var encryption_key := String(params.get("encryption_key", ""))
+			var decrypt_config = params.get("config", null) as DecryptPuzzleConfig
+			return make_decrypt_puzzle(difficulty, encryption_key, decrypt_config)
+	return null
 
 func make_response(effects: Array[Resource] = []) -> ResponseComponent:
 	var response := ResponseComponent.new()
@@ -240,20 +384,8 @@ func make_disruptor(
 	disruptor.max_alert_targets = max_alert_targets
 	return disruptor
 
-func _append_ic_modules(runtime_signal: SignalData, modules_to_add: Array) -> void:
-	if runtime_signal.ic_modules == null:
-		runtime_signal.ic_modules = ICComponent.new()
-
-	for module in modules_to_add:
-		if module == null:
-			continue
-		runtime_signal.ic_modules.add_module(module.duplicate(true))
-
-func _append_response_effects(runtime_signal: SignalData, effects_to_add: Array) -> void:
-	if runtime_signal.response == null:
-		runtime_signal.response = ResponseComponent.new()
-
-	for effect in effects_to_add:
-		if effect == null:
-			continue
-		runtime_signal.response.effects.append(effect.duplicate(true))
+func _pick_difficulty_value(values: Array, difficulty: int):
+	if values.is_empty():
+		return null
+	var clamped_index := clampi(difficulty, 0, values.size() - 1)
+	return values[clamped_index]

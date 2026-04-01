@@ -64,13 +64,13 @@ Development Progress
 - Migrated to action pipeline for commands, IC and programs
 - Scaffolding in place for programs
 
-3/30/2026:
+3/31/2026:
 - Programs: Base UI and RAM logic in place
 - Flesh out action system: lineage, notifications
-- Built Assassin
+- Built Assassin program
+- Migrated run-building to fluent pattern
 
 Short-term TODO:
-- disruptors with no uses should disable themselves
 - Robust heat implementation with difficulty scaling
 - out-of-timeline alert/alarms
 - More and more advanced IC
