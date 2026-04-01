@@ -6,6 +6,7 @@ signal action_failed(action_context: ActionContext)
 
 var _pending_actions: Array[ActionContext] = []
 var _is_processing_actions := false
+const DEBUG_PREFIX := "[ActionResolver]"
 
 func build_action_from_command(cmd_context: CommandContext) -> ActionContext:
 	var action := ActionContext.from_command(cmd_context)
@@ -15,7 +16,7 @@ func build_action_from_command(cmd_context: CommandContext) -> ActionContext:
 
 	match cmd_context.command:
 		"KILL":
-			action.action_type = ActionContext.ActionType.DISABLE_SIGNAL
+			action.action_type = ActionContext.ActionType.KILL_SIGNAL
 			action.add_tag(&"hostile")
 			action.add_tag(&"terminal")
 			action.heat_delta = 500.0
@@ -48,12 +49,15 @@ func build_action_from_command(cmd_context: CommandContext) -> ActionContext:
 			action.action_type = ActionContext.ActionType.UNKNOWN
 			action.fail("Unsupported action.")
 
+	action.ensure_lineage_defaults()
+	_debug_action("build", action, "from command " + str(cmd_context.command))
 	return action
 
 func resolve_action(action_context: ActionContext) -> ActionContext:
 	if action_context == null:
 		return null
 
+	_debug_action("resolve_request", action_context)
 	enqueue_action(action_context)
 	return action_context
 
@@ -61,7 +65,9 @@ func enqueue_action(action_context: ActionContext) -> ActionContext:
 	if action_context == null:
 		return null
 
+	action_context.ensure_lineage_defaults()
 	_pending_actions.append(action_context)
+	_debug_action("enqueue", action_context, "queue_size=" + str(_pending_actions.size()))
 	if not _is_processing_actions:
 		_drain_action_queue()
 	return action_context
@@ -73,6 +79,7 @@ func _drain_action_queue() -> void:
 	_is_processing_actions = true
 	while not _pending_actions.is_empty():
 		var action_context = _pending_actions.pop_front()
+		_debug_action("dequeue", action_context, "remaining=" + str(_pending_actions.size()))
 		_resolve_single_action(action_context)
 	_is_processing_actions = false
 
@@ -81,18 +88,22 @@ func _resolve_single_action(action_context: ActionContext) -> void:
 		return
 
 	action_context.mark_processing()
+	_debug_action("start", action_context)
 	action_started.emit(action_context)
 
 	_run_preprocessors(action_context)
 	if action_context.was_unsuccessful():
+		_debug_action("halted_pre", action_context)
 		_emit_terminal_outcome(action_context)
 		return
 
 	_apply_core_effect(action_context)
 	_run_postprocessors(action_context)
+	_debug_action("finish", action_context, "status=" + _status_to_string(action_context.status))
 	_emit_terminal_outcome(action_context)
 
 func _run_preprocessors(action_context: ActionContext) -> void:
+	_debug_action("preprocess", action_context)
 	ProgramManager.preprocess_action(action_context)
 	var target := action_context.primary_target
 	if target == null or target.data == null or target.data.ic_modules == null:
@@ -103,6 +114,7 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 	if action_context == null or action_context.was_unsuccessful():
 		return
 
+	_debug_action("core", action_context, _action_type_to_string(action_context.action_type))
 	match action_context.action_type:
 		ActionContext.ActionType.ACCESS_SIGNAL:
 			_apply_access_signal(action_context)
@@ -110,6 +122,8 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 			_apply_show_help(action_context)
 		ActionContext.ActionType.PROBE_SIGNAL:
 			_apply_probe_signal(action_context)
+		ActionContext.ActionType.KILL_SIGNAL:
+			_apply_kill_signal(action_context)
 		ActionContext.ActionType.ADD_HEAT:
 			_apply_add_heat(action_context)
 		ActionContext.ActionType.DISABLE_SIGNAL:
@@ -128,6 +142,7 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 			action_context.fail("Unsupported action.")
 
 func _run_postprocessors(action_context: ActionContext) -> void:
+	_debug_action("postprocess", action_context)
 	ProgramManager.postprocess_action(action_context)
 	var target := action_context.primary_target
 	if target == null or target.data == null or target.data.ic_modules == null:
@@ -164,11 +179,7 @@ func _apply_probe_signal(action_context: ActionContext) -> void:
 		return
 	action_context.succeed()
 
-func _apply_add_heat(action_context: ActionContext) -> void:
-	GlobalEvents.heat_increased.emit(action_context.heat_delta, str(action_context.get_metadata(&"heat_source", "")))
-	action_context.succeed()
-
-func _apply_disable_signal(action_context: ActionContext) -> void:
+func _apply_kill_signal(action_context: ActionContext) -> void:
 	if not _ensure_target_is_responding(action_context):
 		return
 
@@ -177,7 +188,9 @@ func _apply_disable_signal(action_context: ActionContext) -> void:
 		action_context.fail("KILL failed. No active process to kill on signal type: DOOR.")
 		return
 
-	target.disable_signal()
+	if not _disable_signal_target(target, action_context):
+		return
+
 	action_context.succeed("Shutting down " + target.data.system_id + "...")
 	GlobalEvents.signal_killed.emit(target)
 	if action_context.heat_delta != 0.0:
@@ -185,8 +198,22 @@ func _apply_disable_signal(action_context: ActionContext) -> void:
 			action_context.heat_delta,
 			"Shutting down " + target.data.system_id + ".",
 			target,
-			action_context.source_type
+			action_context
 		)
+
+func _apply_add_heat(action_context: ActionContext) -> void:
+	if action_context.heat_delta > 0.0:
+		GlobalEvents.heat_increased.emit(action_context.heat_delta, str(action_context.get_metadata(&"heat_source", "")))
+	action_context.succeed()
+
+func _apply_disable_signal(action_context: ActionContext) -> void:
+	if not _ensure_target_is_responding(action_context):
+		return
+
+	var target := action_context.primary_target
+	if not _disable_signal_target(target, action_context):
+		return
+	action_context.succeed()
 
 func _apply_enable_signal(action_context: ActionContext) -> void:
 	var target := action_context.primary_target
@@ -345,6 +372,15 @@ func _apply_activate_disruptor(action_context: ActionContext) -> void:
 			break
 
 	signal_data.disruptor.uses -= 1
+	if signal_data.disruptor.get_uses() <= 0:
+		var disable_action := ActionContext.create_followup_action(
+			action_context,
+			ActionContext.ActionType.DISABLE_SIGNAL,
+			target
+		)
+		disable_action.set_metadata(&"disable_reason", "disruptor_depleted")
+		_debug_action("followup", disable_action, "disruptor depleted")
+		enqueue_action(disable_action)
 	if matched_targets <= 0:
 		action_context.succeed(signal_data.display_name + " activated. No valid targets in range.")
 		return
@@ -371,12 +407,66 @@ func _emit_terminal_outcome(action_context: ActionContext) -> void:
 	else:
 		action_resolved.emit(action_context)
 
-func _queue_heat_action(amount: float, source_text: String, target: ActiveSignal = null, source_type: int = ActionContext.SourceType.SYSTEM) -> void:
-	var heat_action := ActionContext.create_system_action(
+func _queue_heat_action(amount: float, source_text: String, target: ActiveSignal = null, source_action: ActionContext = null) -> void:
+	var heat_action := ActionContext.create_followup_action(
+		source_action,
 		ActionContext.ActionType.ADD_HEAT,
 		target,
-		source_type
+		source_action.source_type if source_action != null else ActionContext.SourceType.SYSTEM
 	)
 	heat_action.heat_delta = amount
 	heat_action.set_metadata(&"heat_source", source_text)
+	_debug_action("followup", heat_action, "heat=" + str(amount))
 	enqueue_action(heat_action)
+
+func _disable_signal_target(target: ActiveSignal, action_context: ActionContext = null) -> bool:
+	if target == null or target.data == null:
+		if action_context != null:
+			action_context.fail("Invalid context, no signal available.")
+		return false
+	if target.is_disabled:
+		if action_context != null:
+			action_context.fail("No response. Signal disabled.")
+		return false
+
+	target.disable_signal()
+	return true
+
+func _debug_action(stage: String, action_context: ActionContext, details: String = "") -> void:
+	if action_context == null:
+		print(DEBUG_PREFIX + " [" + stage + "] <null>")
+		return
+
+	var target_id := "<none>"
+	if action_context.primary_target != null and action_context.primary_target.data != null:
+		target_id = action_context.primary_target.data.system_id
+
+	var message := "%s [%s] type=%s source=%s root_cmd=%s target=%s" % [
+		DEBUG_PREFIX,
+		stage,
+		_action_type_to_string(action_context.action_type),
+		_source_type_to_string(action_context.source_type),
+		action_context.root_command_name,
+		target_id,
+	]
+	if not details.is_empty():
+		message += " " + details
+	print(message)
+
+func _action_type_to_string(action_type: int) -> String:
+	var names := ActionContext.ActionType.keys()
+	if action_type < 0 or action_type >= names.size():
+		return str(action_type)
+	return names[action_type]
+
+func _source_type_to_string(source_type: int) -> String:
+	var names := ActionContext.SourceType.keys()
+	if source_type < 0 or source_type >= names.size():
+		return str(source_type)
+	return names[source_type]
+
+func _status_to_string(status: int) -> String:
+	var names := ActionContext.Status.keys()
+	if status < 0 or status >= names.size():
+		return str(status)
+	return names[status]

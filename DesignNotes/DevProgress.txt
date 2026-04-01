@@ -58,19 +58,23 @@ Development Progress
 3/28/2026:
 - Tutorial polish
 
-3/31/2026:
+3/30/2026:
 - Added terminal detail panels and toolbox
 - Added mini-timeline prototype
 - Migrated to action pipeline for commands, IC and programs
 - Scaffolding in place for programs
 
+3/30/2026:
+- Programs: Base UI and RAM logic in place
+- Flesh out action system: lineage, notifications
+- Built Assassin
+
 Short-term TODO:
 - disruptors with no uses should disable themselves
 - Robust heat implementation with difficulty scaling
 - out-of-timeline alert/alarms
-- Programs and RAM: finish UI, implement assassin and RAM logic. Scan?
 - More and more advanced IC
-
+- Programs: Custom tooltips
 
 Polish TODO:
 - end sequence z-index stuff

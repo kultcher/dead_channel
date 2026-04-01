@@ -57,6 +57,10 @@ signal program_ram_changed(used_ram: int, total_ram: int)
 signal program_installed(program_instance: ProgramInstance)
 signal program_removed(program_instance: ProgramInstance)
 signal program_state_changed(program_instance: ProgramInstance, old_state: int, new_state: int)
+signal program_use_requested(program_instance: ProgramInstance)
+signal program_became_ready(program_instance: ProgramInstance)
+signal program_executed(program_instance: ProgramInstance)
+signal program_cleanup_finished(program_instance: ProgramInstance)
 
 
 var _runner_holds: Dictionary = {}

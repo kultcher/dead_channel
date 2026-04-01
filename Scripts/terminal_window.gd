@@ -183,6 +183,11 @@ func print_to_log(text: String):
 func print_unlogged(text: String):
 	history.append_text(text + "\n")
 
+func print_transient(text: String) -> void:
+	if text.is_empty():
+		return
+	print_unlogged("[Program] " + text)
+
 func play_system_dump(text: String, initial_cps: float = 100.0, max_cps: float = 500.0) -> void:
 	if _dump_in_progress:
 		return

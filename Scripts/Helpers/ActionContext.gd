@@ -5,6 +5,7 @@ enum ActionType {
 	ACCESS_SIGNAL,
 	SHOW_HELP,
 	PROBE_SIGNAL,
+	KILL_SIGNAL,
 	ADD_HEAT,
 	DISABLE_SIGNAL,
 	ENABLE_SIGNAL,
@@ -34,6 +35,12 @@ var action_type: ActionType = ActionType.UNKNOWN
 var source_type: SourceType = SourceType.UNKNOWN
 var status: Status = Status.PENDING
 
+var parent_action_type: ActionType = ActionType.UNKNOWN
+var parent_action_source: SourceType = SourceType.UNKNOWN
+var root_action_type: ActionType = ActionType.UNKNOWN
+var root_action_source: SourceType = SourceType.UNKNOWN
+var root_command_name: String = ""
+
 var command_name: String = ""
 var command_context: CommandContext = null
 
@@ -55,6 +62,7 @@ static func from_command(cmd_context: CommandContext) -> ActionContext:
 	action.command_context = cmd_context
 	if cmd_context != null:
 		action.command_name = cmd_context.command
+		action.root_command_name = cmd_context.command
 		action.source_signal = cmd_context.active_sig
 		action.primary_target = cmd_context.active_sig
 		for flag in cmd_context.flags:
@@ -71,7 +79,44 @@ static func create_system_action(
 	action.source_type = source
 	action.source_signal = target
 	action.primary_target = target
+	action.root_action_type = type
+	action.root_action_source = source
 	return action
+
+static func create_followup_action(
+	parent_action: ActionContext,
+	type: ActionType,
+	target: ActiveSignal = null,
+	source: SourceType = SourceType.UNKNOWN
+) -> ActionContext:
+	var resolved_source := source
+	if resolved_source == SourceType.UNKNOWN and parent_action != null:
+		resolved_source = parent_action.source_type
+
+	var action := ActionContext.new()
+	action.action_type = type
+	action.source_type = resolved_source
+	action.source_signal = target
+	action.primary_target = target
+	if parent_action != null:
+		action.parent_action_type = parent_action.action_type
+		action.parent_action_source = parent_action.source_type
+		action.root_action_type = parent_action.root_action_type
+		action.root_action_source = parent_action.root_action_source
+		action.root_command_name = parent_action.root_command_name
+		if action.root_action_type == ActionType.UNKNOWN:
+			action.root_action_type = parent_action.action_type
+		if action.root_action_source == SourceType.UNKNOWN:
+			action.root_action_source = parent_action.source_type
+	return action
+
+func ensure_lineage_defaults() -> void:
+	if root_action_type == ActionType.UNKNOWN:
+		root_action_type = action_type
+	if root_action_source == SourceType.UNKNOWN:
+		root_action_source = source_type
+	if root_command_name.is_empty():
+		root_command_name = command_name
 
 func add_tag(tag: StringName) -> void:
 	if tag == StringName():

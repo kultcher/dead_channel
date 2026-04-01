@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://c0rljpkveb2dg"]
+
+[ext_resource type="Texture2D" uid="uid://cx2um530ae5b1" path="res://Visuals/Icons/Simple/square.svg" id="1_0ffbw"]
+[ext_resource type="Script" uid="uid://crmpsi8e8iacg" path="res://Scripts/program_cell.gd" id="1_yj3pn"]
+[ext_resource type="Texture2D" uid="uid://d1wyllxrkjv3t" path="res://Visuals/Icons/Simple/ninja-heroic-stance.svg" id="2_w18qk"]
+
+[node name="CellVBox" type="VBoxContainer" unique_id=1235257269]
+size_flags_horizontal = 4
+script = ExtResource("1_yj3pn")
+
+[node name="ActiveProgramProgress" type="ProgressBar" parent="." unique_id=1212522228]
+layout_mode = 2
+size_flags_vertical = 2
+size_flags_stretch_ratio = 0.2
+
+[node name="ActiveProgramButton" type="TextureButton" parent="." unique_id=914459696]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("1_0ffbw")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="DockedProgramButton" type="TextureButton" parent="." unique_id=1832246666]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 6
+size_flags_vertical = 3
+tooltip_text = "Assassin"
+mouse_default_cursor_shape = 2
+texture_normal = ExtResource("2_w18qk")
+ignore_texture_size = true
+stretch_mode = 0

@@ -415,8 +415,9 @@ func start_null_spike_active_effect(duration: float = 0.5) -> void:
 
 	_stop_null_spike_active_tween()
 	_null_spike_active_visual_enabled = true
-	visible = true
-	modulate = Color.WHITE
+	#NOTE: showing cutscene controller was washing the screen out from one of the other rects I guess?
+	#visible = true
+	#modulate = Color.WHITE
 	_set_black_fade_alpha(0.0)
 	_set_sync_overlay_visible(true)
 	_set_sync_wash_alpha(0.0)
@@ -732,8 +733,8 @@ func _on_null_spike_active_tween_finished(finished_tween: Tween) -> void:
 	_null_spike_active_tween = null
 	if _null_spike_active_visual_enabled:
 		_set_sync_overlay_visible(true)
-		visible = true
-		modulate = Color.WHITE
+		#visible = true
+		#modulate = Color.WHITE
 		return
 	_set_sync_overlay_visible(false)
 	if not _alarm_active:

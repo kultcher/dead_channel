@@ -5,6 +5,10 @@ signal ram_usage_changed(used_ram: int, total_ram: int)
 signal program_installed(program_instance: ProgramInstance)
 signal program_removed(program_instance: ProgramInstance)
 signal program_state_changed(program_instance: ProgramInstance, old_state: int, new_state: int)
+signal program_use_requested(program_instance: ProgramInstance)
+signal program_became_ready(program_instance: ProgramInstance)
+signal program_executed(program_instance: ProgramInstance)
+signal program_cleanup_finished(program_instance: ProgramInstance)
 
 @export var total_ram: int = 3:
 	set(value):
@@ -25,7 +29,16 @@ func _ready() -> void:
 		program_removed.connect(GlobalEvents.program_removed.emit)
 	if not program_state_changed.is_connected(GlobalEvents.program_state_changed.emit):
 		program_state_changed.connect(GlobalEvents.program_state_changed.emit)
+	if not program_use_requested.is_connected(GlobalEvents.program_use_requested.emit):
+		program_use_requested.connect(GlobalEvents.program_use_requested.emit)
+	if not program_became_ready.is_connected(GlobalEvents.program_became_ready.emit):
+		program_became_ready.connect(GlobalEvents.program_became_ready.emit)
+	if not program_executed.is_connected(GlobalEvents.program_executed.emit):
+		program_executed.connect(GlobalEvents.program_executed.emit)
+	if not program_cleanup_finished.is_connected(GlobalEvents.program_cleanup_finished.emit):
+		program_cleanup_finished.connect(GlobalEvents.program_cleanup_finished.emit)
 
+	_install_player_loadout()
 	total_ram_changed.emit(total_ram)
 	_emit_ram_usage_changed()
 
@@ -37,6 +50,7 @@ func _process(delta: float) -> void:
 		if program.tick(delta):
 			program_state_changed.emit(program, old_state, program.state)
 			_emit_ram_usage_changed()
+			_handle_state_transition_notices(program, old_state, program.state)
 
 func install_program(definition: ProgramDefinition) -> ProgramInstance:
 	if definition == null:
@@ -101,6 +115,20 @@ func mark_program_used(program_id: StringName) -> bool:
 	program.begin_cleanup(true)
 	program_state_changed.emit(program, old_state, program.state)
 	_emit_ram_usage_changed()
+	program_executed.emit(program)
+	_print_program_notice(_get_program_notice(program, &"executed"))
+	return true
+
+func request_use(program_id: StringName) -> bool:
+	var program := get_program(program_id)
+	if program == null or program.state != ProgramInstance.State.RUNNING:
+		return false
+	if program.definition == null or program.definition.kind != ProgramDefinition.ProgramKind.ACTIVE:
+		return false
+	if not program.definition.is_manual_activation():
+		return false
+
+	program_use_requested.emit(program)
 	return true
 
 func get_used_ram() -> int:
@@ -126,6 +154,14 @@ func postprocess_action(action_context: ActionContext) -> void:
 			continue
 		program.postprocess_action(action_context)
 
+func print_program_notice(text: String) -> void:
+	if text.is_empty():
+		return
+	if CommandDispatch == null or CommandDispatch.terminal_window == null:
+		return
+	if CommandDispatch.terminal_window.has_method("print_transient"):
+		CommandDispatch.terminal_window.print_transient(text)
+
 func _can_afford_state_transition(program: ProgramInstance, target_state: int) -> bool:
 	if program == null or program.definition == null:
 		return false
@@ -135,3 +171,37 @@ func _can_afford_state_transition(program: ProgramInstance, target_state: int) -
 
 func _emit_ram_usage_changed() -> void:
 	ram_usage_changed.emit(get_used_ram(), total_ram)
+
+func _handle_state_transition_notices(program: ProgramInstance, old_state: int, new_state: int) -> void:
+	if program == null:
+		return
+	if old_state == ProgramInstance.State.LOADING and new_state == ProgramInstance.State.RUNNING:
+		program_became_ready.emit(program)
+		_print_program_notice(_get_program_notice(program, &"ready"))
+		return
+	if old_state == ProgramInstance.State.CLEANUP and new_state == ProgramInstance.State.DOCKED:
+		program_cleanup_finished.emit(program)
+		_print_program_notice(_get_program_notice(program, &"cleanup"))
+
+func _get_program_notice(program: ProgramInstance, notice_type: StringName) -> String:
+	if program == null or program.definition == null:
+		return ""
+	match notice_type:
+		&"ready":
+			return program.definition.get_ready_notice(program)
+		&"executed":
+			return program.definition.get_executed_notice(program)
+		&"cleanup":
+			return program.definition.get_cleanup_finished_notice(program)
+		_:
+			return ""
+
+func _print_program_notice(text: String) -> void:
+	print_program_notice(text)
+
+func _install_player_loadout() -> void:
+	_programs.clear()
+	if PlayerData == null or not PlayerData.has_method("get_equipped_programs"):
+		return
+	for definition in PlayerData.get_equipped_programs():
+		install_program(definition)

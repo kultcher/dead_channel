@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AssassinProgram" format=3 uid="uid://lcibm5a8wp51"]
+
+[ext_resource type="Script" uid="uid://bqaw6x3ygpirf" path="res://Scripts/Programs/AssassinProgram.gd" id="1_6xw4n"]
+[ext_resource type="Texture2D" uid="uid://d1wyllxrkjv3t" path="res://Visuals/Icons/Simple/ninja-heroic-stance.svg" id="2_5c52a"]
+
+[resource]
+script = ExtResource("1_6xw4n")
+program_id = &"assassin"
+display_name = "Assassin"
+description = "Your next KILL command generates no heat."
+icon = ExtResource("2_5c52a")
+kind = 1
+activation_mode = 0
+load_time_sec = 3.0
+cleanup_time_sec = 30.0
+ram_cost = 2

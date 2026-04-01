@@ -1,8 +1,11 @@
 extends Node
 
+const ASSASSIN_PROGRAM := preload("res://Resources/Programs/assassin_program.tres")
+
 var codex_seen: Dictionary = {}
 var codex_popup_seen: Dictionary = { &"codex_reboot": true }
 var tutorial_flags: Dictionary = {}
+var equipped_programs: Array[ProgramDefinition] = [ASSASSIN_PROGRAM]
 
 func _ready():
 	GlobalEvents.signal_scan_complete.connect(_has_seen_codex_popup)
@@ -22,3 +25,10 @@ func check_against_codex(signal_data: SignalData) -> Array[StringName]:
 		for module in signal_data.ic_modules.modules:
 			codex_ids.append(module.get_codex_id())
 	return codex_ids
+
+func get_equipped_programs() -> Array[ProgramDefinition]:
+	var programs: Array[ProgramDefinition] = []
+	for program in equipped_programs:
+		if program != null:
+			programs.append(program)
+	return programs

@@ -23,6 +23,11 @@ func get_display_name() -> String:
 		return ""
 	return definition.get_display_name()
 
+func get_description() -> String:
+	if definition == null:
+		return ""
+	return definition.get_description()
+
 func is_running() -> bool:
 	return state == State.RUNNING
 
