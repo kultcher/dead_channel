@@ -159,14 +159,20 @@ func _reset_visuals():
 
 		
 func disable_vision():
-	if !detection_poly: return
-	await _reset_visuals()
+	if not detection_poly:
+		return
+	_reset_visuals()
 	var fade_tween = create_tween()
 	fade_tween.tween_property(detection_poly, "color", fade_color, 0.5)
+	await fade_tween.finished
+	if detection_poly != null:
+		detection_poly.visible = false
 
 func enable_vision():
-	await _reset_visuals()
-	# WARNING: this is maybe a little fragile
+	if detection_poly == null:
+		return
+	detection_poly.visible = true
+	_reset_visuals()
 
 func _get_detection_component() -> DetectionComponent:
 	if parent_sig == null or parent_sig.my_data == null:

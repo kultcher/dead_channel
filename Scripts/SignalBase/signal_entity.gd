@@ -55,6 +55,8 @@ func setup(signal_wrapper: ActiveSignal):
 	if my_data.type == SignalData.Type.GUARD and my_data.mobility != null:
 		set_guard_revealed(false)
 	update_visuals()
+	if my_active_sig != null and my_active_sig.is_disabled and detection_controller != null:
+		detection_controller.disable_vision()
 	refresh_session_indicator_geometry()
 	_sync_session_indicator_state()
 	

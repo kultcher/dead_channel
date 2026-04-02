@@ -186,6 +186,7 @@ func get_spawns() -> Array[Dictionary]:
 			.lane(3) \
 			.build(),
 		
+		# final gauntlet
 		spawn(COMBAT_DRONE, 65.5) \
 			.id("c_drone_02") \
 			.lane(1) \

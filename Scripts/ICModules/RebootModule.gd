@@ -12,9 +12,12 @@ func get_codex_id():
 	return &"codex_reboot"
 
 func postprocess_action(action_context: ActionContext) -> void:
+	print("REBOOT POST PROC")
 	if action_context == null or not action_context.was_successful():
+		print("NOT SUCCESS")
 		return
 	if action_context.action_type != ActionContext.ActionType.DISABLE_SIGNAL:
+		print("ACTION TYPE")
 		return
 	var active_sig := action_context.primary_target
 	if active_sig == null:

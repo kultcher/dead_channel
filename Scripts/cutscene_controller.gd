@@ -1,4 +1,4 @@
-extends PanelContainer
+extends Control
 
 const NULL_SPIKE_SYNC_SHADER = preload("res://Shaders/null_spike_sync.gdshader")
 
@@ -30,7 +30,7 @@ func _ready() -> void:
 
 func set_black_screen(enabled: bool) -> void:
 	visible = enabled
-	modulate = Color(1, 1, 1, 1.0 if enabled else 0.0)
+	modulate = Color.WHITE
 	_set_black_fade_alpha(1.0 if enabled else 0.0)
 
 func start_alarm_effects() -> void:
@@ -39,17 +39,8 @@ func start_alarm_effects() -> void:
 
 	_stop_alarm_tween()
 	_alarm_active = true
-	visible = true
-	modulate = Color.WHITE
-
-	if key_texture != null:
-		key_texture.visible = true
-		key_texture.modulate = Color(1.0, 0.92, 0.92, 1.0)
-
-	if black_fade != null:
-		black_fade.visible = true
-		black_fade.color = Color(0.0, 0.0, 0.0, 0.28)
-
+	_begin_cutscene_visuals(0.28)
+	_show_key_layer(1.0, Color(1.0, 0.92, 0.92, 1.0))
 	if strobe_rect != null:
 		strobe_rect.visible = true
 		strobe_rect.color = Color(0.95, 0.06, 0.06, 0.0)
@@ -79,7 +70,7 @@ func stop_alarm_effects(fade_duration: float = 0.35) -> void:
 	_stop_alarm_tween()
 
 	if not is_inside_tree():
-		_reset_alarm_visuals()
+		_reset_cutscene_visuals()
 		return
 
 	var fade_tween := create_tween()
@@ -91,7 +82,7 @@ func stop_alarm_effects(fade_duration: float = 0.35) -> void:
 		fade_tween.parallel().tween_method(_set_alarm_flash_alpha, flash_rect.color.a, 0.0, fade_duration)
 	fade_tween.parallel().tween_method(_set_alarm_key_tint, 0.18, 0.0, fade_duration)
 	await fade_tween.finished
-	_reset_alarm_visuals()
+	_reset_cutscene_visuals()
 
 func play_intro_glitch_transition(duration: float = 1.0) -> void:
 	if not is_inside_tree():
@@ -100,32 +91,23 @@ func play_intro_glitch_transition(duration: float = 1.0) -> void:
 
 	_stop_alarm_tween()
 	_alarm_active = false
-	visible = true
-	modulate = Color.WHITE
-	_set_black_fade_alpha(1.0)
-	if glitch_texture != null:
-		glitch_texture.visible = true
-		glitch_texture.modulate.a = 1.0
-		_set_glitch_intensity(1.0)
-	if key_texture != null:
-		key_texture.visible = false
+	_begin_cutscene_visuals(1.0)
+	_hide_key_layer()
+	_show_glitch_layer(_get_default_glitch_texture(), Color.WHITE, 1.0)
+	_set_glitch_intensity(1.0)
 
 	var fade_tween := create_tween()
 	var overlay_fade_duration := maxf(0.1, duration * 0.7)
 	var texture_fade_duration := maxf(0.08, duration * 0.35)
 	fade_tween.tween_method(_set_black_fade_alpha, 1.0, 0.0, overlay_fade_duration)
 	if glitch_texture != null:
-		fade_tween.parallel().tween_method(_apply_intro_glitch_progress, 0.0, 1.0, duration)
-		fade_tween.parallel().tween_property(glitch_texture, "modulate:a", 0.0, texture_fade_duration).set_delay(maxf(0.0, duration - texture_fade_duration))
+			fade_tween.parallel().tween_method(_apply_intro_glitch_progress, 0.0, 1.0, duration)
+			fade_tween.parallel().tween_property(glitch_texture, "modulate:a", 0.0, texture_fade_duration).set_delay(maxf(0.0, duration - texture_fade_duration))
 	await fade_tween.finished
-	visible = false
-	modulate = Color.WHITE
+	_set_glitch_intensity(0.0)
 	_set_black_fade_alpha(1.0)
-	if glitch_texture != null:
-		_set_glitch_intensity(0.0)
-		glitch_texture.visible = false
-		glitch_texture.modulate.a = 1.0
-		glitch_texture.texture = null
+	_hide_glitch_layer()
+	_hide_if_idle()
 
 func play_reverse_glitch_transition(duration: float = 1.0, hold_duration: float = 1.0) -> void:
 	if not is_inside_tree():
@@ -135,16 +117,10 @@ func play_reverse_glitch_transition(duration: float = 1.0, hold_duration: float 
 	_stop_alarm_tween()
 	_alarm_active = false
 	var captured_texture := await _capture_viewport_texture()
-	visible = true
-	modulate = Color.WHITE
-	_set_black_fade_alpha(0.0)
-	if glitch_texture != null:
-		glitch_texture.texture = captured_texture
-		glitch_texture.visible = true
-		glitch_texture.modulate.a = 1.0
-		_set_glitch_intensity(0.0)
-	if key_texture != null:
-		key_texture.visible = false
+	_begin_cutscene_visuals(0.0)
+	_hide_key_layer()
+	_show_glitch_layer(captured_texture, Color.WHITE, 1.0)
+	_set_glitch_intensity(0.0)
 
 	if glitch_texture != null and hold_duration > 0.0:
 		var hold_tween := create_tween()
@@ -156,17 +132,12 @@ func play_reverse_glitch_transition(duration: float = 1.0, hold_duration: float 
 	var texture_fade_duration := maxf(0.08, duration * 0.3)
 	fade_tween.tween_method(_set_black_fade_alpha, 0.0, 1.0, overlay_fade_duration)
 	if glitch_texture != null:
-		fade_tween.parallel().tween_method(_apply_reverse_glitch_progress, 0.45, 1.0, duration)
-		fade_tween.parallel().tween_property(glitch_texture, "modulate:a", 0.0, texture_fade_duration).set_delay(maxf(0.0, duration - texture_fade_duration))
+			fade_tween.parallel().tween_method(_apply_reverse_glitch_progress, 0.45, 1.0, duration)
+			fade_tween.parallel().tween_property(glitch_texture, "modulate:a", 0.0, texture_fade_duration).set_delay(maxf(0.0, duration - texture_fade_duration))
 	await fade_tween.finished
-	visible = true
-	modulate = Color.WHITE
 	_set_black_fade_alpha(1.0)
-	if glitch_texture != null:
-		_set_glitch_intensity(0.0)
-		glitch_texture.visible = false
-		glitch_texture.modulate.a = 1.0
-		glitch_texture.texture = null
+	_set_glitch_intensity(0.0)
+	_hide_glitch_layer()
 
 func play_still_reveal(duration: float = 1.5) -> void:
 	if not is_inside_tree():
@@ -175,17 +146,9 @@ func play_still_reveal(duration: float = 1.5) -> void:
 
 	_stop_alarm_tween()
 	_alarm_active = false
-	visible = true
-	modulate = Color.WHITE
-	_set_black_fade_alpha(1.0)
-	if glitch_texture != null:
-		glitch_texture.visible = false
-		glitch_texture.texture = null
-	if key_texture != null:
-		key_texture.visible = true
-		key_texture.modulate.a = 0.0
-		key_texture.scale = Vector2(1.12, 1.12)
-		key_texture.position = Vector2(-60, -36)
+	_begin_cutscene_visuals(1.0)
+	_hide_glitch_layer()
+	_show_key_layer(0.0, Color.WHITE, Vector2(1.12, 1.12), Vector2(-60, -36))
 
 	var reveal_tween := create_tween()
 	reveal_tween.tween_method(_set_black_fade_alpha, 1.0, 0.0, maxf(0.1, duration))
@@ -194,8 +157,6 @@ func play_still_reveal(duration: float = 1.5) -> void:
 		reveal_tween.parallel().tween_property(key_texture, "scale", Vector2.ONE, maxf(0.1, duration))
 		reveal_tween.parallel().tween_property(key_texture, "position", Vector2.ZERO, maxf(0.1, duration))
 	await reveal_tween.finished
-	visible = true
-	modulate = Color.WHITE
 	_set_black_fade_alpha(0.0)
 
 func play_cutscene_return_transition(duration: float = 1.2, blackout_duration: float = 0.18) -> void:
@@ -204,27 +165,17 @@ func play_cutscene_return_transition(duration: float = 1.2, blackout_duration: f
 		return
 
 	_stop_alarm_tween()
-	await _reset_alarm_visuals()
+	_reset_cutscene_visuals(false)
 
 	_alarm_active = false
-	visible = true
-	modulate = Color.WHITE
+	_begin_cutscene_visuals(0.0)
 	var fade_to_black_duration := maxf(0.2, duration * 0.5)
 	var reveal_duration := maxf(0.35, duration * 0.85)
 
-	if key_texture != null:
-		key_texture.visible = true
-		key_texture.modulate = Color.WHITE
-	if glitch_texture != null:
-		if key_texture != null and key_texture.texture != null:
-			glitch_texture.texture = key_texture.texture
-		else:
-			glitch_texture.texture = _base_glitch_texture
-		glitch_texture.visible = true
-		key_texture.visible = false
-		glitch_texture.modulate = Color(1.0, 0.92, 0.92, 0.78)
-		_apply_key_collapse_glitch_progress(0.0)
-	_set_black_fade_alpha(0.0)
+	_show_key_layer(1.0, Color.WHITE)
+	_show_glitch_layer(_get_key_glitch_source(), Color(1.0, 0.92, 0.92, 0.78), 0.78)
+	_hide_key_layer()
+	_apply_key_collapse_glitch_progress(0.0)
 
 	var collapse_tween := create_tween()
 	collapse_tween.set_parallel(true)
@@ -239,17 +190,9 @@ func play_cutscene_return_transition(duration: float = 1.2, blackout_duration: f
 		await get_tree().create_timer(blackout_duration).timeout
 
 	var captured_texture := await _capture_viewport_texture()
-	if key_texture != null:
-		key_texture.visible = false
-	if glitch_texture != null:
-		if captured_texture != null:
-			glitch_texture.texture = captured_texture
-		elif _base_glitch_texture != null:
-			glitch_texture.texture = _base_glitch_texture
-		glitch_texture.visible = true
-		glitch_texture.modulate = Color.WHITE
-		glitch_texture.modulate.a = 1.0
-		_set_glitch_intensity(1.0)
+	_hide_key_layer()
+	_show_glitch_layer(captured_texture, Color.WHITE, 1.0)
+	_set_glitch_intensity(1.0)
 	_set_black_fade_alpha(1.0)
 
 	var reveal_tween := create_tween()
@@ -257,12 +200,12 @@ func play_cutscene_return_transition(duration: float = 1.2, blackout_duration: f
 	var texture_fade_duration := maxf(0.1, reveal_duration * 0.42)
 	reveal_tween.tween_method(_set_black_fade_alpha, 1.0, 0.0, overlay_fade_duration)
 	if glitch_texture != null:
-		reveal_tween.parallel().tween_method(_apply_intro_glitch_progress, 0.0, 1.0, reveal_duration)
-		reveal_tween.parallel().tween_property(glitch_texture, "modulate:a", 0.0, texture_fade_duration).set_delay(maxf(0.0, reveal_duration - texture_fade_duration))
+			reveal_tween.parallel().tween_method(_apply_intro_glitch_progress, 0.0, 1.0, reveal_duration)
+			reveal_tween.parallel().tween_property(glitch_texture, "modulate:a", 0.0, texture_fade_duration).set_delay(maxf(0.0, reveal_duration - texture_fade_duration))
 	await reveal_tween.finished
 
-	modulate = Color.WHITE
-	visible = false
+	_hide_glitch_layer()
+	_hide_if_idle()
 
 func play_null_spike_init_transition() -> void:
 	if not is_inside_tree():
@@ -271,20 +214,11 @@ func play_null_spike_init_transition() -> void:
 	_stop_alarm_tween()
 	_alarm_active = false
 	var captured_texture := await _capture_viewport_texture()
-	visible = true
-	modulate = Color.WHITE
-	_set_black_fade_alpha(1.0)
-	if key_texture != null:
-		key_texture.visible = false
-	if glitch_texture != null:
-		if captured_texture != null:
-			glitch_texture.texture = captured_texture
-		else:
-			glitch_texture.texture = _base_glitch_texture
-		glitch_texture.visible = true
-		glitch_texture.modulate = Color(1.0, 1.0, 1.0, 1.0)
-		_set_glitch_speed(2.0)
-		_set_glitch_intensity(0.12)
+	_begin_cutscene_visuals(1.0)
+	_hide_key_layer()
+	_show_glitch_layer(captured_texture, Color.WHITE, 1.0)
+	_set_glitch_speed(2.0)
+	_set_glitch_intensity(0.12)
 
 	var phase_1 := create_tween()
 	phase_1.set_parallel(true)
@@ -327,14 +261,11 @@ func play_null_spike_init_transition() -> void:
 	phase_4.tween_property(glitch_texture, "modulate", Color(1.0, 1.0, 1.0, 0.0), 2.1)
 	await phase_4.finished
 
-	_reset_alarm_visuals()
-	visible = false
+	_reset_cutscene_visuals()
 
 func start_first_null_spike_sync(total_duration: float = 4.8) -> void:
-	visible = true
-	set_self_modulate(Color(1,1,1,0))
 
-	_set_black_fade_alpha(0.0)
+	_begin_cutscene_visuals(0.0)
 	_set_sync_overlay_visible(true)
 	_set_sync_overlay_intensity(0.25)
 	_set_sync_overlay_band_density(3.0)
@@ -342,8 +273,8 @@ func start_first_null_spike_sync(total_duration: float = 4.8) -> void:
 	_set_sync_overlay_speed(0.8)
 	_set_sync_overlay_glow(0.4)
 	_set_sync_wash_alpha(0.01)
-
-
+	for child in get_children():
+		print(child, " ", child.visible)
 	var total := maxf(5.0, total_duration)
 	var phase_1 := 1.05
 	var pulse_1 := 0.4
@@ -410,14 +341,9 @@ func stop_first_null_spike_sync() -> void:
 	_finish_first_null_spike_sync()
 
 func start_null_spike_active_effect(duration: float = 0.5) -> void:
-	#if _null_spike_sync_tween != null and _null_spike_sync_tween.is_valid():
-	#	return
-
 	_stop_null_spike_active_tween()
 	_null_spike_active_visual_enabled = true
-	#NOTE: showing cutscene controller was washing the screen out from one of the other rects I guess?
-	#visible = true
-	#modulate = Color.WHITE
+	_begin_cutscene_visuals(0.0)
 	_set_black_fade_alpha(0.0)
 	_set_sync_overlay_visible(true)
 	_set_sync_wash_alpha(0.0)
@@ -432,7 +358,6 @@ func start_null_spike_active_effect(duration: float = 0.5) -> void:
 	active_tween.tween_method(_set_sync_overlay_stretch, _get_sync_overlay_stretch(), 0.50, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	active_tween.tween_method(_set_sync_overlay_speed, _get_sync_overlay_speed(), 20.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	active_tween.tween_method(_set_sync_overlay_glow, _get_sync_overlay_glow(), 0.03, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	#active_tween.tween_method(_set_sync_wash_alpha, 0.0, 0.08, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	active_tween.finished.connect(_on_null_spike_active_tween_finished.bind(active_tween))
 
 func stop_null_spike_active_effect(duration: float = 0.5) -> void:
@@ -451,7 +376,6 @@ func stop_null_spike_active_effect(duration: float = 0.5) -> void:
 	active_tween.tween_method(_set_sync_overlay_stretch, _get_sync_overlay_stretch(), 0.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	active_tween.tween_method(_set_sync_overlay_speed, _get_sync_overlay_speed(), 1.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	active_tween.tween_method(_set_sync_overlay_glow, _get_sync_overlay_glow(), 0.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
-	#active_tween.tween_method(_set_sync_wash_alpha, null_spike_sync_wash.color.a if null_spike_sync_wash != null else 0.0, 0.0, tween_duration).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
 	active_tween.finished.connect(_on_null_spike_active_tween_finished.bind(active_tween))
 
 func _capture_viewport_texture() -> Texture2D:
@@ -493,11 +417,7 @@ func _setup_null_spike_sync_layers() -> void:
 			sync_material.shader = NULL_SPIKE_SYNC_SHADER
 			null_spike_sync_overlay.material = sync_material
 		null_spike_sync_overlay.visible = false
-		_set_sync_overlay_intensity(0.0)
-		_set_sync_overlay_band_density(80.0)
-		_set_sync_overlay_stretch(0.0)
-		_set_sync_overlay_speed(1.0)
-		_set_sync_overlay_glow(0.0)
+		_reset_sync_overlay_visuals()
 
 func _set_black_fade_alpha(alpha: float) -> void:
 	if black_fade == null:
@@ -708,20 +628,14 @@ func _stop_null_spike_active_tween() -> void:
 func _finish_first_null_spike_sync() -> void:
 	_stop_null_spike_sync_tween()
 	_set_sync_overlay_visible(false)
-	_set_sync_overlay_intensity(0.0)
-	_set_sync_overlay_band_density(80.0)
-	_set_sync_overlay_stretch(0.0)
-	_set_sync_overlay_speed(1.0)
-	_set_sync_overlay_glow(0.0)
-	_set_sync_wash_alpha(0.0)
-	null_spike_sync_wash.visible = false
+	_reset_sync_overlay_visuals()
+	if null_spike_sync_wash != null:
+		null_spike_sync_wash.visible = false
 	_set_black_fade_alpha(0.0)
-	if not _alarm_active:
-		visible = false
+	_hide_if_idle()
 	null_spike_sync_finished.emit()
 
 func _on_activate_null_spike() -> void:
-	print("Starting effect")
 	start_null_spike_active_effect()
 
 func _on_deactivate_null_spike() -> void:
@@ -733,12 +647,9 @@ func _on_null_spike_active_tween_finished(finished_tween: Tween) -> void:
 	_null_spike_active_tween = null
 	if _null_spike_active_visual_enabled:
 		_set_sync_overlay_visible(true)
-		#visible = true
-		#modulate = Color.WHITE
 		return
 	_set_sync_overlay_visible(false)
-	if not _alarm_active:
-		visible = false
+	_hide_if_idle()
 
 func _get_sync_overlay_material() -> ShaderMaterial:
 	if null_spike_sync_overlay == null:
@@ -755,19 +666,74 @@ func _play_blackout_pulse(fade_duration: float, hold_duration: float = 0.0) -> v
 	reveal_tween.tween_method(_set_black_fade_alpha, 1.0, 0.0, maxf(0.01, fade_duration))
 	await reveal_tween.finished
 
-func _reset_alarm_visuals() -> void:
+func _begin_cutscene_visuals(black_alpha: float) -> void:
+	visible = true
+	modulate = Color.WHITE
+	_set_black_fade_alpha(black_alpha)
+
+func _show_key_layer(alpha: float = 1.0, tint: Color = Color.WHITE, scale: Vector2 = Vector2.ONE, local_position: Vector2 = Vector2.ZERO) -> void:
+	if key_texture == null:
+		return
+	key_texture.visible = true
+	key_texture.modulate = tint
+	key_texture.modulate.a = alpha
+	key_texture.scale = scale
+	key_texture.position = local_position
+
+func _hide_key_layer() -> void:
+	if key_texture == null:
+		return
+	key_texture.visible = false
+	key_texture.modulate = Color.WHITE
+	key_texture.scale = Vector2.ONE
+	key_texture.position = Vector2.ZERO
+
+func _show_glitch_layer(texture: Texture2D, tint: Color = Color.WHITE, alpha: float = 1.0) -> void:
+	if glitch_texture == null:
+		return
+	glitch_texture.texture = texture if texture != null else _get_default_glitch_texture()
+	glitch_texture.visible = true
+	glitch_texture.modulate = tint
+	glitch_texture.modulate.a = alpha
+
+func _hide_glitch_layer(reset_texture: bool = true) -> void:
+	if glitch_texture == null:
+		return
+	glitch_texture.visible = false
+	glitch_texture.modulate = Color.WHITE
+	glitch_texture.modulate.a = 1.0
+	if reset_texture:
+		glitch_texture.texture = null
+
+func _get_default_glitch_texture() -> Texture2D:
+	return _base_glitch_texture
+
+func _get_key_glitch_source() -> Texture2D:
+	if key_texture != null and key_texture.texture != null:
+		return key_texture.texture
+	return _get_default_glitch_texture()
+
+func _reset_sync_overlay_visuals() -> void:
+	_set_sync_overlay_intensity(0.0)
+	_set_sync_overlay_band_density(80.0)
+	_set_sync_overlay_stretch(0.0)
+	_set_sync_overlay_speed(1.0)
+	_set_sync_overlay_glow(0.0)
+	_set_sync_wash_alpha(0.0)
+
+func _hide_if_idle() -> void:
+	if _alarm_active or _null_spike_active_visual_enabled:
+		return
+	visible = false
+
+func _reset_cutscene_visuals(hide_controller: bool = true) -> void:
 	_stop_alarm_tween()
 	_stop_null_spike_sync_tween()
 	_stop_null_spike_active_tween()
 	_null_spike_active_visual_enabled = false
 	_set_glitch_intensity(0.0)
-	if glitch_texture != null:
-		glitch_texture.visible = false
-		glitch_texture.modulate = Color(1, 1, 1, 1)
-		glitch_texture.texture = _base_glitch_texture
-	if key_texture != null:
-		key_texture.visible = false
-		key_texture.modulate = Color(1, 1, 1, 1)
+	_hide_glitch_layer()
+	_hide_key_layer()
 	if black_fade != null:
 		black_fade.visible = false
 		black_fade.color = Color(0, 0, 0, 1)
@@ -778,9 +744,6 @@ func _reset_alarm_visuals() -> void:
 		flash_rect.visible = false
 		flash_rect.color = Color(1.0, 0.96, 0.96, 0.0)
 	_set_sync_overlay_visible(false)
-	_set_sync_overlay_intensity(0.0)
-	_set_sync_overlay_stretch(0.0)
-	_set_sync_overlay_glow(0.0)
-	_set_sync_wash_alpha(0.0)
-	if not _alarm_active:
+	_reset_sync_overlay_visuals()
+	if hide_controller and not _alarm_active:
 		visible = false

@@ -13,6 +13,7 @@ var _patrol_direction: int = 1
 var _return_patrol_index: int = -1
 var _dwell_timer: float = 0.0
 var _investigate_timer: float = 0.0
+var _alert_response_time_remaining: float = 0.0
 var _current_alert: GuardAlertData = null
 var _alert_destination_cell_x: float = 0.0
 var _alert_destination_lane_pos: float = 0.0
@@ -57,7 +58,7 @@ func _process(delta: float) -> void:
 	if _mobility.movement_disabled:
 		return
 
-	_prune_expired_alert()
+	_prune_expired_alert(delta)
 	_update_render_offset()
 	_update_reveal_state()
 
@@ -96,6 +97,7 @@ func _process_alert_move(delta: float) -> void:
 	_investigate_timer = _mobility.investigate_duration_sec
 	if _current_alert.investigate_sec_override >= 0.0:
 		_investigate_timer = _current_alert.investigate_sec_override
+	_investigate_timer = maxf(_investigate_timer, 0.1)
 	_state = State.INVESTIGATING
 
 func _process_investigate(delta: float) -> void:
@@ -105,6 +107,7 @@ func _process_investigate(delta: float) -> void:
 		return
 
 	_current_alert = null
+	_alert_response_time_remaining = 0.0
 	_begin_return_to_patrol()
 
 func _process_return(delta: float) -> void:
@@ -215,20 +218,22 @@ func _on_guard_alert_raised(alert: GuardAlertData) -> void:
 		return
 	if alert.ttl_sec <= 0.0:
 		alert.ttl_sec = _mobility.default_alert_ttl_sec
-	if alert.emitted_time_sec <= 0.0:
-		alert.emitted_time_sec = Time.get_ticks_msec() / 1000.0
 
 	_current_alert = alert.duplicate(true)
+	_alert_response_time_remaining = _current_alert.ttl_sec
 	_set_alert_destination()
 	_state = State.RESPONDING_ALERT
 	_dwell_timer = 0.0
 
-func _prune_expired_alert() -> void:
+func _prune_expired_alert(delta: float) -> void:
 	if _state != State.RESPONDING_ALERT:
 		return
-	var now_sec := Time.get_ticks_msec() / 1000.0
-	if _current_alert != null and _current_alert.is_expired(now_sec):
+	if _current_alert == null:
+		return
+	_alert_response_time_remaining = maxf(0.0, _alert_response_time_remaining - delta)
+	if _alert_response_time_remaining <= 0.0:
 		_current_alert = null
+		_alert_response_time_remaining = 0.0
 		_begin_return_to_patrol()
 
 func _begin_return_to_patrol() -> void:

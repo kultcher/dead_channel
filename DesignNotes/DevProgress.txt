@@ -70,29 +70,42 @@ Development Progress
 - Built Assassin program
 - Migrated run-building to fluent pattern
 
+4/1/2026:
+- Cleaned up terminal window and cutscene controller a little bit
+
 Short-term TODO:
 - Robust heat implementation with difficulty scaling
 - out-of-timeline alert/alarms
 - More and more advanced IC
 - Programs: Custom tooltips
+- Tutorial: Better solution for hiding tooltips
+- FIX: Distraction "wasting" charges... also check proximity?
+- TUTORIAL: Do cohesion pass
+- end sequence z-index stuff
 
 Polish TODO:
 Code:
 - Split out tutorial script and logic
+- Circle back: Check handoff from command_context to actioncontext - should various edge case fails make it to action step?
+- Make puzzles more Godot-y
+- Cleanup cutscene controller (hardcode textures)
+
 Game:
-- end sequence z-index stuff
+- Add "victory sequence" for Decrypt
+- Add active signal label to puzzles
+- add ciphers and on-solve trigger to codex
 - lab door sequence break
 - Add chatlog/bark UI
-- add ciphers and on-solve trigger to codex
-- Add "drop to root" session log messages on passive signals that despawn
-- Cleanup cutscene controller (hardcode textures)
-- Convert authoring to fluent builder paradigm
 - guard comms pulses
+
+Minor:
+- Add "drop to root" session log messages on passive signals that despawn
 - Add a cleaner way to update scan tooltips (array?)
 - Adjust delay behavior to ResponseEffect instead of detection?
 - Fix guard facing override??
-- fix weird glitchiness after terminal dump sequence
+- fix weird glitchiness after terminal dump sequence and text flow at end ... is terminal killing whitespace automatically?
 - add proper esc menu
+
 
 Verify:
 x add sequence break protection on drone_02 coolant vent

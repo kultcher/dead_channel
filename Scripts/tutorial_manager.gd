@@ -353,9 +353,14 @@ func _run_lab_reveal_sequence() -> void:
 		], "", Rect2(), Vector2(750,300), true)
 
 	await get_tree().create_timer(2).timeout
+	print("timer")
+	
 
 func _run_alarm_sequence():
+	print("cutscene start")
+
 	_start_cutscene_alarm()
+	print("cutscene end")
 
 	await _show_dialogue([
 		"Shit. See, this is why we always scan before we mess with things. Now we caught the light.",

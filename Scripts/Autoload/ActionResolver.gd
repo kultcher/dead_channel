@@ -126,6 +126,8 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 			_apply_kill_signal(action_context)
 		ActionContext.ActionType.ADD_HEAT:
 			_apply_add_heat(action_context)
+		ActionContext.ActionType.RAISE_GUARD_ALERT:
+			_apply_raise_guard_alert(action_context)
 		ActionContext.ActionType.DISABLE_SIGNAL:
 			_apply_disable_signal(action_context)
 		ActionContext.ActionType.ENABLE_SIGNAL:
@@ -188,22 +190,32 @@ func _apply_kill_signal(action_context: ActionContext) -> void:
 		action_context.fail("KILL failed. No active process to kill on signal type: DOOR.")
 		return
 
-	if not _disable_signal_target(target, action_context):
-		return
-
-	action_context.succeed("Shutting down " + target.data.system_id + "...")
-	GlobalEvents.signal_killed.emit(target)
-	if action_context.heat_delta != 0.0:
-		_queue_heat_action(
-			action_context.heat_delta,
-			"Shutting down " + target.data.system_id + ".",
-			target,
-			action_context
-		)
+	var disable_action := ActionContext.create_followup_action(
+		action_context,
+		ActionContext.ActionType.DISABLE_SIGNAL,
+		target
+	)
+	disable_action.command_context = action_context.command_context
+	disable_action.command_name = action_context.command_name
+	disable_action.heat_delta = action_context.heat_delta
+	for tag in action_context.tags:
+		disable_action.add_tag(tag)
+	_debug_action("followup", disable_action, "derived from kill")
+	enqueue_action(disable_action)
+	action_context.succeed()
 
 func _apply_add_heat(action_context: ActionContext) -> void:
 	if action_context.heat_delta > 0.0:
 		GlobalEvents.heat_increased.emit(action_context.heat_delta, str(action_context.get_metadata(&"heat_source", "")))
+	action_context.succeed()
+
+func _apply_raise_guard_alert(action_context: ActionContext) -> void:
+	var alert: GuardAlertData = action_context.get_metadata(&"guard_alert", null)
+	if alert == null:
+		action_context.fail("Guard alert action missing payload.")
+		return
+
+	GlobalEvents.guard_alert_raised.emit(alert)
 	action_context.succeed()
 
 func _apply_disable_signal(action_context: ActionContext) -> void:
@@ -212,6 +224,17 @@ func _apply_disable_signal(action_context: ActionContext) -> void:
 
 	var target := action_context.primary_target
 	if not _disable_signal_target(target, action_context):
+		return
+	if action_context.root_command_name == "KILL":
+		action_context.succeed("Shutting down " + target.data.system_id + "...")
+		GlobalEvents.signal_killed.emit(target)
+		if action_context.heat_delta != 0.0:
+			_queue_heat_action(
+				action_context.heat_delta,
+				"Shutting down " + target.data.system_id + ".",
+				target,
+				action_context
+			)
 		return
 	action_context.succeed()
 
@@ -354,18 +377,15 @@ func _apply_activate_disruptor(action_context: ActionContext) -> void:
 		if absf(target_cell - source_cell) > float(range_cells):
 			continue
 
-		var alert := GuardAlertData.new()
-		alert.source_type = GuardAlertData.SourceType.DISTRACTION
-		alert.target_signal_id = other_sig.data.system_id
-		alert.target_instance_id = other_sig.get_instance_id()
-		alert.target_cell_x = source_cell
-		alert.target_lane = source_lane
-		alert.priority = signal_data.disruptor.severity
-		alert.ttl_sec = signal_data.disruptor.ttl_sec
-		alert.investigate_sec_override = signal_data.disruptor.investigate_duration_sec
-		alert.source_id = signal_data.system_id
-		alert.emitted_time_sec = Time.get_ticks_msec() / 1000.0
-		GlobalEvents.guard_alert_raised.emit(alert)
+		var alert_action := _create_guard_alert_action(
+			action_context,
+			target,
+			other_sig,
+			source_cell,
+			source_lane
+		)
+		_debug_action("followup", alert_action, "alert_target=" + other_sig.data.system_id)
+		enqueue_action(alert_action)
 		matched_targets += 1
 		alerted_targets += 1
 		if alerted_targets >= max_alert_targets:
@@ -418,6 +438,39 @@ func _queue_heat_action(amount: float, source_text: String, target: ActiveSignal
 	heat_action.set_metadata(&"heat_source", source_text)
 	_debug_action("followup", heat_action, "heat=" + str(amount))
 	enqueue_action(heat_action)
+
+func _create_guard_alert_action(
+	source_action: ActionContext,
+	source_signal: ActiveSignal,
+	target_signal: ActiveSignal,
+	target_cell_x: float,
+	target_lane: int
+) -> ActionContext:
+	var alert_action := ActionContext.create_followup_action(
+		source_action,
+		ActionContext.ActionType.RAISE_GUARD_ALERT,
+		target_signal,
+		source_action.source_type if source_action != null else ActionContext.SourceType.SYSTEM
+	)
+	alert_action.add_tag(&"alert")
+	alert_action.add_tag(&"distraction")
+	alert_action.add_tag(&"guard")
+
+	var alert := GuardAlertData.new()
+	alert.source_type = GuardAlertData.SourceType.DISTRACTION
+	if target_signal != null and target_signal.data != null:
+		alert.target_signal_id = target_signal.data.system_id
+		alert.target_instance_id = target_signal.get_instance_id()
+	alert.target_cell_x = target_cell_x
+	alert.target_lane = target_lane
+	if source_signal != null and source_signal.data != null and source_signal.data.disruptor != null:
+		alert.priority = source_signal.data.disruptor.severity
+		alert.ttl_sec = source_signal.data.disruptor.ttl_sec
+		alert.investigate_sec_override = source_signal.data.disruptor.investigate_duration_sec
+		alert.source_id = source_signal.data.system_id
+	alert.emitted_time_sec = Time.get_ticks_msec() / 1000.0
+	alert_action.set_metadata(&"guard_alert", alert)
+	return alert_action
 
 func _disable_signal_target(target: ActiveSignal, action_context: ActionContext = null) -> bool:
 	if target == null or target.data == null:
