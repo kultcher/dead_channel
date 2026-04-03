@@ -64,3 +64,39 @@ The architecture of **Dead Channel** is built on a modular, component-based syst
 2. **Domain-Specific Event Buses:** Prevent `GlobalEvents` from becoming a bottleneck.
 3. **Timer Management:** Replace `add_child(timer)` on Singletons with a dedicated timer/tween-based utility.
 4. **Scene Hierarchy Refactor:** Prepare for a "Master Scene" that can host the `RunManager` without it being the root of the entire application.
+
+---
+
+## 5. Technical Deep Dive: Follow-up Questions
+
+### A. Polymorphic Command Logic (Replacing Hardcoded Enums)
+Moving logic from `ActionResolver` to `HackableComponent` is only the first step. To truly eliminate the "hardcoding heavy" problem, move away from `match` statements and toward **Resource-based Polymorphism**.
+
+**Recommendation:** Treat each command as its own **Action Resource**.
+1. Create a base `TerminalAction.gd` (Resource) with a virtual `execute(context: ActionContext)` function.
+2. Create concrete resources like `KillAction.gd`, `ProbeAction.gd`, and `ToggleDoorAction.gd`.
+3. `HackableComponent` then holds a `Dictionary` of these resources:
+   ```gdscript
+   @export var registered_commands: Dictionary = {
+       "KILL": preload("res://Actions/KillAction.tres"),
+       "OP": preload("res://Actions/DoorOpAction.tres")
+   }
+   ```
+4. When a command is received, `HackableComponent` simply fetches the resource by name and calls `execute()`. Adding a new command (e.g., `SPOOF`) then requires zero changes to the core engine—you just create a new `.tres` file and add it to the relevant signal's dictionary.
+
+### B. Async Action Queue Management
+The current `ActionResolver` uses a synchronous `while` loop to drain its queue. This means if an action triggers a long-running effect (like a "Trace" countdown or an animation), the loop continues immediately to the next action, leading to potential race conditions.
+
+**Suggested Approaches:**
+1. **Coroutine Awaiting:** Make `_resolve_single_action` a coroutine and `await` it in the loop. This pauses the queue until the action "signals" completion.
+2. **Signal-Based Resolution:** Give `ActionContext` a `finished` signal. The `ActionResolver` should only pop the next action when the current one emits `finished`. This is essential for gameplay-driven actions (e.g., waiting for a guard to reach a destination before applying a consequence).
+
+### C. Godot Lifecycle: Tweens vs. Timers
+In Godot, `Timer` is a `Node`, while `Tween` (in Godot 4) is a `RefCounted` object.
+- **Timers:** Must be added to the SceneTree (`add_child()`) to function, as they rely on tree notifications for their internal clock. `Resources` (like `ICModule`) cannot own Nodes, leading to the "dummy child on a singleton" hack.
+- **Tweens:** Much lighter. While they still need a "bound" Node to access the `SceneTree`, they don't require the same strict parenting structure as a `Timer`.
+
+**Idiomatic Alternative:**
+Instead of using "Dummy Tweens" or injecting children into `GlobalEvents`, implement a **TimerManager Autoload**. This manager (which is a Node) can provide a clean API for non-Node objects:
+`TimerManager.wait(5.0).connect(_on_timeout)`
+This keeps the "active" tree management inside a singleton where it belongs, while keeping your data Resources clean and passive.
