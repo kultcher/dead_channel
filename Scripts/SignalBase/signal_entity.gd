@@ -17,6 +17,7 @@ var mobility_controller: MobilityController = null
 var _guard_revealed: bool = true
 var _alert_visual_t: float = 0.0
 var _is_hover_highlighted: bool = false
+var _is_hovering_signal: bool = false
 
 var my_data: SignalData
 var my_active_sig: ActiveSignal
@@ -199,15 +200,10 @@ func show_tooltip():
 func show_hover_tooltip():
 	tooltip_main.show()
 	refresh_status_panels()
-	tooltip_main.show_body()
+	_sync_tooltip_body_visibility()
 
 func fade_tooltip_body():
-	if my_active_sig == null:
-		return
-	if my_active_sig.is_tooltip_collapsed:
-		tooltip_main.fade_body_out()
-		return
-	tooltip_main.show_body()
+	_sync_tooltip_body_visibility()
 
 func refresh_status_panels():
 	refresh_scan_status()
@@ -255,9 +251,11 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 			tooltip_lock_requested.emit(my_active_sig)
 
 func _on_area_2d_mouse_entered() -> void:
+	_is_hovering_signal = true
 	hover_started.emit(my_active_sig)
 
 func _on_area_2d_mouse_exited() -> void:
+	_is_hovering_signal = false
 	hover_ended.emit(my_active_sig)
 
 func get_focus_rect() -> Rect2:
@@ -302,9 +300,23 @@ func _sync_session_indicator_state() -> void:
 func show_scanning_tooltip():
 	if my_active_sig != null:
 		refresh_scan_status()
-		tooltip_main.show_body()
+		_sync_tooltip_body_visibility()
 
 func show_scan_complete():
 	if my_active_sig != null:
 		refresh_status_panels()
+		_sync_tooltip_body_visibility()
+
+func sync_tooltip_body_visibility() -> void:
+	_sync_tooltip_body_visibility()
+
+func _sync_tooltip_body_visibility() -> void:
+	if my_active_sig == null or tooltip_main == null:
+		return
+	if not my_active_sig.is_tooltip_collapsed:
 		tooltip_main.show_body()
+		return
+	if my_active_sig.is_being_scanned or _is_hovering_signal:
+		tooltip_main.show_body()
+		return
+	tooltip_main.fade_body_out()

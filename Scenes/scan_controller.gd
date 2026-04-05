@@ -136,6 +136,8 @@ func _cleanup_scan_visuals(sig: ActiveSignal):
 	sig.is_being_scanned = false
 	if sig.instance_node != null:
 		sig.instance_node.refresh_scan_status()
+		if sig.instance_node.has_method("sync_tooltip_body_visibility"):
+			sig.instance_node.sync_tooltip_body_visibility()
 
 func _finish_completed_scan(sig: ActiveSignal) -> void:
 	if sig == null:
