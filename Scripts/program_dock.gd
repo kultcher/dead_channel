@@ -16,9 +16,9 @@ var _pulse_time := 0.0
 
 func _ready() -> void:
 	_prepare_templates()
-	_connect_program_manager()
-	_rebuild_ram_lights(ProgramManager.total_ram)
-	_refresh_ram_lights(ProgramManager.get_used_ram(), ProgramManager.total_ram)
+	_connect_managers()
+	_rebuild_ram_lights(RAMManager.total_ram)
+	_refresh_ram_lights(RAMManager.get_used_ram(), RAMManager.total_ram)
 	_rebuild_cells()
 	set_process(true)
 
@@ -30,11 +30,11 @@ func _prepare_templates() -> void:
 	cell_template.hide()
 	ram_light_template.hide()
 
-func _connect_program_manager() -> void:
-	if not ProgramManager.total_ram_changed.is_connected(_on_total_ram_changed):
-		ProgramManager.total_ram_changed.connect(_on_total_ram_changed)
-	if not ProgramManager.ram_usage_changed.is_connected(_on_ram_usage_changed):
-		ProgramManager.ram_usage_changed.connect(_on_ram_usage_changed)
+func _connect_managers() -> void:
+	if not RAMManager.total_ram_changed.is_connected(_on_total_ram_changed):
+		RAMManager.total_ram_changed.connect(_on_total_ram_changed)
+	if not RAMManager.ram_usage_changed.is_connected(_on_ram_usage_changed):
+		RAMManager.ram_usage_changed.connect(_on_ram_usage_changed)
 	if not ProgramManager.program_installed.is_connected(_on_program_structure_changed):
 		ProgramManager.program_installed.connect(_on_program_structure_changed)
 	if not ProgramManager.program_removed.is_connected(_on_program_removed):
@@ -126,7 +126,7 @@ func _get_total_phase_time(program: ProgramInstance) -> float:
 
 func _on_total_ram_changed(total_ram: int) -> void:
 	_rebuild_ram_lights(total_ram)
-	_refresh_ram_lights(ProgramManager.get_used_ram(), total_ram)
+	_refresh_ram_lights(RAMManager.get_used_ram(), total_ram)
 
 func _on_ram_usage_changed(used_ram: int, total_ram: int) -> void:
 	_refresh_ram_lights(used_ram, total_ram)

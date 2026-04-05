@@ -24,19 +24,26 @@ func get_spawns() -> Array[Dictionary]:
 			.build(),
 		spawn(PANNING_CAMERA, 6.5)
 			.id("cam_04")
-			.lane(1)
+			.lane(0)
 			.vision(20.0, 1.0)
 			.detection_sweep([-1, 3], [180, 3])
 			.add_ic_custom("reboot", {"reboot_time": 3.0})
 			.add_ic_custom("faraday", {"max_runner_distance_cells": 3.0})
 			.build(),
-
-		spawn(BASIC_DOOR, 12.5)
+		spawn(PANNING_CAMERA, 5.5)
+			.id("cam_10")
+			.lane(4)
+			.vision(20.0, 1.0)
+			.detection_sweep([-1, 3], [180, 3])
+			.add_ic_custom("reboot", {"reboot_time": 3.0})
+			.add_ic_custom("faraday", {"max_runner_distance_cells": 3.0})
+			.build(),
+		spawn(BASIC_DOOR, 6.5)
 			.lane(2)
 			.add_puzzle("sniff", 1)
 			.build(),
 
-		spawn(PANNING_CAMERA, 12.5)
+		spawn(PANNING_CAMERA, 7.5)
 			.id("cam_04")
 			.lane(4)
 			.vision(20.0, 1.0)

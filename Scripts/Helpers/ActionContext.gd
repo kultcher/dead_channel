@@ -2,6 +2,7 @@ class_name ActionContext extends RefCounted
 
 enum ActionType {
 	UNKNOWN,
+	START_SCAN_SIGNAL,
 	ACCESS_SIGNAL,
 	SHOW_HELP,
 	PROBE_SIGNAL,

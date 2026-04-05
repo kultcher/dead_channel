@@ -103,6 +103,8 @@ func update_signal_position():
 				new_node.hover_started.connect(_on_signal_mouse_enter)
 				new_node.hover_ended.connect(_on_signal_mouse_exit)
 				active_sig.instance_node = new_node
+				if scan_controller != null and scan_controller.has_method("sync_signal_queue_visuals"):
+					scan_controller.sync_signal_queue_visuals()
 			
 			var visual_y = (signal_lane * timeline_manager.lane_height) + (timeline_manager.lane_height * 0.5)
 			var render_offset := active_sig.runtime_render_offset

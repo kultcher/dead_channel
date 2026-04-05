@@ -8,6 +8,17 @@ var _pending_actions: Array[ActionContext] = []
 var _is_processing_actions := false
 const DEBUG_PREFIX := "[ActionResolver]"
 
+func build_scan_action(target_signal: ActiveSignal) -> ActionContext:
+	var action := ActionContext.create_system_action(
+		ActionContext.ActionType.START_SCAN_SIGNAL,
+		target_signal
+	)
+	action.add_tag(&"scan")
+	action.set_metadata(&"scan_time_multiplier", 1.0)
+	action.ensure_lineage_defaults()
+	_debug_action("build", action, "for scan start")
+	return action
+
 func build_action_from_command(cmd_context: CommandContext) -> ActionContext:
 	var action := ActionContext.from_command(cmd_context)
 	if cmd_context == null:
@@ -116,6 +127,8 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 
 	_debug_action("core", action_context, _action_type_to_string(action_context.action_type))
 	match action_context.action_type:
+		ActionContext.ActionType.START_SCAN_SIGNAL:
+			_apply_start_scan_signal(action_context)
 		ActionContext.ActionType.ACCESS_SIGNAL:
 			_apply_access_signal(action_context)
 		ActionContext.ActionType.SHOW_HELP:
@@ -159,6 +172,14 @@ func _apply_access_signal(action_context: ActionContext) -> void:
 
 	var show_connection_banner := bool(action_context.get_metadata(&"show_connection_banner", false))
 	CommandDispatch.switch_terminal_session(target, show_connection_banner)
+	action_context.succeed()
+
+func _apply_start_scan_signal(action_context: ActionContext) -> void:
+	if not _ensure_target_is_responding(action_context):
+		return
+
+	var scan_time_multiplier := float(action_context.get_metadata(&"scan_time_multiplier", 1.0))
+	action_context.set_metadata(&"scan_time_multiplier", maxf(0.01, scan_time_multiplier))
 	action_context.succeed()
 
 func _apply_show_help(action_context: ActionContext) -> void:

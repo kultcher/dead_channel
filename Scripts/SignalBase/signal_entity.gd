@@ -7,6 +7,8 @@ extends Node2D
 @onready var target_indicator: Node2D = $TargetIndicator
 
 @onready var scan_radial = $ScanRadial
+@onready var scan_queue_label: Label = $ScanQueueLabel
+
 @onready var tooltip_main = $DetailTooltip
 
 @onready var detection_controller = $DetectionController
@@ -29,6 +31,7 @@ signal hover_ended(hovered_signal: ActiveSignal)
 
 func _ready():
 	scan_radial.visible = false
+	scan_queue_label.visible = false
 	set_process(true)
 	if target_indicator != null and target_indicator.has_method("initialize"):
 		target_indicator.initialize(self)
@@ -163,6 +166,21 @@ func scan_cleanup():
 	scan_radial.visible = false
 	if my_active_sig != null:
 		refresh_scan_status()
+
+func set_scan_queue_position(queue_position: int) -> void:
+	if scan_queue_label == null:
+		return
+	if queue_position <= 0:
+		clear_scan_queue_position()
+		return
+	scan_queue_label.text = str(queue_position)
+	scan_queue_label.visible = true
+
+func clear_scan_queue_position() -> void:
+	if scan_queue_label == null:
+		return
+	scan_queue_label.text = ""
+	scan_queue_label.visible = false
 
 func initialize_tooltip():
 	tooltip_main.tt_header.text = my_data.display_name
