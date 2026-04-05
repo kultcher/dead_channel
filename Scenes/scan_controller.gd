@@ -8,13 +8,17 @@ func _process(delta):
 	if currently_scanning_signal != null:
 		_process_active_scan(delta)
 
-func begin_hover(target_signal: ActiveSignal) -> void:
+func toggle_scan(target_signal: ActiveSignal) -> void:
 	if not GlobalEvents.is_tutorial_feature_enabled("scan"):
 		return
+	if target_signal == null:
+		return
+	if currently_scanning_signal == target_signal:
+		cancel_scan(target_signal)
+		return
+	if target_signal.current_scan_index >= target_signal.scan_layers.size():
+		return
 	start_signal_scan(target_signal)
-
-func end_hover(active_sig: ActiveSignal = null) -> void:
-	cancel_scan(active_sig)
 
 func toggle_lock(clicked_signal: ActiveSignal) -> void:
 	if not GlobalEvents.is_tutorial_feature_enabled("scan"):
@@ -33,16 +37,17 @@ func start_signal_scan(target_signal: ActiveSignal):
 		return
 	if signal_manager != null and not signal_manager.is_signal_within_interaction_range(target_signal):
 		return
+	if target_signal.current_scan_index >= target_signal.scan_layers.size():
+		return
 
 	if currently_scanning_signal != null and currently_scanning_signal != target_signal:
-		_cleanup_scan_visuals(currently_scanning_signal)
+		cancel_scan(currently_scanning_signal)
 
 	currently_scanning_signal = target_signal
 	target_signal.is_being_scanned = true
 
 	target_signal.instance_node.bring_to_front()
 	target_signal.instance_node.show_scanning_tooltip()
-	target_signal.instance_node.set_scan_highlight(true)
 
 func handle_lock_toggle(clicked_signal: ActiveSignal):
 	if clicked_signal == null:
@@ -56,7 +61,7 @@ func handle_lock_toggle(clicked_signal: ActiveSignal):
 		clicked_signal.instance_node.bring_to_front()
 
 func cancel_scan(active_sig: ActiveSignal = null):
-	if currently_scanning_signal != active_sig:
+	if active_sig == null or currently_scanning_signal != active_sig:
 		return
 
 	active_sig.current_layer_progress = 0
@@ -107,5 +112,4 @@ func _complete_scan_layer(sig: ActiveSignal, layer):
 func _cleanup_scan_visuals(sig: ActiveSignal):
 	sig.is_being_scanned = false
 	if sig.instance_node != null:
-		sig.instance_node.set_scan_highlight(false)
 		sig.instance_node.refresh_scan_status()

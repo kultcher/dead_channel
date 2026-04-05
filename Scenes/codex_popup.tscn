@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d2qmwye10uij3"]
 
-[ext_resource type="Script" uid="uid://bqtg3iwfjr0ov" path="res://codex_popup.gd" id="1_dvmgm"]
+[ext_resource type="Script" uid="uid://bqtg3iwfjr0ov" path="res://Scripts/codex_popup.gd" id="1_dvmgm"]
 [ext_resource type="Texture2D" uid="uid://bmo0ymjiuo6vj" path="res://Visuals/Icons/Simple/anticlockwise-rotation.svg" id="2_12vnh"]
 [ext_resource type="StyleBox" uid="uid://cjkpqgdj663bg" path="res://Resources/StyleBox/orange_button_pressed.tres" id="3_12vnh"]
 

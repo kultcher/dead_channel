@@ -53,6 +53,14 @@ visual ideas:
 	- ALERT SIGNALS: special, off-timeline signals that spawn guards and do other bad stuff
 
 
+	UX enhancements:
+	Move "run" to "crack" and remove middle step
+
+	Add "guess the cipher" to decrypt options
+
+	Ui button for "OP" and other effects
+
+
 	T1 ice: reboot, punish, lockout
 	ICE classes: 
 		-white: purely defensive

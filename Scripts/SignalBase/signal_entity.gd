@@ -14,6 +14,7 @@ extends Node2D
 var mobility_controller: MobilityController = null
 var _guard_revealed: bool = true
 var _alert_visual_t: float = 0.0
+var _is_hover_highlighted: bool = false
 
 var my_data: SignalData
 var my_active_sig: ActiveSignal
@@ -21,9 +22,10 @@ var my_active_sig: ActiveSignal
 var is_disabled: bool = false
 
 signal signal_interaction(data: SignalData)
-signal scan_requested(clicked_signal: ActiveSignal)
-signal scan_aborted(scanning_signal: ActiveSignal)
-signal scan_lock_requested(scanning_signal: ActiveSignal)
+signal scan_toggle_requested(clicked_signal: ActiveSignal)
+signal tooltip_lock_requested(target_signal: ActiveSignal)
+signal hover_started(hovered_signal: ActiveSignal)
+signal hover_ended(hovered_signal: ActiveSignal)
 
 func _ready():
 	scan_radial.visible = false
@@ -86,8 +88,10 @@ func _process(delta: float) -> void:
 		shape.rotation_degrees = _get_visual_facing_deg()
 
 	if my_data == null or mobility_controller == null:
+		_apply_base_highlight_state()
 		return
 	if my_data.type != SignalData.Type.GUARD and my_data.type != SignalData.Type.DRONE:
+		_apply_base_highlight_state()
 		return
 	if not _guard_revealed:
 		return
@@ -99,7 +103,7 @@ func _process(delta: float) -> void:
 		return
 
 	_alert_visual_t = 0.0
-	shape.self_modulate = Color.WHITE
+	_apply_base_highlight_state()
 
 func _get_visual_facing_deg() -> float:
 	if my_active_sig == null:
@@ -134,14 +138,15 @@ func set_guard_revealed(is_revealed: bool) -> void:
 	else:
 		set_session_indicator_state(0)
 
-func set_scan_highlight(active: bool):
-	if active:
+func set_hover_highlight(active: bool):
+	_is_hover_highlighted = active
+	_apply_base_highlight_state()
+
+func _apply_base_highlight_state() -> void:
+	if _is_hover_highlighted:
 		shape.self_modulate = Color(0.5, 1.0, 0.5) # Turn Greenish
 	else:
-		if my_data != null and my_data.type == SignalData.Type.GUARD and mobility_controller != null and mobility_controller.is_in_alert_state():
-			_alert_visual_t = 0.0
-		else:
-			shape.self_modulate = Color.WHITE
+		shape.self_modulate = Color.WHITE
 
 func update_scan_progress(current: float, max_duration: float):
 	if not scan_radial.visible:
@@ -226,13 +231,16 @@ func _on_area_2d_input_event(_viewport: Node, event: InputEvent, _shape_idx: int
 			signal_interaction.emit(my_active_sig)
 			
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			scan_lock_requested.emit(my_active_sig)
+			scan_toggle_requested.emit(my_active_sig)
+			
+		elif event.button_index == MOUSE_BUTTON_MIDDLE and event.pressed:
+			tooltip_lock_requested.emit(my_active_sig)
 
 func _on_area_2d_mouse_entered() -> void:
-	scan_requested.emit(my_active_sig)
+	hover_started.emit(my_active_sig)
 
 func _on_area_2d_mouse_exited() -> void:
-	scan_aborted.emit(my_active_sig)
+	hover_ended.emit(my_active_sig)
 
 func get_focus_rect() -> Rect2:
 	var icon_shape: CollisionShape2D = $SignalIcon/IconCollision

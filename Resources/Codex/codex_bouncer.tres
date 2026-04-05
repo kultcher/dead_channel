@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CodexEntry" format=3 uid="uid://bnnvnj06y45an"]
 
 [ext_resource type="Texture2D" uid="uid://c4vbdv0o28omt" path="res://Visuals/Icons/Simple/shield-reflect.svg" id="1_acp8o"]
-[ext_resource type="Script" uid="uid://bcwfqttb2lhqa" path="res://codex_entry.gd" id="2_o15od"]
+[ext_resource type="Script" uid="uid://bcwfqttb2lhqa" path="res://Scripts/codex_entry.gd" id="2_o15od"]
 
 [resource]
 script = ExtResource("2_o15od")
