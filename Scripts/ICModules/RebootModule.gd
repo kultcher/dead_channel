@@ -4,12 +4,20 @@ class_name RebootModule extends ICModule
 
 var timer: Timer
 
+const DIFFICULTY_REBOOT_TIMES := [3.0, 5.0, 10.0, 15.0]
+
 func get_desc():
 	var desc: String = "Reboot(%ds)" % reboot_time
 	return desc
 
 func get_codex_id():
 	return &"codex_reboot"
+
+func apply_difficulty(difficulty: int) -> void:
+	reboot_time = float(_pick_difficulty_value(DIFFICULTY_REBOOT_TIMES, difficulty))
+
+func apply_params(params: Dictionary) -> void:
+	reboot_time = float(params.get("reboot_time", reboot_time))
 
 func postprocess_action(action_context: ActionContext) -> void:
 	print("REBOOT POST PROC")

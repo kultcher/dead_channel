@@ -21,6 +21,7 @@ func get_spawns() -> Array[Dictionary]:
 			.detection_sweep([-1, 3], [180, 3])
 			.add_ic_custom("reboot", {"reboot_time": 3.0})
 			.add_ic_custom("faraday", {"max_runner_distance_cells": 3.0})
+			.add_ic("haze", 1)
 			.build(),
 		spawn(PANNING_CAMERA, 6.5)
 			.id("cam_04")

@@ -4,11 +4,19 @@ class_name BouncerModule extends ICModule
 
 var timer: Timer = null
 
+const DIFFICULTY_DISCONNECT_TIMES := [2.0, 3.0, 4.0, 5.0]
+
 func get_desc():
 	return "Bouncer(%.1fs)" % time_to_disconnect
 
 func get_codex_id():
 	return &"codex_bouncer"
+
+func apply_difficulty(difficulty: int) -> void:
+	time_to_disconnect = float(_pick_difficulty_value(DIFFICULTY_DISCONNECT_TIMES, difficulty))
+
+func apply_params(params: Dictionary) -> void:
+	time_to_disconnect = float(params.get("time_to_disconnect", time_to_disconnect))
 
 func postprocess_action(action_context: ActionContext) -> void:
 	if action_context == null or not action_context.was_successful():

@@ -9,12 +9,15 @@ extends PanelContainer
 
 func setup_and_display(codex_id: StringName):
 	var entry = get_resource_from_stringname(codex_id)
-	if entry == null: return
+	if entry == null:
+		queue_free()
+		return
 	title_label.text = entry.title
 	type_label.text = entry.category
 	extra_label.text = entry.extra
 	icon.texture = entry.icon
 	body.text = entry.body_text
+	self.show()
 	get_tree().paused = true
 
 
@@ -30,6 +33,9 @@ func _close_popup():
 	queue_free()
 
 func get_resource_from_stringname(codex_id: StringName) -> Resource:
-	var target: String = "res://Resources/Codex/" + StringName(codex_id) + ".tres"	
-	var entry = load(target)
+	var entry: Resource = null
+	var target: String = "res://Resources/Codex/" + StringName(codex_id) + ".tres"
+	if FileAccess.file_exists(target):
+		entry = load(target)
+	else: push_warning("Codex entry not found.")
 	return entry

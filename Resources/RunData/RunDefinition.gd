@@ -206,45 +206,21 @@ func make_ic(modules: Array[Resource] = []) -> ICComponent:
 	ic.modules.assign(modules)
 	return ic
 
-func make_reboot_module(reboot_time: float = 5.0) -> RebootModule:
-	var module := RebootModule.new()
-	module.reboot_time = reboot_time
-	return module
-
-func make_faraday_module(max_runner_distance_cells: float = 2.0) -> FaradayModule:
-	var module := FaradayModule.new()
-	module.max_runner_distance_cells = max_runner_distance_cells
-	return module
-
-func make_bouncer_module(bounce_time: float = 3.0) -> BouncerModule:
-	var module := BouncerModule.new()
-	module.time_to_disconnect = bounce_time
-	return module
-
 func build_ic(name: StringName, difficulty: int) -> Resource:
 	var ic_name := String(name).to_lower()
-	match ic_name:
-		"reboot":
-			var reboot_times := [3.0, 5.0, 10.0, 15.0]
-			return make_reboot_module(_pick_difficulty_value(reboot_times, difficulty))
-		"faraday":
-			var faraday_ranges := [1.5, 2.0, 3.0, 4.0]
-			return make_faraday_module(_pick_difficulty_value(faraday_ranges, difficulty))
-		"bouncer":
-			var bouncer_times := [2.0, 3.0, 4.0, 5.0]
-			return make_bouncer_module(_pick_difficulty_value(bouncer_times, difficulty))
-	return null
+	var module := _create_ic_module(ic_name)
+	if module == null:
+		return null
+	module.apply_difficulty(difficulty)
+	return module
 
 func build_custom_ic(name: StringName, params: Dictionary) -> Resource:
 	var ic_name := String(name).to_lower()
-	match ic_name:
-		"reboot":
-			return make_reboot_module(float(params.get("reboot_time", 5.0)))
-		"faraday":
-			return make_faraday_module(float(params.get("max_runner_distance_cells", 2.0)))
-		"bouncer":
-			return make_bouncer_module(float(params.get("time_to_disconnect", 3.0)))
-	return null
+	var module := _create_ic_module(ic_name)
+	if module == null:
+		return null
+	module.apply_params(params)
+	return module
 
 func build_puzzle(name: StringName, difficulty: int) -> PuzzleComponent:
 	var puzzle_name := String(name).to_lower()
@@ -384,8 +360,14 @@ func make_disruptor(
 	disruptor.max_alert_targets = max_alert_targets
 	return disruptor
 
-func _pick_difficulty_value(values: Array, difficulty: int):
-	if values.is_empty():
+func _create_ic_module(name: String) -> ICModule:
+	var factory_map := {
+		"reboot": func() -> ICModule: return RebootModule.new(),
+		"faraday": func() -> ICModule: return FaradayModule.new(),
+		"bouncer": func() -> ICModule: return BouncerModule.new(),
+		"haze": func() -> ICModule: return HazeModule.new(),
+	}
+	var factory = factory_map.get(name, null)
+	if factory == null:
 		return null
-	var clamped_index := clampi(difficulty, 0, values.size() - 1)
-	return values[clamped_index]
+	return factory.call()

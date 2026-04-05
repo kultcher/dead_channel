@@ -15,6 +15,12 @@ func get_codex_id():
 func bind_to_context(signal_data: SignalData, terminal_ref: Control):
 	pass
 
+func apply_difficulty(_difficulty: int) -> void:
+	pass
+
+func apply_params(_params: Dictionary) -> void:
+	pass
+
 func process_action(_action_context: ActionContext) -> void:
 	pass
 
@@ -35,3 +41,9 @@ func on_enabled(active_sig: ActiveSignal):
 
 func get_connection_flow_lines(_active_sig: ActiveSignal) -> Array[String]:
 	return []
+
+func _pick_difficulty_value(values: Array, difficulty: int):
+	if values.is_empty():
+		return null
+	var clamped_index := clampi(difficulty - 1, 0, values.size() - 1)
+	return values[clamped_index]

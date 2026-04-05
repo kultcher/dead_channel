@@ -24,6 +24,7 @@ content_margin_bottom = 3.0
 bg_color = Color(0.14509805, 0.14509805, 0.14509805, 0.49019608)
 
 [node name="CodexPopup" type="PanelContainer" unique_id=1495871548]
+visible = false
 offset_right = 223.0
 offset_bottom = 232.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_12vnh")

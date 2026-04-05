@@ -73,27 +73,30 @@ Development Progress
 4/1/2026:
 - Cleaned up terminal window and cutscene controller a little bit
 
+4/5/2026:
+- Moved to RAM-based right-click scanning
+- Added Haze IC
+
 Short-term TODO:
-- RAM-based scanning
 - Fuzz
-- Robust heat implementation with difficulty scaling and global alerts
-- out-of-timeline alert/alarms
+- Robust heat implementation with difficulty scaling and out-of-timeline global alert/alarms
 - More and more advanced IC
 - procgen
-- Programs: Custom tooltips
-- Tutorial: Better solution for hiding tooltips
-- FIX: Distraction "wasting" charges... also check proximity?
+- FIX: Distraction "wasting" charges... also check proximity? Should target forward-most signal in range?
+
 - TUTORIAL: Do cohesion pass
+- Tutorial: Better solution for hiding tooltips
 - end sequence z-index stuff
 
 Polish TODO:
 Code:
 - Split out tutorial script and logic
-- Circle back: Check handoff from command_context to actioncontext - should various edge case fails make it to action step?
-- Make puzzles more Godot-y
-- Cleanup cutscene controller (hardcode textures)
+- Circle back: Check handoff from command_context to actioncontext - should various edge case fails make it to action step or be handled earlier? (i.e. no kill on doors)
+- Make puzzles more Godot-y (instead of built-by-code)
+- Cleanup cutscene controller (hardcoded textures)
 
 Game:
+- Programs: Custom tooltips
 - Add "victory sequence" for Decrypt
 - Add active signal label to puzzles
 - add ciphers and on-solve trigger to codex
@@ -121,6 +124,7 @@ x watch out for disabled terminal before null_lab
 
 
 Not Yet Implemented (priority):
+- planning mode prototype
 - finalize early jargonizer
 - guard comms pings
 - New signals: hazards, terminals, motion sensors, cyberguards, turrets
