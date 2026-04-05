@@ -74,9 +74,12 @@ Development Progress
 - Cleaned up terminal window and cutscene controller a little bit
 
 Short-term TODO:
-- Robust heat implementation with difficulty scaling
+- RAM-based scanning
+- Fuzz
+- Robust heat implementation with difficulty scaling and global alerts
 - out-of-timeline alert/alarms
 - More and more advanced IC
+- procgen
 - Programs: Custom tooltips
 - Tutorial: Better solution for hiding tooltips
 - FIX: Distraction "wasting" charges... also check proximity?

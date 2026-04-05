@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="CodexEntry" format=3 uid="uid://c2qjwqhwkmoej"]
 
 [ext_resource type="Texture2D" uid="uid://dx8lunef0w5ht" path="res://Visuals/Icons/Simple/caged-ball.svg" id="1_dc2pr"]
-[ext_resource type="Script" uid="uid://bcwfqttb2lhqa" path="res://codex_entry.gd" id="2_q0snw"]
+[ext_resource type="Script" uid="uid://bcwfqttb2lhqa" path="res://Scripts/codex_entry.gd" id="2_q0snw"]
 
 [resource]
 script = ExtResource("2_q0snw")

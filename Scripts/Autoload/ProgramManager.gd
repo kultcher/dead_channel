@@ -37,8 +37,12 @@ func _ready() -> void:
 		program_executed.connect(GlobalEvents.program_executed.emit)
 	if not program_cleanup_finished.is_connected(GlobalEvents.program_cleanup_finished.emit):
 		program_cleanup_finished.connect(GlobalEvents.program_cleanup_finished.emit)
+	if RAMManager != null and not RAMManager.total_ram_changed.is_connected(_on_ram_manager_total_changed):
+		RAMManager.total_ram_changed.connect(_on_ram_manager_total_changed)
 
 	_install_player_loadout()
+	if RAMManager != null:
+		total_ram = RAMManager.total_ram
 	total_ram_changed.emit(total_ram)
 	_emit_ram_usage_changed()
 
@@ -140,6 +144,8 @@ func get_used_ram() -> int:
 	return used_ram
 
 func get_available_ram() -> int:
+	if RAMManager != null and RAMManager.has_method("get_available_ram"):
+		return RAMManager.get_available_ram()
 	return maxi(0, total_ram - get_used_ram())
 
 func preprocess_action(action_context: ActionContext) -> void:
@@ -166,11 +172,14 @@ func _can_afford_state_transition(program: ProgramInstance, target_state: int) -
 	if program == null or program.definition == null:
 		return false
 	var target_cost := program.definition.get_phase_ram_cost(target_state)
-	var projected_ram := get_used_ram() - program.get_current_ram_cost() + target_cost
-	return projected_ram <= total_ram
+	var projected_program_ram := get_used_ram() - program.get_current_ram_cost() + target_cost
+	var reserved_ram := RAMManager.get_reserved_ram() if RAMManager != null and RAMManager.has_method("get_reserved_ram") else 0
+	var ram_cap := RAMManager.total_ram if RAMManager != null else total_ram
+	return projected_program_ram + reserved_ram <= ram_cap
 
 func _emit_ram_usage_changed() -> void:
-	ram_usage_changed.emit(get_used_ram(), total_ram)
+	var ram_cap := RAMManager.total_ram if RAMManager != null else total_ram
+	ram_usage_changed.emit(get_used_ram(), ram_cap)
 
 func _handle_state_transition_notices(program: ProgramInstance, old_state: int, new_state: int) -> void:
 	if program == null:
@@ -205,3 +214,8 @@ func _install_player_loadout() -> void:
 		return
 	for definition in PlayerData.get_equipped_programs():
 		install_program(definition)
+
+func _on_ram_manager_total_changed(new_total_ram: int) -> void:
+	total_ram = maxi(0, new_total_ram)
+	total_ram_changed.emit(total_ram)
+	_emit_ram_usage_changed()

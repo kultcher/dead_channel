@@ -98,10 +98,13 @@ func update_signal_position():
 				add_child(new_node)
 				new_node.setup(active_sig)
 				new_node.signal_interaction.connect(_on_signal_left_clicked)
-				new_node.scan_lock_requested.connect(_on_signal_right_clicked)
-				new_node.scan_requested.connect(_on_signal_mouse_enter)
-				new_node.scan_aborted.connect(_on_signal_mouse_exit)
+				new_node.scan_toggle_requested.connect(_on_signal_right_clicked)
+				new_node.tooltip_lock_requested.connect(_on_signal_middle_clicked)
+				new_node.hover_started.connect(_on_signal_mouse_enter)
+				new_node.hover_ended.connect(_on_signal_mouse_exit)
 				active_sig.instance_node = new_node
+				if scan_controller != null and scan_controller.has_method("sync_signal_queue_visuals"):
+					scan_controller.sync_signal_queue_visuals()
 			
 			var visual_y = (signal_lane * timeline_manager.lane_height) + (timeline_manager.lane_height * 0.5)
 			var render_offset := active_sig.runtime_render_offset
@@ -138,11 +141,18 @@ func _on_signal_mouse_enter(signal_entered: ActiveSignal):
 	if not is_signal_within_interaction_range(signal_entered):
 		return
 	if signal_entered != null and signal_entered.instance_node != null:
+		signal_entered.instance_node.set_hover_highlight(true)
 		signal_entered.instance_node.show_hover_tooltip()
-	if scan_controller != null:
-		scan_controller.begin_hover(signal_entered)
 
 func _on_signal_right_clicked(signal_clicked: ActiveSignal):
+	if not GlobalEvents.is_tutorial_feature_enabled("scan"):
+		return
+	if not is_signal_within_interaction_range(signal_clicked):
+		return
+	if scan_controller != null:
+		scan_controller.toggle_scan(signal_clicked)
+
+func _on_signal_middle_clicked(signal_clicked: ActiveSignal):
 	if not GlobalEvents.is_tutorial_feature_enabled("scan"):
 		return
 	if not is_signal_within_interaction_range(signal_clicked):
@@ -151,9 +161,8 @@ func _on_signal_right_clicked(signal_clicked: ActiveSignal):
 		scan_controller.toggle_lock(signal_clicked)
 	
 func _on_signal_mouse_exit(signal_exited: ActiveSignal):
-	if scan_controller != null:
-		scan_controller.end_hover(signal_exited)
 	if signal_exited != null and signal_exited.instance_node != null:
+		signal_exited.instance_node.set_hover_highlight(false)
 		signal_exited.instance_node.fade_tooltip_body()
 
 func _on_terminal_session_visual_changed(active_sig: ActiveSignal) -> void:

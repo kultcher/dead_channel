@@ -13,6 +13,8 @@ func process_action(action_context: ActionContext) -> void:
 		return
 	if action_context.action_type == ActionContext.ActionType.ACCESS_SIGNAL:
 		return
+	if action_context.action_type == ActionContext.ActionType.START_SCAN_SIGNAL:
+		return
 	if CommandDispatch.signal_manager == null:
 		return
 

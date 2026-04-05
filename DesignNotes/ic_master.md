@@ -174,6 +174,43 @@ Ransom: ransomware type effect?
 
 ????Honeypot: the apparent best target is bait???
 
+_______
+
+NEWEST:
+- Tether: Two linked signals, both have to be disabled within a window or they reboot
+- Leash: Linked signals, only one can be inactive at a time
+- Siphon: While connected to this signal, others get buffed
+- Chorus: IC only active if multiple connections
+- Parasite: IC migrates to other signals when killed
+- Mimic: Copies another signal's scan data
+- Desync: State changes are not reflected on the timeline
+- Repeater: Commands run on this signal are automnatically run on the next signal you connect to
+- Inflation: All RAM costs increased by 1 while connected. Like a super leech.
+- Audit: Recurring checksum
+- Split: Connecting to this signal forces your terminal to split into two panes. Commands randomly go to one pane or the other. Output appears in the wrong pane. You're playing a "which terminal am I actually typing into" game while also trying to hack.???
+- Shuffle: Tabs are obfuscated
+- Palimpsest: Enhanced Shy: rewrites scan data with MISNINFORMATION
+- Siren: Fakes a "runner damaged" event
+- Crosstalk: Commands input into other sessions leak into this one
+- Keepalive: Requires periodic keypress to maintain connection.
+- PlayDead: Reboots when player disconnects.
+- Tinnitus: Audio-only disruptor.
+- Tar Pit: Extends the duration of any cleanup? Maybe forces active programs into cleanup?
+- Dead Man's Switch: If connected when <trigger>, causes heat spike or other badness
+- Symbiote: Hidden. "Replaces" a program in your toolbar, causing it to occasionally fail or fail on next use.
+- Relay Feedback: Causes negative effect on the runner
+- Proximity Mine: Subverts standard triggers, replacing with a proximity trigger.
+- Redact: Partially Censors names of other IC
+- Dyslexia: Rearranges letters. Maybe only in some words?
+- Haunted cursor - Cursor jumps to a random position after each character
+- Booster: Increases capabilities of thing (faster camera movement)
+- Lockon: Causes detection to lock-on
+
+
+
+Globals:
+- Poltergeist: Special IC package that jumps around signals on the timeline.
+
 
 
 Luxon IC: mutate, evolve
