@@ -199,6 +199,12 @@ static func _build_fallback_bank() -> Dictionary:
 				"OUTPUT MODE: PULSE",
 				"SYNC: STANDBY",
 				"RANGE PROFILE: LOCAL"
+			],
+			"status_escalation": [
+				"COUNTERMEASURE LINK: LIVE",
+				"THREAT WEIGHTING: ESCALATING",
+				"RESPONSE MESH: STAGED",
+				"ALERT ROUTING: GLOBAL"
 			]
 		},
 		SECTION_CORP_SPECIFIC: {}
@@ -283,6 +289,8 @@ static func _collect_installed_modules(active_sig: ActiveSignal) -> Array[String
 			modules.append_array(["session.sys", "audit.sys"])
 		SignalData.Type.DISRUPTOR:
 			modules.append_array(["pulse.sys", "targeting.sys"])
+		SignalData.Type.ESCALATION:
+			modules.append_array(["threat_mesh.sys", "dispatch.sys"])
 		_:
 			modules.append("kernel.sys")
 
@@ -422,6 +430,8 @@ static func _get_type_status_category(signal_type: int) -> String:
 			return "status_terminal"
 		SignalData.Type.DISRUPTOR:
 			return "status_disruptor"
+		SignalData.Type.ESCALATION:
+			return "status_escalation"
 		_:
 			return "status_universal"
 

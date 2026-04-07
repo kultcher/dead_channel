@@ -66,6 +66,8 @@ func setup():
 		data.puzzle.ensure_initial_lock_state()
 	if data.type == SignalData.Type.DOOR:
 		set_door_locked(data.door_locked)
+	if data.escalation != null:
+		data.escalation.initialize(self)
 
 func disable_signal():
 	is_disabled = true
@@ -76,6 +78,8 @@ func disable_signal():
 		instance_node.update_visuals()
 	if data.ic_modules:
 		data.ic_modules.notify_disabled(self)
+	if data.escalation != null:
+		data.escalation.on_disabled(self)
 
 func enable_signal():
 	is_disabled = false
@@ -84,6 +88,8 @@ func enable_signal():
 		instance_node.update_visuals()
 	if data.ic_modules:
 		data.ic_modules.notify_enabled(self)
+	if data.escalation != null:
+		data.escalation.on_enabled(self)
 
 func generate_scan_layers():
 	scan_layers.clear()

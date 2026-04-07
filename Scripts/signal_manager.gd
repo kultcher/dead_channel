@@ -7,6 +7,7 @@ extends Node2D
 @onready var window_manager = $"../../WindowManager"
 @onready var terminal_window = $"../../WorkspaceAnchor/TerminalWindow"
 @onready var scan_controller = $"../ScanController"
+@onready var escalation_manager = $"../../EscalationManager"
 @onready var spawner = SignalSpawner.new()
 
 var signal_scene = preload("res://Scenes/signal_entity.tscn")
@@ -42,6 +43,8 @@ func get_signal_by_system_id(system_id: String) -> ActiveSignal:
 	for sig in signal_queue:
 		if sig != null and sig.data != null and sig.data.system_id == system_id:
 			return sig
+	if escalation_manager != null and escalation_manager.has_method("get_signal_by_system_id"):
+		return escalation_manager.get_signal_by_system_id(system_id)
 	return null
 
 func has_signal_in_network(system_id: String) -> bool:
@@ -62,6 +65,8 @@ func get_horizontal_runner_distance_cells(active_sig: ActiveSignal) -> float:
 func is_signal_within_interaction_range(active_sig: ActiveSignal) -> bool:
 	if active_sig == null or timeline_manager == null:
 		return false
+	if active_sig.data != null and active_sig.data.type == SignalData.Type.ESCALATION:
+		return true
 	return get_horizontal_runner_distance_cells(active_sig) <= timeline_manager.signal_interaction_range_cells
 	
 func _process(delta):

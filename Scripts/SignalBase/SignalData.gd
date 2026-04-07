@@ -3,7 +3,7 @@
 
 class_name SignalData extends Resource
 
-enum Type { DOOR, CAMERA, TRAP, DRONE, GUARD, INFO, DISRUPTOR, TERMINAL, MISC }
+enum Type { DOOR, CAMERA, TRAP, DRONE, GUARD, INFO, DISRUPTOR, TERMINAL, ESCALATION, MISC }
 enum VisualState { HIDDEN, UNKNOWN, SPOOFED, REVEALED }
 
 var identity_dict = {
@@ -13,6 +13,7 @@ var identity_dict = {
 	Type.GUARD: "Guard | Bio",
 	Type.DISRUPTOR: "Disruptor | Mech",
 	Type.TERMINAL: "Terminal | Mech",
+	Type.ESCALATION: "Escalation | IC",
  }
 
 # IDENTIFIERS
@@ -39,3 +40,4 @@ var identity_dict = {
 @export var ic_modules: ICComponent
 @export var mobility: MobilityComponent
 @export var disruptor: DisruptorComponent
+@export var escalation: EscalationComponent

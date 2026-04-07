@@ -294,7 +294,7 @@ func _run_lab_reveal_sequence() -> void:
 		"You need to come inside and see this."
 	], "", Rect2(), Vector2(750,300), true)
 
-	GlobalEvents.heat_changed.emit(0)
+	GlobalEvents.heat_set_requested.emit(0)
 	window_manager.objective_tracker.hide()
 
 	await get_tree().create_timer(1).timeout

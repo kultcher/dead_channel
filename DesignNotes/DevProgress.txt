@@ -77,13 +77,18 @@ Development Progress
 - Moved to RAM-based right-click scanning
 - Added Haze IC
 
+4/7/2026:
+- Added basic escalation with drone spawning
+
 Short-term TODO:
-- Fuzz
-- Robust heat implementation with difficulty scaling and out-of-timeline global alert/alarms
+- Escalation ICE
 - More and more advanced IC
 - procgen
+- Fuzz
 - FIX: Distraction "wasting" charges... also check proximity? Should target forward-most signal in range?
 
+- Tutorial: Disable escalation
+- Tutorial: Rewrite/work for right-click scanning
 - TUTORIAL: Do cohesion pass
 - Tutorial: Better solution for hiding tooltips
 - end sequence z-index stuff

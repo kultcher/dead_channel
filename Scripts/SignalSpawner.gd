@@ -7,6 +7,7 @@ var door_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/door_vi
 var door_unlocked_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/door_unlocked_visuals.tres")
 var guard_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/guard_visuals.tres")
 var disruptor_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/disruptor_visuals.tres")
+var escalation_visuals: SignalVisuals = preload("res://Resources/SignalVisuals/escalation_visuals.tres")
 
 func create_test_cam(id, lane):
 	var cam = SignalData.new()
@@ -150,6 +151,27 @@ func create_test_disruptor(id: String, lane: int) -> SignalData:
 	disruptor.disruptor = disruptor_component
 
 	return disruptor
+
+func create_escalation_signal(id: String, lane: int = 2) -> SignalData:
+	var escalation := SignalData.new()
+	escalation.type = SignalData.Type.ESCALATION
+	escalation.lane = lane
+	escalation.system_id = "esc_" + id
+	escalation.display_name = "ESC-" + id.to_upper()
+	escalation.visuals = escalation_visuals
+
+	var hackable := HackableComponent.new()
+	escalation.hackable = hackable
+
+	var ic := ICComponent.new()
+	escalation.ic_modules = ic
+
+	var escalation_component := EscalationComponent.new()
+	escalation_component.tier_index = maxi(0, int(id) - 1)
+	escalation_component.spawn_behavior = EscalationSpawnBehavior.new()
+	escalation.escalation = escalation_component
+
+	return escalation
 
 func _make_absolute_patrol_point(
 	base_cell_x: float,
