@@ -1,8 +1,26 @@
 [gd_scene format=3 uid="uid://cdbk7lcnj3n2j"]
 
+[ext_resource type="Shader" uid="uid://0wglleb1rff6" path="res://Shaders/signal_sweep_heartbeat.gdshader" id="1_qg775"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pfk58"]
+shader = ExtResource("1_qg775")
+shader_parameter/sweep_position = 0.6400000304
+shader_parameter/sweep_width = 0.045
+shader_parameter/sweep_softness = 0.08
+shader_parameter/leading_edge_bias = 1.6
+shader_parameter/trailing_falloff = 1.1
+shader_parameter/brightness_boost = 0.45
+shader_parameter/glow_strength = 0.65
+shader_parameter/rim_strength = 0.55
+shader_parameter/glow_tint = Color(0.72, 0.96, 1, 1)
+shader_parameter/breakup_strength = 1.0
+shader_parameter/breakup_scale = 80.0
+
 [node name="Polygon2D" type="Node2D" unique_id=729301136]
 
 [node name="Polygon2D" type="Polygon2D" parent="." unique_id=966295149]
+modulate = Color(0.011764706, 0.05882353, 1, 1)
+material = SubResource("ShaderMaterial_pfk58")
 position = Vector2(1, 0)
 scale = Vector2(2, 0.8749998)
 polygon = PackedVector2Array(14, 54.857155, 18, 54.857155, 18, 42, 27.5, 55, 30, 48, 20, 35.42858, 32, 35.42858, 32, 28.571436, 20, 28.571436, 22.573593, 25.16578, 29.5, 16.000004, 27, 9.142859, 18, 22, 18, 9.142859, 14, 9.142859, 14, 22, 5, 9.142859, 2.5, 14.857146, 11, 28, 0, 28, 0, 36, 11, 36, 2.5, 48, 5, 56, 14, 42)

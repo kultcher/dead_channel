@@ -8,7 +8,7 @@ const NULL_SPIKE_SYNC_SHADER = preload("res://Shaders/null_spike_sync.gdshader")
 @onready var strobe_rect = $StrobeRect
 @onready var flash_rect = $FlashRect
 @onready var null_spike_sync_wash = $NullSpikeSyncWash
-@onready var null_spike_sync_overlay = $"../SignalTimeline/NullSpikeSyncOverlay"
+@onready var null_spike_sync_overlay = $"../SignalTimeline/GridLayer/NullSpikeSyncOverlay"
 
 var _alarm_tween: Tween
 var _alarm_active := false

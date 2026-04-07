@@ -23,6 +23,7 @@ var my_data: SignalData
 var my_active_sig: ActiveSignal
 
 var is_disabled: bool = false
+var _shape_sweep_material: ShaderMaterial = null
 
 signal signal_interaction(data: SignalData)
 signal scan_toggle_requested(clicked_signal: ActiveSignal)
@@ -33,6 +34,7 @@ signal hover_ended(hovered_signal: ActiveSignal)
 func _ready():
 	scan_radial.visible = false
 	scan_queue_label.visible = false
+	_shape_sweep_material = shape.material as ShaderMaterial
 	set_process(true)
 	if target_indicator != null and target_indicator.has_method("initialize"):
 		target_indicator.initialize(self)
@@ -88,6 +90,8 @@ func update_visuals():
 	shape.rotation_degrees = _get_visual_facing_deg()
 
 func _process(delta: float) -> void:
+	_update_signal_sweep_shader()
+
 	if my_active_sig != null:
 		shape.rotation_degrees = _get_visual_facing_deg()
 
@@ -108,6 +112,16 @@ func _process(delta: float) -> void:
 
 	_alert_visual_t = 0.0
 	_apply_base_highlight_state()
+
+func _update_signal_sweep_shader() -> void:
+	if _shape_sweep_material == null:
+		return
+	if CommandDispatch.timeline_manager == null:
+		return
+	_shape_sweep_material.set_shader_parameter(
+		"sweep_position",
+		CommandDispatch.timeline_manager.get_signal_sweep_x()
+	)
 
 func _get_visual_facing_deg() -> float:
 	if my_active_sig == null:

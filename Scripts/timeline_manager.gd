@@ -14,6 +14,10 @@ extends Node2D
 @export var min_timeline_height_px: float = 180.0
 @export var max_timeline_height_px: float = 360.0
 @export var signal_interaction_range_cells: float = 8.0
+@export var signal_sweep_enabled: bool = true
+@export var signal_sweep_cycle_sec: float = 8.5
+@export var signal_sweep_start_x: float = -0.1
+@export var signal_sweep_end_x: float = 1.1
 
 
 # TIMELINE DIMENSIONS
@@ -35,9 +39,12 @@ var tutorial_locked: bool = false
 var _time_scale_tween: Tween
 var _view_offset_tween: Tween
 var view_offset_cells: float = 0.0
+var signal_sweep_normalized_x: float = 1.1
 
 # REGISTRATION
 @onready var signal_manager = $"../SignalManager"
+@onready var breathe_overlay = $"../GridLayer/TimelineBreathEffect"
+@onready var _sweep_breathe_material: Material = breathe_overlay.material
 
 # SIGNALS (to update UI later)
 signal speed_changed(new_speed)
@@ -48,6 +55,7 @@ func _ready():
 	Engine.time_scale = 1.0
 	get_viewport().size_changed.connect(_refresh_layout_metrics)
 	_refresh_layout_metrics()
+	signal_sweep_normalized_x = signal_sweep_start_x
 
 	GlobalEvents.runners_stopped.connect(_on_runners_stopped)
 	GlobalEvents.runners_resumed.connect(_on_runners_resumed)
@@ -57,6 +65,7 @@ func _ready():
 
 func _process(delta):
 	_handle_input()
+	_update_signal_sweep(delta)
 	
 	var actual_speed = cells_per_second * current_speed_mult
 	current_cell_pos += actual_speed * delta
@@ -94,6 +103,9 @@ func get_timeline_height() -> float:
 func get_viewport_size() -> Vector2:
 	return Vector2(screen_width, screen_height)
 
+func get_signal_sweep_x() -> float:
+	return signal_sweep_normalized_x
+
 func _refresh_layout_metrics() -> void:
 	var viewport_size := get_viewport().get_visible_rect().size
 	screen_width = viewport_size.x
@@ -103,6 +115,29 @@ func _refresh_layout_metrics() -> void:
 	var timeline_height := clampf(screen_height * timeline_height_ratio, min_timeline_height_px, max_timeline_height_px)
 	lane_height = timeline_height / LANES
 	layout_changed.emit(viewport_size)
+
+func _update_signal_sweep(delta: float) -> void:
+	print(signal_sweep_normalized_x)
+	if not signal_sweep_enabled:
+		signal_sweep_normalized_x = signal_sweep_start_x
+		return
+
+	if signal_sweep_cycle_sec <= 0.001:
+		signal_sweep_normalized_x = signal_sweep_end_x
+		return
+
+	var distance := signal_sweep_end_x - signal_sweep_start_x
+	var sweep_speed := distance / signal_sweep_cycle_sec
+	signal_sweep_normalized_x += sweep_speed * delta
+
+	if signal_sweep_normalized_x >= signal_sweep_end_x:
+		signal_sweep_normalized_x = signal_sweep_start_x
+
+	_sweep_breathe_material.set_shader_parameter(
+		"sweep_position",
+		get_signal_sweep_x()
+	)
+
 
 func _handle_input():
 	if Input.is_action_just_pressed("null_spike"):

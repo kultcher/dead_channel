@@ -8,12 +8,14 @@ extends Node2D
 @onready var debug_label = $Debug
 
 # CONFIGURATION
-var grid_color = Color(1, 0.441, 0.0, 1.0)
+var LANE_GRID_COLOR = Color(0.169, 0.733, 0.588, 0.75)
+var CELL_GRID_COLOR = Color(0.275, 0.699, 0.771, 0.2)
 
 @onready var cell_width: float = timeline_manager.cell_width_px
 @onready var lane_height: float = timeline_manager.lane_height
 @onready var screen_width: float = timeline_manager.screen_width
 @onready var screen_height: float = timeline_manager.screen_height
+
 
 var time_elapsed: float = 0.0
 
@@ -50,7 +52,7 @@ func _draw():
 		draw_line(
 			Vector2(0, y_pos),
 			Vector2(screen_width, y_pos),
-			grid_color,
+			LANE_GRID_COLOR,
 			1.0 
 		)
 
@@ -77,6 +79,6 @@ func _draw():
 			draw_line(
 				Vector2(draw_x, 0), 
 				Vector2(draw_x, lane_height * timeline_manager.LANES),
-				grid_color, 
+				CELL_GRID_COLOR, 
 				2.0) 
 		draw_x += cell_width

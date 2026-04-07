@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://bu5j0vtniw7no" path="res://Scripts/SignalBase/signal_entity.gd" id="1_syivg"]
 [ext_resource type="Script" uid="uid://bf3h4o3iodo4" path="res://Scripts/SignalBase/DetectionController.gd" id="2_6hws6"]
 [ext_resource type="PackedScene" uid="uid://dfbl7tsxqd446" path="res://Scenes/signal_detail_tooltip.tscn" id="2_ea3pi"]
+[ext_resource type="Shader" uid="uid://0wglleb1rff6" path="res://Shaders/signal_sweep_heartbeat.gdshader" id="2_lak2q"]
 [ext_resource type="Script" uid="uid://dio2n4hwtubvd" path="res://Scenes/signal_target_indicator.gd" id="2_xq7gi"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_syivg"]
@@ -19,6 +20,20 @@ height = 96
 fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(0.5, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dhsqe"]
+shader = ExtResource("2_lak2q")
+shader_parameter/sweep_position = 0.5
+shader_parameter/sweep_width = 0.0010000000475
+shader_parameter/sweep_softness = 0.08
+shader_parameter/leading_edge_bias = 1.6
+shader_parameter/trailing_falloff = 1.1
+shader_parameter/brightness_boost = 0.45
+shader_parameter/glow_strength = 0.850000040375
+shader_parameter/rim_strength = 0.55
+shader_parameter/glow_tint = Color(0.72, 0.96, 1, 1)
+shader_parameter/breakup_strength = 0.18
+shader_parameter/breakup_scale = 18.0
 
 [node name="SignalEntity" type="Node2D" unique_id=2133266310]
 script = ExtResource("1_syivg")
@@ -57,6 +72,7 @@ offset_bottom = -9.0
 grow_vertical = 0
 
 [node name="Shape" type="Polygon2D" parent="." unique_id=927938383]
+material = SubResource("ShaderMaterial_dhsqe")
 
 [node name="TargetIndicator" type="Node2D" parent="." unique_id=533402596]
 script = ExtResource("2_xq7gi")

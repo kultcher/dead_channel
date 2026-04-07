@@ -36,7 +36,7 @@ var _signal_hosts: Dictionary = {}
 var _active_escalation_signals: Dictionary = {}
 
 func _ready() -> void:
-	#if process_mode == Node.PROCESS_MODE_DISABLED: return
+	if process_mode == Node.PROCESS_MODE_DISABLED: return
 	_initialize_tier_state()
 	_build_panel()
 	if escalation_panel != null:

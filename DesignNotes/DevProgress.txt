@@ -82,6 +82,8 @@ Development Progress
 
 Short-term TODO:
 - Escalation ICE
+- Escalation passive difficulty
+- Fix escalation UI
 - More and more advanced IC
 - procgen
 - Fuzz
