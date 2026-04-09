@@ -162,13 +162,13 @@ func get_spawns() -> Array[Dictionary]:
 			.build(),
 
 		spawn(BASIC_CAMERA, 55.5) \
-			.id("cam_05") \
+			.id("cam_08") \
 			.lane(0) \
 			.facing(-10) \
 			.build(),
 
 		spawn(BASIC_CAMERA, 55.5) \
-			.id("cam_06") \
+			.id("cam_09") \
 			.lane(4) \
 			.facing(10) \
 			.build(),
@@ -236,6 +236,5 @@ func get_spawns() -> Array[Dictionary]:
 		
 		spawn(BASIC_TERMINAL, 73.5) \
 			.id("override_terminal") \
-			.add_puzzle("decrypt", 1) \
 			.build(),
 	]

@@ -1,0 +1,107 @@
+[gd_scene format=3 uid="uid://d1v33qnlb8cd7"]
+
+[ext_resource type="Texture2D" uid="uid://cxqgms0ht0c6e" path="res://Visuals/ns_module_bare_clean_noscreen.png" id="1_0bowo"]
+[ext_resource type="FontFile" uid="uid://g80fed4aap1u" path="res://Visuals/Fonts/FiraCode-SemiBold.ttf" id="2_rojul"]
+[ext_resource type="Theme" uid="uid://83f6f0fn04lu" path="res://Resources/Themes/terminal_detail_panel.tres" id="2_u1qtx"]
+[ext_resource type="Texture2D" uid="uid://6lbtnhkjsdik" path="res://Visuals/Icons/Simple/magnifying-glass.svg" id="3_0bowo"]
+[ext_resource type="Texture2D" uid="uid://dw1mnwtj12isr" path="res://Visuals/ns_module_screen.png" id="3_x20j8"]
+[ext_resource type="FontFile" uid="uid://b0472lemon553" path="res://Visuals/Fonts/KodeMono-Bold.ttf" id="4_rojul"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dqt0a"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x20j8"]
+bg_color = Color(0.23753911, 0.23753914, 0.23753902, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_dqt0a"]
+
+[node name="Control" type="Control" unique_id=744579021]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=61353363]
+layout_mode = 0
+offset_right = 1125.0
+offset_bottom = 425.0
+texture = ExtResource("1_0bowo")
+expand_mode = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="TextureRect" unique_id=1046958569]
+self_modulate = Color(1, 1, 1, 0.21568628)
+layout_mode = 0
+offset_left = 243.0
+offset_top = 68.0
+offset_right = 904.0
+offset_bottom = 338.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dqt0a")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="TextureRect/PanelContainer" unique_id=746664656]
+layout_mode = 2
+theme_override_colors/default_color = Color(18.892157, 18.892157, 18.892157, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_outline_size = 2
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 0
+theme_override_constants/outline_size = 1
+theme_override_fonts/normal_font = ExtResource("2_rojul")
+
+[node name="TextureButton" type="TextureRect" parent="TextureRect" unique_id=531572158]
+self_modulate = Color(1, 1, 1, 0.19607843)
+layout_mode = 0
+offset_left = 231.0
+offset_top = 62.0
+offset_right = 904.0
+offset_bottom = 338.0
+texture = ExtResource("3_x20j8")
+expand_mode = 1
+
+[node name="ScanPanel" type="PanelContainer" parent="." unique_id=582142471]
+layout_mode = 0
+offset_left = 56.0
+offset_top = 111.0
+offset_right = 201.0
+offset_bottom = 145.0
+size_flags_horizontal = 0
+theme = ExtResource("2_u1qtx")
+theme_type_variation = &"partial_scan"
+theme_override_styles/panel = SubResource("StyleBoxFlat_x20j8")
+
+[node name="ScanProgress" type="ProgressBar" parent="ScanPanel" unique_id=287924611]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+max_value = 3.0
+step = 1.0
+show_percentage = false
+
+[node name="ScanCenterBox" type="MarginContainer" parent="ScanPanel/ScanProgress" unique_id=1652463428]
+layout_mode = 0
+offset_right = 20.0
+offset_bottom = 32.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="ScanHBox" type="HBoxContainer" parent="ScanPanel/ScanProgress/ScanCenterBox" unique_id=145076914]
+layout_mode = 2
+
+[node name="ScanIcon" type="TextureRect" parent="ScanPanel/ScanProgress/ScanCenterBox/ScanHBox" unique_id=961150121]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("3_0bowo")
+expand_mode = 1
+
+[node name="ScanLabel" type="Label" parent="ScanPanel/ScanProgress/ScanCenterBox/ScanHBox" unique_id=2074282356]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_rojul")
+theme_override_styles/normal = SubResource("StyleBoxTexture_dqt0a")
+text = "Unscanned"

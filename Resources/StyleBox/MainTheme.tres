@@ -1,21 +1,10 @@
 [gd_resource type="Theme" format=3 uid="uid://discgqqbkpb5x"]
 
 [ext_resource type="FontFile" uid="uid://g80fed4aap1u" path="res://Visuals/Fonts/FiraCode-SemiBold.ttf" id="1_oiu25"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_03ujl"]
-content_margin_left = 5.0
-content_margin_top = 5.0
-content_margin_right = 5.0
-content_margin_bottom = 5.0
-bg_color = Color(0.2624395, 0.24836084, 0.24836442, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.23529412, 0.03137255, 0.60784316, 0.49019608)
+[ext_resource type="StyleBox" uid="uid://00fvhjn3d3jv" path="res://Resources/StyleBox/terminal_outer.tres" id="1_tptxl"]
 
 [resource]
 default_font = ExtResource("1_oiu25")
-PanelContainer/styles/panel = SubResource("StyleBoxFlat_03ujl")
+PanelContainer/styles/panel = ExtResource("1_tptxl")
 TitleBarText/base_type = &"RichTextLabel"
 TitleBarText/colors/default_color = Color(1, 1, 1, 1)

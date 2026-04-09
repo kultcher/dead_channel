@@ -6,6 +6,9 @@ var timer: Timer
 
 const DIFFICULTY_REBOOT_TIMES := [3.0, 5.0, 10.0, 15.0]
 
+func _init():
+	warning_msg = get_desc()
+
 func get_desc():
 	var desc: String = "Reboot(%ds)" % reboot_time
 	return desc

@@ -54,9 +54,11 @@ script = ExtResource("1_0k24o")
 
 [node name="TooltipHbox" type="VBoxContainer" parent="." unique_id=231727107]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="TooltipVBox" type="VBoxContainer" parent="TooltipHbox" unique_id=1209469793]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="HeaderPanel" type="PanelContainer" parent="TooltipHbox/TooltipVBox" unique_id=408525704]
 custom_minimum_size = Vector2(96, 0)
@@ -144,10 +146,12 @@ expand_mode = 1
 [node name="BodyBox" type="BoxContainer" parent="TooltipHbox" unique_id=498601959]
 visible = false
 layout_mode = 2
+mouse_filter = 2
 
 [node name="BodyText" type="RichTextLabel" parent="TooltipHbox/BodyBox" unique_id=1795723363]
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
 fit_content = true
 autowrap_mode = 0
 
@@ -156,6 +160,7 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
+mouse_filter = 2
 
 [node name="BodyPanel" type="PanelContainer" parent="BodyControl" unique_id=1079680036]
 visible = false
@@ -163,11 +168,13 @@ layout_mode = 0
 offset_top = 8.0
 offset_right = 2.0
 offset_bottom = 10.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_jaqdb")
 
 [node name="BodyText" type="RichTextLabel" parent="BodyControl/BodyPanel" unique_id=1957049013]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
+mouse_filter = 2
 fit_content = true
 autowrap_mode = 0

@@ -100,25 +100,25 @@ func _run_intro_sequence() -> void:
 		"All right, I'm on the move. You should already be seeing some network SIGNALs registering on the timeline.",
 		"It'll look they're moving toward me, but it's all relative\u2014I'm moving toward them. The stationary ones, anyway."
 	], "", window_manager.get_control_focus_rect(runner_focus_panel), Vector2(), false, 2, "intro_walk_and_talk")
-	_set_objective("- Wait for Blackjack to get into position")
+	_set_objective("- Wait for Blackjack to get into position\n- Hold the [color=cyan]-> arrow key[/color] to tell him to hustle.")
 
 func _run_cam_01_sequence() -> void:
 	await _wait_for_cell(1)
 	_acquire_runner_hold("cam_01_gate")
 	await _show_dialogue([
 		"Eyes on two cameras. One is off the main route, so it shouldn't be an issue, but the other is right above the facility door.",
-		"We'll need to take it out, but give it a scan first. Always check for access blocks. Or worse, ICE."
+		"We'll need to take it out, but give it a scan first. Always check for access blocks. Or worse, ICE.\n\n[color=cyan]<Right Click>[/color] to scan."
 	], "cam_01")
-	_set_objective("Mouseover the cam_01 signal to scan it.")
+	_set_objective("- [color=cyan]Right click[/color] the cam_01 signal to scan it.")
 	_enable_feature("scan")
 
 	await _wait_for_scan_complete("cam_01")
 	await _show_dialogue([
 		"Good. Unlocked, no ICE. Probably no one watching, either, but who knows with these old AI husks.",
 		"Some of them are still crawling with drones and turrets. Well, 'spose turrets don't crawl. That I've seen.",
-		"You know the drill. Connect to that camera and KILL it."
+		"You know the drill. Connect to that camera and [color=orange]KILL[/color] it.\n\n[color=cyan]<Left Click>[/color] to connect, then type [color=orange]KILL[/color] in the terminal and press enter.\n"
 	], "cam_01")
-	_set_objective("Left click the cam_01 signal to connect, then type KILL in the terminal.")
+	_set_objective("- [color=cyan]Left click[/color] the cam_01 signal to connect, then type [color=orange]KILL[/color] in the terminal.")
 	_enable_feature("connect")
 	_enable_feature("terminal_commands")
 
@@ -129,8 +129,8 @@ func _run_cam_01_sequence() -> void:
 	await _show_dialogue([
 		"Simple as. Just watch your heat. KILL is noisy, and more network noise means more attention from the system.",
 		"Runners don't like attention. For you, it might just mean more ICE. For us, it tends to come with bullet holes."
-	], "", window_manager.get_control_focus_rect(heat_tracker), Vector2(50, 350), true, 5, "door_walk_and_talk")
-	_set_objective("Wait for Blackjack to move ahead")
+	], "", Rect2(Vector2(0,1030), Vector2(100,5)), Vector2(50, 700), true, 5, "door_walk_and_talk")
+	_set_objective("- Wait for Blackjack to move ahead\n- Hold the [color=cyan]-> arrow key[/color] to tell him to hustle.")
 
 
 func _run_door_01_sequence() -> void:
@@ -143,16 +143,16 @@ func _run_door_01_sequence() -> void:
 	await _show_dialogue([
 		"All right, facility door in sight. Give it a scan, if you haven't already."
 	], "door_01")
-	_set_objective("- Mouseover to scan the door_01 signal.")
+	_set_objective("- [color=cyan]Right click[/color] door_01 signal to scan it")
 
 	await _wait_for_scan_complete("door_01")
 	_focus_door_lock_state("door_01")
 	
 	await _show_dialogue([
 		"Locked, obviously. Different locks require different keys.",
-		"This one auth-locked. Means the credentials are floating around the network, we just need to sniff out the right data. RUN sniff in your terminal to find it."
+		"This one auth-locked. Means the credentials are floating around the network, we just need to sniff out the right data. [color=orange]RUN sniff[/color] in your terminal to find it."
 	], "door_01")
-	_set_objective("- Left click the door_01 signal to connect, then type RUN sniff in the terminal to run the Sniff program.\nWhen connected to a locked signal, you can also click on the Lock status panel below the terminal to pull up a clickable list of unlocking programs.")
+	_set_objective("- Left click the door_01 signal to connect, then type [color=orange]RUN sniff[/color] in the terminal to run the Sniff program.\nWhen connected to a locked signal, you can also click on the Lock status panel below the terminal to pull up a clickable list of unlocking programs.")
 
 	await _wait_for_puzzle_started(PuzzleComponent.Type.SNIFF)
 
@@ -167,9 +167,9 @@ func _run_door_01_sequence() -> void:
 
 	await _show_dialogue([
 		"Now you've got access, but you still need to unlock the door in realspace.",
-		"A lot of signals have a basic functionality that you can access with the OPERATE command, or OP for short."
+		"A lot of signals have a basic functionality that you can access with the [color=orange]OPERATE[/color] command, or [color=orange]OP[/color] for short."
 	], "door_01")
-	_set_objective("- Make sure you're connected to the door_01 signal and type OP to unlock the door")
+	_set_objective("- Make sure you're connected to the door_01 signal and type [color=orange]OP[/color] to unlock the door")
 
 	await _wait_for_door_unlocked("door_01")
 	_release_runner_hold("door_01_gate")
@@ -177,7 +177,7 @@ func _run_door_01_sequence() -> void:
 	await _show_dialogue([
 		"See? Milk run, like I said.",
 		"By the way, while you'll be doing a lot of unlocking, OP can also lock doors. You'd be surprised how often that comes in handy.",
-		"Heading inside. Tracking another camera. You know the drill. Scan away. Enjoy it while you can, taking time to scan is a luxury you sometimes can't afford under pressure."
+		"Heading inside. Tracking another camera. You know the drill. Scan away."
 	], "", window_manager.get_control_focus_rect(runner_focus_panel), Vector2(), false, 9, "cam_02_walk_and_talk")
 	_set_objective("")
 
@@ -187,13 +187,13 @@ func _run_cam_02_intro_sequence() -> void:
 	await _show_dialogue([
 		"Camera ahead, center lane. Give it a scan."
 	], "cam_02")
-	_set_objective("- Mouseover the cam_02 signal to scan it.")
+	_set_objective("- Right click the cam_02 signal to scan it")
 	await _wait_for_scan_complete("cam_02")
 
 	await _show_dialogue([
 			"This one's got ICE. Not too dangerous. Reboot: does just what it says. If the Signal goes down, it automatically gets rebooted after a short window.",
 			"This camera is panning, too. Your call how to handle it.",
-			"You can KILL it and take the heat and I'll move past while it reboots, or you can let me know when it's safe to slip by while the camera pans."
+			"You can KILL it and take the heat and I'll move past while it reboots, or you can let me know when it's safe to slip by while the camera pans away."
 		], "cam_02")
 	_set_objective("- Connect to cam_02 and KILL it OR\n- Hold -> to have Blackjack hustle past while the camera is panned away")
 
@@ -214,7 +214,7 @@ func _run_drone_01_intro_sequence():
 	await _show_dialogue([
 		"Shit, picking up a drone. Could be armed. They're mobile and not as predictable as cameras. Give it a scan."
 	], "drone_01")
-	_set_objective("Mouseover to scan the drone_01 signal")
+	_set_objective("Right click to scan the drone_01 signal")
 
 	await _wait_for_scan_complete("drone_01")
 
@@ -232,7 +232,7 @@ func _run_drone_01_intro_sequence():
 
 	await _wait_for_cell(16.5)
 	await _set_objective("- Help Blackjack through the gauntlet
-- Use the <- and -> arrow keys to have Blackjack slow down or sleep up
+- Use the <- and -> arrow keys to have Blackjack slow down or speed up
 - Press F1 if you need a refresher on terminal commands")
 	await _show_dialogue([
 		"Long corridor coming up, lots of cameras and a few drones. No more hand-holding, kid. Let's see what you've got.",
@@ -244,9 +244,9 @@ func _run_drone_01_intro_sequence():
 
 
 func _run_null_door_intro_sequence():
-	_enable_feature("terminal_commands", false)
 
 	await _wait_for_cell(38)
+	_enable_feature("terminal_commands", false)
 	await _show_dialogue([
 		"Phew. All right. I think we're past the hard part. Coming up on... some kind of clean lab? Let's have a look.",
 		"Sniff out that door's key, like last time."
@@ -285,6 +285,15 @@ func _run_null_door_intro_sequence():
 
 
 func _run_lab_reveal_sequence() -> void:
+	# make sure null terminal is fully scanned (mostly for using lock toolbox)
+	var null_term = _get_active_signal("null_terminal")
+	for l in null_term.scan_layers:
+		l.revealed = true
+
+	# prevent player from closing null term tab or switching tabs
+	terminal_window.session_tabs.set_mouse_filter(Control.MOUSE_FILTER_IGNORE)
+	terminal_window.root_tab.set_mouse_filter(Control.MOUSE_FILTER_IGNORE)
+
 	await _wait_for_cell(46)
 	_acquire_runner_hold("null_terminal_gate_02")
 	await _show_dialogue([
@@ -338,6 +347,10 @@ func _run_lab_reveal_sequence() -> void:
 
 	await _wait_for_puzzle_solved("null_terminal")
 	window_manager.objective_tracker.hide()
+
+	# reenable tabs
+	terminal_window.session_tabs.set_mouse_filter(Control.MOUSE_FILTER_STOP)
+	terminal_window.root_tab.set_mouse_filter(Control.MOUSE_FILTER_STOP)
 
 
 	await _run_terminal_dump_sequence()
@@ -510,7 +523,7 @@ func _run_gauntlet_sequence():
 
 	await _wait_for_cell(68.5)
 
-	#NOTE: Delay logic temporarily hacky
+	#NOTE: Logic for auto-dismissing during this sequence is in dialogue_window.set_text
 	_show_dialogue([
 		"H  o  l  y\n    s  h  i  t  .  .  ."
 	], "", Rect2(), Vector2(50,300), true)
@@ -522,11 +535,13 @@ func _run_gauntlet_sequence():
 	],  "", Rect2(), Vector2(50,300), true)
 
 	await _wait_for_cell(73)
+	window_manager.objective_tracker.hide()
+	
 	_acquire_runner_hold("end")
 
 	_show_dialogue([
 		"I  '  m    h  e  r  e  .  .  .\nY  o  u    n  e  e  d    t  o\nd  i  s  c  o  n  n  e  c  t"
-	],  "", Rect2(), Vector2(50,300), true)
+	],  "", Rect2(), Vector2(50,300), true, -1, "", 3)
 
 	await get_tree().create_timer(2).timeout
 	
@@ -534,7 +549,7 @@ func _run_gauntlet_sequence():
 		"K  i  d  !  ?  .  .  .\n  D  i  s  c  o  n  n  e  c  t  !"
 	],  "", Rect2(), Vector2(50,300), true)
 
-	await get_tree().create_timer(2).timeout
+	await get_tree().create_timer(3).timeout
 
 	signal_manager.hide_signals()
 	timeline_manager.toggle_null_spike()

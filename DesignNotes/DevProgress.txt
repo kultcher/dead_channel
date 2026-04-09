@@ -80,6 +80,9 @@ Development Progress
 4/7/2026:
 - Added basic escalation with drone spawning
 
+4/8/2026:
+- Brought tutorial up-to-date
+
 Short-term TODO:
 - Escalation ICE
 - Escalation passive difficulty
@@ -87,27 +90,30 @@ Short-term TODO:
 - More and more advanced IC
 - procgen
 - Fuzz
-- FIX: Distraction "wasting" charges... also check proximity? Should target forward-most signal in range?
+- Check to make sure that overrides aren't overwritten by difficulty scaling
 
-- Tutorial: Disable escalation
-- Tutorial: Rewrite/work for right-click scanning
-- TUTORIAL: Do cohesion pass
-- Tutorial: Better solution for hiding tooltips
-- end sequence z-index stuff
 
 Polish TODO:
 Code:
 - Split out tutorial script and logic
 - Circle back: Check handoff from command_context to actioncontext - should various edge case fails make it to action step or be handled earlier? (i.e. no kill on doors)
-- Make puzzles more Godot-y (instead of built-by-code)
+- Make puzzles UI more Godot-y (instead of built-by-code)
 - Cleanup cutscene controller (hardcoded textures)
+- Add startup warning around duplicate signal IDs
 
 Game:
+- Maybe merge RUN programs into "CRACK"
+- FIX: Distraction "wasting" charges... also check proximity? Should target forward-most signal in range?
 - Programs: Custom tooltips
 - Add "victory sequence" for Decrypt
 - Add active signal label to puzzles
 - add ciphers and on-solve trigger to codex
-- lab door sequence break
+- Tutorial sequence breaks:
+> hacking door before finishing dialogue
+> distracting drone before finishing dialogue
+> hacking null terminal during lab door sniff
+> Assassin on first kill is awkward
+- Tutorial: Add more bbcode coloring to keywords
 - Add chatlog/bark UI
 - guard comms pulses
 
@@ -121,6 +127,7 @@ Minor:
 
 
 Verify:
+x Tutorial: Better solution for hiding tooltips?
 x add sequence break protection on drone_02 coolant vent
 x check sequence break on early puzzle solve (add an out if puzzle is solved)
 x make sure you can't run a puzzle twice
@@ -132,11 +139,8 @@ x watch out for disabled terminal before null_lab
 
 Not Yet Implemented (priority):
 - planning mode prototype
-- finalize early jargonizer
-- guard comms pings
+- expand jargonizer
 - New signals: hazards, terminals, motion sensors, cyberguards, turrets
-- fuzz minigame
-- basic procgen
 - Terminal: SPOOF, PROBE
 
 Not Yet Implemented (long-term):

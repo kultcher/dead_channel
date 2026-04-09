@@ -94,7 +94,7 @@ func _get_position_from_focus_rect(focus_rect: Rect2) -> Vector2:
 	var viewport_size := get_viewport_rect().size
 	var target_position := Vector2(
 		focus_rect.position.x - (size.x * 0.4),
-		focus_rect.end.y + 64.0
+		focus_rect.end.y + 144.0
 	)
 	return _clamp_to_viewport(target_position, viewport_size)
 

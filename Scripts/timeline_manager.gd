@@ -4,16 +4,18 @@
 extends Node2D
 
 # SETTINGS
-@export var BASE_CELLS_PER_SECOND: float = 0.20
+@export var BASE_CELLS_PER_SECOND: float = 0.15		# 0.2 ~= 30 seconds window from spawn to contact
 @export var slow_speed_modifier: float = 0.5
-@export var fast_speed_modifier: float = 2.5
+@export var fast_speed_modifier: float = 3
 @export var null_spike_time_scale: float = 0.5
 @export var null_spike_transition_duration: float = 0.50
 @export var runner_screen_offset_cells: float = 1
 @export var timeline_height_ratio: float = 0.25
 @export var min_timeline_height_px: float = 180.0
 @export var max_timeline_height_px: float = 360.0
+
 @export var signal_interaction_range_cells: float = 8.0
+
 @export var signal_sweep_enabled: bool = true
 @export var signal_sweep_cycle_sec: float = 8.5
 @export var signal_sweep_start_x: float = -0.1
@@ -30,7 +32,7 @@ var lane_height: float
 
 # STATE
 var cells_per_second: float = BASE_CELLS_PER_SECOND
-var current_cell_pos: float = 0.0
+var current_cell_pos: float = -4.0
 var last_emitted_cell: int = -1
 var current_cell: int
 var current_speed_mult: float = 1.0
@@ -117,7 +119,6 @@ func _refresh_layout_metrics() -> void:
 	layout_changed.emit(viewport_size)
 
 func _update_signal_sweep(delta: float) -> void:
-	print(signal_sweep_normalized_x)
 	if not signal_sweep_enabled:
 		signal_sweep_normalized_x = signal_sweep_start_x
 		return
@@ -160,6 +161,8 @@ func toggle_null_spike():
 	if not GlobalEvents.is_tutorial_feature_enabled("null_spike"):
 		return
 	if GlobalEvents.first_null_spike == true:
+		#WARNING: Temporary fix for tutorial cutscene issues. Make sure it gets reenabled
+		$"../GridLayer/TimelineBreathEffect".hide()
 		GlobalEvents.activate_first_null_spike.emit()
 		return
 
@@ -170,11 +173,17 @@ func toggle_null_spike():
 
 func deactivate_null_spike():
 	null_spike_active = false
+	#NOTE: Temporary
 	_tween_time_scale(1.0)
+	await get_tree().create_timer(.5).timeout
+	$"../GridLayer/TimelineBreathEffect".show()
 
 func activate_null_spike():
 	null_spike_active = true
 	_tween_time_scale(null_spike_time_scale)
+	$"../GridLayer/TimelineBreathEffect".hide()
+
+
 
 func _tween_time_scale(target_scale: float) -> void:
 	if _time_scale_tween != null and _time_scale_tween.is_valid():

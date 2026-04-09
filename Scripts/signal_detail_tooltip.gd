@@ -49,7 +49,7 @@ func show_body() -> void:
 	tt_body_box.modulate.a = 1.0
 	_queue_realign_body()
 
-func fade_body_out(duration: float = 3.0) -> void:
+func fade_body_out(duration: float = 10.0) -> void:
 	if not tt_body_box.visible:
 		return
 	_stop_body_fade()

@@ -36,7 +36,8 @@ func bind_program(target_program: ProgramInstance) -> void:
 		display_name = program_instance.get_display_name()
 		description = program_instance.get_description()
 		icon = program_instance.definition.icon
-	docked_button.tooltip_text = display_name +"\n" + description
+	#NOTE: Need to rework RAM cost display (or custom tooltip)
+	docked_button.tooltip_text = display_name + "\nRAM Cost: " + str(program_instance.definition.get_phase_ram_cost(1)) + "\n" + description
 	active_button.tooltip_text = display_name +"\n" + description
 	docked_button.texture_normal = icon if icon != null else _default_docked_icon
 	active_button.texture_normal = icon if icon != null else _default_active_icon
@@ -76,6 +77,7 @@ func _apply_loading_state(total_phase_time: float) -> void:
 	docked_button.modulate = Color(1.0, 1.0, 1.0, 0.2)
 	active_button.visible = true
 	active_button.disabled = true
+	active_button.texture_normal = program_instance.definition.icon
 	active_button.modulate = Color.WHITE
 	active_progress.value = _get_fill_value(total_phase_time)
 	active_progress.self_modulate = COLOR_LOADING

@@ -4,6 +4,11 @@
 class_name ICModule extends Resource
 
 @export var codex_id: StringName
+@export var warning_msg: String = "Unknown IC"
+
+func _init():
+	#NOTE: This seems to work
+	warning_msg = get_desc()
 
 # Virtual function to be overridden
 func get_desc():
@@ -11,6 +16,9 @@ func get_desc():
 
 func get_codex_id():
 	return &""
+
+func warning_notice() -> String:
+	return warning_msg
 
 func bind_to_context(signal_data: SignalData, terminal_ref: Control):
 	pass

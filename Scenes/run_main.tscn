@@ -27,17 +27,9 @@
 [ext_resource type="Shader" uid="uid://da2dfyfkllxrp" path="res://Shaders/digital_glitch.gdshader" id="18_3deqw"]
 [ext_resource type="Script" uid="uid://cbv73pnuu78pw" path="res://Scripts/cutscene_controller.gd" id="18_3xdhw"]
 [ext_resource type="Texture2D" uid="uid://bilm8u1f271kd" path="res://Visuals/NullSpikeKeyPH.png" id="20_26ak2"]
-[ext_resource type="Texture2D" uid="uid://0s1a4ceed6us" path="res://Visuals/glitch_screen2.png" id="21_1rh14"]
 [ext_resource type="PackedScene" uid="uid://capen3ifwsuq8" path="res://Scenes/mini_timeline.tscn" id="24_2sj47"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_2sj47"]
-shader = ExtResource("9_d4ye1")
-shader_parameter/intensity = 0.999999977648
-shader_parameter/band_density = 80.0
-shader_parameter/stretch_amount = 0.08
-shader_parameter/jitter_speed = 3.0
-shader_parameter/glow_strength = 0.6
-shader_parameter/glow_tint = Color(0.75, 1, 1, 1)
+[ext_resource type="Texture2D" uid="uid://ds0t2yw52cuja" path="res://Visuals/glitch_screen.png" id="27_pcbq1"]
+[ext_resource type="PackedScene" uid="uid://d1v33qnlb8cd7" path="res://terminal_gfx_test.tscn" id="30_pcbq1"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pcbq1"]
 shader = ExtResource("8_ojo04")
@@ -73,6 +65,15 @@ shader_parameter/block_size = Vector2(0.075, 0.1)
 shader_parameter/edge_softness = 0.0010000000475
 shader_parameter/trail_strength = 0.28
 shader_parameter/grain_strength = 0.025
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2sj47"]
+shader = ExtResource("9_d4ye1")
+shader_parameter/intensity = 0.999999977648
+shader_parameter/band_density = 80.0
+shader_parameter/stretch_amount = 0.08
+shader_parameter/jitter_speed = 3.0
+shader_parameter/glow_strength = 0.6
+shader_parameter/glow_tint = Color(0.75, 1, 1, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k8c5c"]
 border_width_left = 5
@@ -144,11 +145,10 @@ shader_parameter/glow_tint = Color(0.75, 1, 1, 1)
 
 [node name="RunManager" type="Node" parent="." unique_id=973638613]
 script = ExtResource("1_4q6c1")
-level_script_path = "uid://cweechpdcw3v"
+level_script_path = "uid://2c2k0eym4x47"
 
 [node name="TutorialManager" type="Node" parent="." unique_id=755181945]
 script = ExtResource("2_r51ll")
-debug_skip_to_stage = "gauntlet"
 
 [node name="HeatManager" type="Node" parent="." unique_id=599858506]
 script = ExtResource("1_8roaf")
@@ -168,6 +168,7 @@ z_index = -5
 script = ExtResource("2_85m8a")
 
 [node name="Debug" type="Label" parent="SignalTimeline/GridLayer" unique_id=1352355150]
+visible = false
 offset_top = -50.0
 offset_right = 40.0
 offset_bottom = -27.0
@@ -181,14 +182,6 @@ offset_bottom = 293.0
 mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
-[node name="NullSpikeSyncOverlay" type="ColorRect" parent="SignalTimeline/GridLayer" unique_id=1398397070]
-visible = false
-material = SubResource("ShaderMaterial_2sj47")
-offset_top = -10.0
-offset_right = 1920.0
-offset_bottom = 290.0
-mouse_filter = 2
-
 [node name="TimelineBreathEffect" type="ColorRect" parent="SignalTimeline/GridLayer" unique_id=778312295]
 material = SubResource("ShaderMaterial_pcbq1")
 offset_top = -10.0
@@ -198,6 +191,14 @@ mouse_filter = 2
 
 [node name="TimelineDataStream" type="ColorRect" parent="SignalTimeline/GridLayer" unique_id=2181415]
 material = SubResource("ShaderMaterial_ojo04")
+offset_top = -10.0
+offset_right = 1920.0
+offset_bottom = 290.0
+mouse_filter = 2
+
+[node name="NullSpikeSyncOverlay" type="ColorRect" parent="SignalTimeline/GridLayer" unique_id=1398397070]
+visible = false
+material = SubResource("ShaderMaterial_2sj47")
 offset_top = -10.0
 offset_right = 1920.0
 offset_bottom = 290.0
@@ -265,12 +266,14 @@ offset_bottom = 700.0
 [node name="TerminalWindow" parent="WorkspaceAnchor" unique_id=340148133 instance=ExtResource("7_4qt4q")]
 z_index = 5
 layout_mode = 1
+offset_top = -4.0
 offset_right = 1126.0
-offset_bottom = 345.0
+offset_bottom = 341.0
 
 [node name="ProgramDock" parent="WorkspaceAnchor" unique_id=1620614055 instance=ExtResource("11_34l5d")]
 layout_mode = 1
-offset_left = -72.0
+offset_right = -10.0
+offset_bottom = 171.0
 
 [node name="WindowManager" type="CanvasLayer" parent="." unique_id=47041843]
 script = ExtResource("5_wudor")
@@ -302,6 +305,7 @@ texture_progress = SubResource("GradientTexture2D_jx6wh")
 script = ExtResource("6_85m8a")
 
 [node name="HeatDebug" type="Label" parent="HeatTracker" unique_id=1874187724]
+visible = false
 layout_mode = 0
 offset_left = 1700.0
 offset_top = -75.0
@@ -335,6 +339,7 @@ mouse_filter = 2
 texture = ExtResource("14_d5u5a")
 
 [node name="CutsceneController" type="Control" parent="." unique_id=165146185]
+visible = false
 z_index = 10
 custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 3
@@ -356,7 +361,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("21_1rh14")
+texture = ExtResource("27_pcbq1")
 
 [node name="CutsceneKeyTexture" type="TextureRect" parent="CutsceneController" unique_id=1356882612]
 visible = false
@@ -415,6 +420,7 @@ grow_vertical = 2
 mouse_filter = 2
 
 [node name="MiniTimeline" parent="." unique_id=471502649 instance=ExtResource("24_2sj47")]
+visible = false
 offset_left = 194.0
 offset_top = 891.0
 offset_right = 334.0
@@ -424,5 +430,13 @@ offset_bottom = 987.0
 offset_left = 1820.0
 offset_right = 1920.0
 text = "QUIT"
+
+[node name="Control" parent="." unique_id=744579021 instance=ExtResource("30_pcbq1")]
+visible = false
+z_index = 100
+offset_left = 111.0
+offset_top = 637.0
+offset_right = 111.0
+offset_bottom = 637.0
 
 [connection signal="button_down" from="TempQuitButton" to="RunManager" method="_on_temp_quit_button_button_down"]

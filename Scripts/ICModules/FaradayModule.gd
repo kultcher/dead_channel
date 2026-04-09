@@ -4,6 +4,9 @@ class_name FaradayModule extends ICModule
 
 const DIFFICULTY_RUNNER_DISTANCES := [1.5, 2.0, 3.0, 4.0]
 
+
+
+
 func get_desc():
 	return "Faraday(%.1fc)" % max_runner_distance_cells
 

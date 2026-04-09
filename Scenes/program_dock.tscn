@@ -9,7 +9,7 @@ content_margin_left = 4.0
 content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
-bg_color = Color(0.99309915, 0.2826732, 0.6011844, 1)
+bg_color = Color(0.011764706, 0.2509804, 0.62352943, 1)
 
 [node name="ProgramDock" type="PanelContainer" unique_id=1620614055]
 anchors_preset = 1

@@ -264,7 +264,6 @@ func play_null_spike_init_transition() -> void:
 	_reset_cutscene_visuals()
 
 func start_first_null_spike_sync(total_duration: float = 4.8) -> void:
-
 	_begin_cutscene_visuals(0.0)
 	_set_sync_overlay_visible(true)
 	_set_sync_overlay_intensity(0.25)
@@ -273,8 +272,14 @@ func start_first_null_spike_sync(total_duration: float = 4.8) -> void:
 	_set_sync_overlay_speed(0.8)
 	_set_sync_overlay_glow(0.4)
 	_set_sync_wash_alpha(0.01)
+
+	#null_spike_sync_wash.hide()
+
 	for child in get_children():
 		print(child, " ", child.visible)
+	#hide()
+	print(visible)
+
 	var total := maxf(5.0, total_duration)
 	var phase_1 := 1.05
 	var pulse_1 := 0.4

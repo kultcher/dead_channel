@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cdbk7lcnj3n2j"]
 
 [ext_resource type="Shader" uid="uid://0wglleb1rff6" path="res://Shaders/signal_sweep_heartbeat.gdshader" id="1_qg775"]
+[ext_resource type="PackedScene" uid="uid://dbqweh3v2f0bq" path="res://Scenes/terminal_window.tscn" id="2_pfk58"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pfk58"]
 shader = ExtResource("1_qg775")
@@ -16,6 +17,50 @@ shader_parameter/glow_tint = Color(0.72, 0.96, 1, 1)
 shader_parameter/breakup_strength = 1.0
 shader_parameter/breakup_scale = 80.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l15yt"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0, 1, 0, 1)
+border_blend = true
+expand_margin_left = 5.0
+expand_margin_top = 5.0
+expand_margin_right = 5.0
+expand_margin_bottom = 5.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mk0ln"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.89653116, 0.810233, 0, 1)
+border_blend = true
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+shadow_color = Color(0, 1, 0, 0.29411766)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pfk58"]
+resource_local_to_scene = true
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0, 0.8, 0.8, 1)
+border_blend = true
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+shadow_color = Color(0.03137255, 1, 1, 1)
+shadow_size = 25
+
 [node name="Polygon2D" type="Node2D" unique_id=729301136]
 
 [node name="Polygon2D" type="Polygon2D" parent="." unique_id=966295149]
@@ -24,3 +69,38 @@ material = SubResource("ShaderMaterial_pfk58")
 position = Vector2(1, 0)
 scale = Vector2(2, 0.8749998)
 polygon = PackedVector2Array(14, 54.857155, 18, 54.857155, 18, 42, 27.5, 55, 30, 48, 20, 35.42858, 32, 35.42858, 32, 28.571436, 20, 28.571436, 22.573593, 25.16578, 29.5, 16.000004, 27, 9.142859, 18, 22, 18, 9.142859, 14, 9.142859, 14, 22, 5, 9.142859, 2.5, 14.857146, 11, 28, 0, 28, 0, 36, 11, 36, 2.5, 48, 5, 56, 14, 42)
+
+[node name="Control" type="Control" parent="." unique_id=916439147]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PanelContainer" type="PanelContainer" parent="Control" unique_id=1833918031]
+layout_mode = 0
+offset_left = 96.0
+offset_top = 49.0
+offset_right = 136.0
+offset_bottom = 89.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_l15yt")
+
+[node name="PanelContainer" type="PanelContainer" parent="Control/PanelContainer" unique_id=1361924557]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_mk0ln")
+
+[node name="Label" type="Label" parent="Control/PanelContainer/PanelContainer" unique_id=153884440]
+layout_mode = 2
+text = "TEST"
+
+[node name="TerminalWindow" parent="Control" unique_id=340148133 instance=ExtResource("2_pfk58")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 152.0
+offset_top = 158.0
+offset_right = 818.0
+offset_bottom = 271.0
+grow_horizontal = 1
+grow_vertical = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_pfk58")

@@ -23,28 +23,29 @@ signal session_deactivated(active_sig: ActiveSignal)
 signal session_closed(active_sig: ActiveSignal)
 signal session_line_display_mode_changed()
 
-@onready var command_line = $TerminalVBox/CmdLineHBox/CommandLine
-@onready var history = $TerminalVBox/TerminalHistory
-@onready var prefix = $TerminalVBox/CmdLineHBox/InputPrefix
-@onready var title_bar = $TerminalVBox/TitleBar
-@onready var title_text = $TerminalVBox/TitleBar/TitleHBox/TitleText
-@onready var session_tabs = $TerminalVBox/TitleBar/TitleHBox/SessionTabs
+@onready var command_line = $TerminalInner/TerminalVBox/CmdLineHBox/CommandLine
+@onready var history = $TerminalInner/TerminalVBox/TerminalHistory
+@onready var prefix = $TerminalInner/TerminalVBox/CmdLineHBox/InputPrefix
+@onready var title_bar = $TerminalInner/TerminalVBox/TitleBar
+@onready var title_text = $TerminalInner/TerminalVBox/TitleBar/TitleHBox/TitleText
+@onready var session_tabs: TabBar = $TerminalInner/TerminalVBox/TitleBar/TitleHBox/SessionTabs
+@onready var root_tab: TabBar = $TerminalInner/TerminalVBox/TitleBar/TitleHBox/RootTab
 
-@onready var scan_panel = $TerminalVBox/SignalDetailHBox/ScanPanel
-@onready var scan_progress = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanProgress
-@onready var scan_icon = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanProgress/ScanCenterBox/ScanHBox/ScanIcon
-@onready var scan_label = $TerminalVBox/SignalDetailHBox/ScanPanel/ScanProgress/ScanCenterBox/ScanHBox/ScanLabel
+@onready var scan_panel = $TerminalInner/TerminalVBox/SignalDetailHBox/ScanPanel
+@onready var scan_progress = $TerminalInner/TerminalVBox/SignalDetailHBox/ScanPanel/ScanProgress
+@onready var scan_icon = $TerminalInner/TerminalVBox/SignalDetailHBox/ScanPanel/ScanProgress/ScanCenterBox/ScanHBox/ScanIcon
+@onready var scan_label = $TerminalInner/TerminalVBox/SignalDetailHBox/ScanPanel/ScanProgress/ScanCenterBox/ScanHBox/ScanLabel
 
-@onready var lock_panel = $TerminalVBox/SignalDetailHBox/LockPanel
-@onready var lock_icon = $TerminalVBox/SignalDetailHBox/LockPanel/CenterContainer/LockHBox/LockIcon
-@onready var lock_label = $TerminalVBox/SignalDetailHBox/LockPanel/CenterContainer/LockHBox/LockLabel
-@onready var toolbox_button = $TerminalVBox/SignalDetailHBox/LockPanel/LockPanelButton
-@onready var toolbox_panel = $TerminalVBox/SignalDetailHBox/LockPanel/LockPanelButton/LockToolboxControl/ToolboxPanel
+@onready var lock_panel = $TerminalInner/TerminalVBox/SignalDetailHBox/LockPanel
+@onready var lock_icon = $TerminalInner/TerminalVBox/SignalDetailHBox/LockPanel/CenterContainer/LockHBox/LockIcon
+@onready var lock_label = $TerminalInner/TerminalVBox/SignalDetailHBox/LockPanel/CenterContainer/LockHBox/LockLabel
+@onready var toolbox_button = $TerminalInner/TerminalVBox/SignalDetailHBox/LockPanel/LockPanelButton
+@onready var toolbox_panel = $TerminalInner/TerminalVBox/SignalDetailHBox/LockPanel/LockPanelButton/LockToolboxControl/ToolboxPanel
 
-@onready var ic_panel = $TerminalVBox/SignalDetailHBox/ICPanel
-@onready var ic_progress = $TerminalVBox/SignalDetailHBox/ICPanel/ICProgress
-@onready var ic_icon = $TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox/ICIcon
-@onready var ic_label = $TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox/ICLabel
+@onready var ic_panel = $TerminalInner/TerminalVBox/SignalDetailHBox/ICPanel
+@onready var ic_progress = $TerminalInner/TerminalVBox/SignalDetailHBox/ICPanel/ICProgress
+@onready var ic_icon = $TerminalInner/TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox/ICIcon
+@onready var ic_label = $TerminalInner/TerminalVBox/SignalDetailHBox/ICPanel/ICCenterBox/ICHBox/ICLabel
 
 
 
@@ -173,7 +174,7 @@ func print_unlogged(text: String):
 func print_transient(text: String) -> void:
 	if text.is_empty():
 		return
-	print_unlogged("[Program] " + text)
+	print_unlogged(text)
 
 func play_system_dump(text: String, initial_cps: float = 100.0, max_cps: float = 500.0) -> void:
 	if _takeover_controller == null:
@@ -571,6 +572,10 @@ func _on_signal_scanned(signal_data: SignalData, _scan_depth) -> void:
 	_refresh_signal_detail_panel()
 
 func _on_signal_scan_complete(signal_data: SignalData) -> void:
+	#NOTE: This could be more robust
+	if signal_data.ic_modules:
+		for ic in signal_data.ic_modules.modules:
+			print_transient("[color=red]WARNING[/color]: [color=cyan]IC detected[/color] on " + signal_data.display_name + ": " + ic.warning_notice())
 	if active_signal == null or active_signal == root_signal or signal_data != active_signal.data:
 		return
 	_refresh_signal_detail_panel()

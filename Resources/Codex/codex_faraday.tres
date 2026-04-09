@@ -10,5 +10,5 @@ title = "Faraday"
 category = "IC"
 extra = "Threat Level: 1"
 icon = ExtResource("1_dc2pr")
-body_text = "Prevents connections to the signal until a runner is close enough."
+body_text = "Prevents running commands on the signal until a runner is close enough."
 metadata/_custom_type_script = "uid://bcwfqttb2lhqa"
