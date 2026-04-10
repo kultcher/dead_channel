@@ -11,6 +11,9 @@ enum Type { NONE, SNIFF, FUZZ, DECRYPT }
 @export var puzzle_locked: bool = false
 @export var puzzle_config: Resource
 
+var base_difficulty: int = 0
+var uses_escalation_difficulty: bool = true
+
 var puzzle_dict = {
 	Type.NONE: "Open",
 	Type.SNIFF: "Unauthorized",
@@ -20,6 +23,23 @@ var puzzle_dict = {
 
 func _init():
 	pass
+
+func set_difficulty(value: int) -> void:
+	base_difficulty = value
+	difficulty = value
+	uses_escalation_difficulty = true
+
+func apply_escalation(escalation_level: int) -> void:
+	if not uses_escalation_difficulty:
+		return
+	if base_difficulty == 0:
+		return
+	difficulty = base_difficulty + escalation_level
+	ensure_puzzle_generated()
+
+func set_custom_fixed() -> void:
+	print("custom")
+	uses_escalation_difficulty = false
 
 func ensure_initial_lock_state():
 	if puzzle_type != Type.NONE:

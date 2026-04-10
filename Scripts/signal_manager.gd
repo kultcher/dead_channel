@@ -16,6 +16,7 @@ var signal_queue: Array[ActiveSignal] = []
 
 func _ready():
 	CommandDispatch.signal_manager = self
+	GlobalEvents.escalation_state_changed.connect(_escalate_signal_difficulty)
 	if terminal_window != null:
 		if not terminal_window.session_activated.is_connected(_on_terminal_session_visual_changed):
 			terminal_window.session_activated.connect(_on_terminal_session_visual_changed)
@@ -25,13 +26,6 @@ func _ready():
 			terminal_window.session_closed.connect(_on_terminal_session_visual_changed)
 		if not terminal_window.session_line_display_mode_changed.is_connected(_on_session_line_display_mode_changed):
 			terminal_window.session_line_display_mode_changed.connect(_on_session_line_display_mode_changed)
-	
-#	spawn_signal_data(spawner.create_test_cam("05", 2), 3.5)
-#	spawn_signal_data(spawner.create_test_cam("06", 3), 6.5)
-#	spawn_signal_data(spawner.create_test_cam("07", 4), 4.5)
-#	spawn_signal_data(spawner.create_test_cam("08", 0), 7.5)
-#	spawn_signal_data(spawner.create_test_door("01", 2), 1.5)
-#	spawn_signal_data(spawner.create_test_guard("01", 5.0, 1), 5.0)
 
 func get_active_signal(display_name: String):
 	print("Search queue for: ", display_name)
@@ -79,7 +73,17 @@ func spawn_signal_data(data: SignalData, cell_index: float):
 	new_signal.setup()
 	new_signal.generate_scan_layers()
 	signal_queue.append(new_signal)
-	print("Spawn signal: ", new_signal.data.display_name)
+
+func _escalate_signal_difficulty(idx: int = 0, new_tier: int = 0) -> void:
+	for s in signal_queue:
+		if s.instance_node: continue		# skip if on screen
+		if s.data.puzzle:
+			s.data.puzzle.apply_escalation(new_tier)
+			print("Upgrading puzzle on " + s.data.display_name)
+		if not s.data.ic_modules: continue
+		if s.data.ic_modules.modules.size() > 0:
+			for m in s.data.ic_modules.modules:
+				m.apply_escalation(new_tier)
 
 func update_signal_position():
 	for active_sig in signal_queue:

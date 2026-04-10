@@ -185,7 +185,7 @@ func make_puzzle(
 ) -> PuzzleComponent:
 	var puzzle := PuzzleComponent.new()
 	puzzle.puzzle_type = puzzle_type
-	puzzle.difficulty = difficulty
+	puzzle.set_difficulty(difficulty)
 	puzzle.encryption_key = encryption_key
 	if puzzle_config != null:
 		puzzle.puzzle_config = puzzle_config.duplicate(true)
@@ -211,7 +211,7 @@ func build_ic(name: StringName, difficulty: int) -> Resource:
 	var module := _create_ic_module(ic_name)
 	if module == null:
 		return null
-	module.apply_difficulty(difficulty)
+	module.set_difficulty(difficulty)
 	return module
 
 func build_custom_ic(name: StringName, params: Dictionary) -> Resource:
@@ -219,6 +219,7 @@ func build_custom_ic(name: StringName, params: Dictionary) -> Resource:
 	var module := _create_ic_module(ic_name)
 	if module == null:
 		return null
+	module.set_custom_fixed()
 	module.apply_params(params)
 	return module
 
@@ -236,16 +237,26 @@ func build_puzzle(name: StringName, difficulty: int) -> PuzzleComponent:
 func build_custom_puzzle(name: StringName, params: Dictionary) -> PuzzleComponent:
 	var puzzle_name := String(name).to_lower()
 	var difficulty := int(params.get("difficulty", 1))
+	var uses_escalation_difficulty := bool(params.get("uses_escalation_difficulty", false))
 	match puzzle_name:
 		"sniff":
 			var sniff_config = params.get("config", null) as SniffPuzzleConfig
-			return make_sniff_puzzle(difficulty, sniff_config)
+			var puzzle := make_sniff_puzzle(difficulty, sniff_config)
+			if not uses_escalation_difficulty:
+				puzzle.set_custom_fixed()
+			return puzzle
 		"fuzz":
-			return make_fuzz_puzzle(difficulty)
+			var puzzle := make_fuzz_puzzle(difficulty)
+			if not uses_escalation_difficulty:
+				puzzle.set_custom_fixed()
+			return puzzle
 		"decrypt":
 			var encryption_key := String(params.get("encryption_key", ""))
 			var decrypt_config = params.get("config", null) as DecryptPuzzleConfig
-			return make_decrypt_puzzle(difficulty, encryption_key, decrypt_config)
+			var puzzle := make_decrypt_puzzle(difficulty, encryption_key, decrypt_config)
+			if not uses_escalation_difficulty:
+				puzzle.set_custom_fixed()
+			return puzzle
 	return null
 
 func make_response(effects: Array[Resource] = []) -> ResponseComponent:

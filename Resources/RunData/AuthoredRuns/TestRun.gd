@@ -22,47 +22,47 @@ func get_spawns() -> Array[Dictionary]:
 			.add_ic_custom("reboot", {"reboot_time": 3.0})
 			.add_ic("haze", 1)
 			.build(),
-		spawn(PANNING_CAMERA, 7.5)
-			.id("cam_04")
-			.lane(0)
-			.vision(20.0, 1.0)
-			.detection_sweep([-1, 3], [180, 3])
-			.add_ic_custom("reboot", {"reboot_time": 3.0})
-			.build(),
-		spawn(PANNING_CAMERA, 8.5)
-			.id("cam_10")
-			.lane(4)
-			.vision(20.0, 1.0)
-			.detection_sweep([-1, 3], [180, 3])
-			.add_ic_custom("reboot", {"reboot_time": 3.0})
-			.build(),
-		spawn(BASIC_DOOR, 6.5)
-			.lane(2)
-			.add_puzzle("sniff", 1)
-			.build(),
-
-		spawn(PANNING_CAMERA, 9.5)
-			.id("cam_04")
-			.lane(4)
-			.vision(20.0, 1.0)
-			.detection_sweep([1, 3.5], [180, 3.5])
-			.add_ic_custom("reboot", {"reboot_time": 10.0})
-			.build(),
-
-		spawn(BASIC_DRONE, 25.0)
-			.id("drone_02")
-			.lane(1)
-			.patrol([0.0, 0, 3, 0], [6.0, 0, 3, 0])
-			.add_ic_custom("reboot", {"reboot_time": 10.0})
-			.build(),
-
-		spawn(BASIC_CAMERA, 26.5)
-			.id("cam_05")
-			.lane(1)
-			.vision(20.0, 1.0)
-			.detection_sweep([-1, 3.5], [180, 3.5])
-			.add_ic_custom("reboot", {"reboot_time": 10.0})
-			.build(),
+		#spawn(PANNING_CAMERA, 7.5)
+			#.id("cam_04")
+			#.lane(0)
+			#.vision(20.0, 1.0)
+			#.detection_sweep([-1, 3], [180, 3])
+			#.add_ic_custom("reboot", {"reboot_time": 3.0})
+			#.build(),
+		#spawn(PANNING_CAMERA, 8.5)
+			#.id("cam_10")
+			#.lane(4)
+			#.vision(20.0, 1.0)
+			#.detection_sweep([-1, 3], [180, 3])
+			#.add_ic_custom("reboot", {"reboot_time": 3.0})
+			#.build(),
+		#spawn(BASIC_DOOR, 6.5)
+			#.lane(2)
+			#.add_puzzle("sniff", 1)
+			#.build(),
+#
+		#spawn(PANNING_CAMERA, 9.5)
+			#.id("cam_04")
+			#.lane(4)
+			#.vision(20.0, 1.0)
+			#.detection_sweep([1, 3.5], [180, 3.5])
+			#.add_ic_custom("reboot", {"reboot_time": 10.0})
+			#.build(),
+#
+		#spawn(BASIC_DRONE, 25.0)
+			#.id("drone_02")
+			#.lane(1)
+			#.patrol([0.0, 0, 3, 0], [6.0, 0, 3, 0])
+			#.add_ic_custom("reboot", {"reboot_time": 10.0})
+			#.build(),
+#
+		#spawn(BASIC_CAMERA, 26.5)
+			#.id("cam_05")
+			#.lane(1)
+			#.vision(20.0, 1.0)
+			#.detection_sweep([-1, 3.5], [180, 3.5])
+			#.add_ic_custom("reboot", {"reboot_time": 10.0})
+			#.build(),
 		spawn(PANNING_CAMERA, 29.5)
 			.id("cam_06")
 			.lane(4)
@@ -70,32 +70,32 @@ func get_spawns() -> Array[Dictionary]:
 			.detection_sweep([1, 3.5], [180, 3.5])
 			.add_ic_custom("reboot", {"reboot_time": 3.0})
 			.build(),
-		spawn(BASIC_CAMERA, 35.5)
+		spawn(BASIC_CAMERA, 12.5)
 			.id("cam_07")
 			.lane(2)
 			.vision(20.0, 1.0)
-			.add_ic_custom("reboot", {"reboot_time": 10.0})
-			.add_ic_custom("bouncer", {"time_to_disconnect": 3.0})
+			.add_ic("reboot", 2)
+			.add_ic("bouncer", 2)
 			.build(),
 
-		spawn(BASIC_DRONE, 31.0)
-			.id("drone_03")
-			.lane(3)
-			.patrol([0.0, 0, 3, 0], [-6.0, 0, 3, 0])
-			.build(),
-
-		spawn(BASIC_DISRUPTOR, 27.5)
-			.id("coolant_vent_00")
-			.lane(4)
-			.build(),
-		spawn(BASIC_DISRUPTOR, 29.5)
-			.id("breaker_panel_02")
-			.lane(0)
-			.build(),
-		spawn(BASIC_DISRUPTOR, 31.5)
-			.id("nano_fabricator_00")
-			.lane(4)
-			.build(),
+		#spawn(BASIC_DRONE, 31.0)
+			#.id("drone_03")
+			#.lane(3)
+			#.patrol([0.0, 0, 3, 0], [-6.0, 0, 3, 0])
+			#.build(),
+#
+		#spawn(BASIC_DISRUPTOR, 27.5)
+			#.id("coolant_vent_00")
+			#.lane(4)
+			#.build(),
+		#spawn(BASIC_DISRUPTOR, 29.5)
+			#.id("breaker_panel_02")
+			#.lane(0)
+			#.build(),
+		#spawn(BASIC_DISRUPTOR, 31.5)
+			#.id("nano_fabricator_00")
+			#.lane(4)
+			#.build(),
 		# spawn(BASIC_DOOR, 19.5)
 		# 	.id("lab_door")
 		# 	.lane(2)

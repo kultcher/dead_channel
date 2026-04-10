@@ -1,4 +1,4 @@
-extends Node
+class_name EscalationManager extends Node
 
 const PANEL_BG := Color(0.05, 0.02, 0.02, 0.92)
 const PANEL_BORDER := Color(0.85, 0.2, 0.18, 1.0)

@@ -145,7 +145,7 @@ shader_parameter/glow_tint = Color(0.75, 1, 1, 1)
 
 [node name="RunManager" type="Node" parent="." unique_id=973638613]
 script = ExtResource("1_4q6c1")
-level_script_path = "uid://2c2k0eym4x47"
+level_script_path = "uid://cweechpdcw3v"
 
 [node name="TutorialManager" type="Node" parent="." unique_id=755181945]
 script = ExtResource("2_r51ll")
@@ -154,7 +154,6 @@ script = ExtResource("2_r51ll")
 script = ExtResource("1_8roaf")
 
 [node name="EscalationManager" type="Node" parent="." unique_id=1694473189]
-process_mode = 4
 script = ExtResource("4_tudq4")
 
 [node name="SignalTimeline" type="Node2D" parent="." unique_id=304122731]

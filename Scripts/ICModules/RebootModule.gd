@@ -19,6 +19,7 @@ func get_codex_id():
 func apply_difficulty(difficulty: int) -> void:
 	reboot_time = float(_pick_difficulty_value(DIFFICULTY_REBOOT_TIMES, difficulty))
 
+
 func apply_params(params: Dictionary) -> void:
 	reboot_time = float(params.get("reboot_time", reboot_time))
 

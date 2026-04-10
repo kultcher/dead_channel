@@ -100,6 +100,7 @@ Code:
 - Make puzzles UI more Godot-y (instead of built-by-code)
 - Cleanup cutscene controller (hardcoded textures)
 - Add startup warning around duplicate signal IDs
+- Add signal ICE visual indicator layer
 
 Game:
 - Maybe merge RUN programs into "CRACK"
