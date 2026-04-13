@@ -571,7 +571,7 @@ func null_spike_sync_sequence():
 	_enable_feature("scan", false)
 	Input.set_default_cursor_shape(Input.CURSOR_FORBIDDEN)
 
-	var sync_text := FileAccess.get_file_as_string(NULL_SPIKE_SYNC_PATH)
+	var sync_text := TutorialTextBank.read_text(NULL_SPIKE_SYNC_PATH, TutorialTextBank.NULL_SPIKE_SYNC)
 	var sync_duration = terminal_window.estimate_type_duration(sync_text, 0.02)
 	print(sync_duration)
 	cutscene_controller.start_first_null_spike_sync(sync_duration)
@@ -743,7 +743,7 @@ func _unlock_signal_puzzle(system_id: String) -> void:
 func _run_terminal_dump_sequence() -> void:
 	if terminal_window == null:
 		return
-	var dump_text := FileAccess.get_file_as_string(NULL_SPIKE_DUMP_PATH)
+	var dump_text := TutorialTextBank.read_text(NULL_SPIKE_DUMP_PATH, TutorialTextBank.NULL_SPIKE_DUMP)
 	if dump_text.is_empty():
 		return
 	await terminal_window.play_system_dump(dump_text)

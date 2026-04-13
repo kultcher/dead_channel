@@ -106,10 +106,13 @@ func toggle_help_overlay() -> void:
 
 func _show_codex_popup(codex_id: StringName, signal_data: SignalData):
 	var popup = codex_popup.instantiate()
-	if signal_data != null:
-		var signal_instance = signal_manager.get_signal_by_system_id(signal_data.system_id).instance_node
-		popup.position = signal_instance.position + Vector2(-110, 150)
+	popup.process_mode = Node.PROCESS_MODE_ALWAYS
+	if signal_data != null and signal_manager != null:
+		var active_signal = signal_manager.get_signal_by_system_id(signal_data.system_id)
+		if active_signal != null and active_signal.instance_node != null:
+			popup.position = active_signal.instance_node.get_global_position() + Vector2(-110, 150)
 	add_child(popup)
+	move_child(popup, get_child_count() - 1)
 	popup.setup_and_display(codex_id)
 
 func _on_runner_died() -> void:
