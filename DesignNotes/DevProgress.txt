@@ -87,6 +87,7 @@ Development Progress
 - Added editor-level Escalation UI
 - Added Necromancer Escalation IC
 - Added IC effect visual layer, effects for Reboot, Haze, Bouncer and Faraday
+- Added callback
 
 Short-term TODO:
 - More and more advanced IC + escalation IC

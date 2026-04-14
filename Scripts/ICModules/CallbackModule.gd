@@ -68,8 +68,12 @@ func process_action(action_context: ActionContext) -> void:
 		return
 	if not _armed:
 		return
+	if action_context.source_type != ActionContext.SourceType.TERMINAL_COMMAND:
+		return
 	match action_context.action_type:
 		ActionContext.ActionType.SHOW_HELP:
+			return
+		ActionContext.ActionType.ACCESS_SIGNAL:
 			return
 		ActionContext.ActionType.CALLBACK_INPUT:
 			_process_callback_input(action_context)
@@ -80,8 +84,13 @@ func process_action(action_context: ActionContext) -> void:
 			)
 
 func get_connection_flow_lines(_active_sig: ActiveSignal) -> Array[String]:
+	if callback_sequence.is_empty():
+		callback_sequence = _build_callback_sequence(_get_sequence_counts())
+	if _resolved:
+		return ["[color=cyan]CALLBACK[/color]: Client recognized. Reopening session."]
 	return [
 		"[b][color=red]CALLBACK[/color][/b]: Return-sequence challenge armed.",
+		"RETURN SEQUENCE: [color=cyan]$%s[/color]" % callback_sequence,
 		"Use [color=cyan]$<sequence>[/color] to clear the channel."
 	]
 
@@ -93,6 +102,8 @@ func _process_callback_input(action_context: ActionContext) -> void:
 		action_context.succeed("[b][color=green]CALLBACK[/color][/b] accepted. Command channel restored.")
 		return
 	action_context.fail("[b][color=orange]CALLBACK[/color][/b] rejected.")
+
+# CALLBACK SEQUENCE BUILD #
 
 func _get_sequence_counts(difficulty: int = -1) -> Vector3i:
 	var effective_difficulty := difficulty

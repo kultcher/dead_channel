@@ -37,6 +37,10 @@
 !Fuzzy: Greatly delays scan progress.
 - Requires tying up time or RAM to gain information. May force player to operate blind.
 
+!Callback: Have to echo a somewhat complicated passphrase back to the terminal.
+- Taxes time and attention, punishes carelessness.
+
+
 Stickler: No shortcuts or aliases allowed. Player must manually type full commands, can't click to connect to signals, etc.
 - Tests memory and accuracy, potentially creates time pressure. Potentially dangerous combo with Bouncer or Faraday.
 
@@ -50,8 +54,6 @@ Spammer: Randomly opens popups all over the screen.
 
 Failsafe: Signal presists for X seconds after being disabled.
 
-Callback: Have to echo a somewhat complicated passphrase back to the terminal.
-- Taxes time and attention, punishes carelessness.
 
 ### Tier 2:
 

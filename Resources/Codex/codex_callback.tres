@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CodexEntry" format=3 uid="uid://drsm3evo1yhun"]
+
+[ext_resource type="Texture2D" uid="uid://c5pkwl3o75qoc" path="res://Visuals/Icons/Simple/rotary-phone.svg" id="1_sypi5"]
+[ext_resource type="Script" uid="uid://bcwfqttb2lhqa" path="res://Scripts/codex_entry.gd" id="2_iob7j"]
+
+[resource]
+script = ExtResource("2_iob7j")
+codex_id = &"callback"
+title = "Callback"
+category = "IC"
+extra = "Threat Level: 1"
+icon = ExtResource("1_sypi5")
+body_text = "Blocks commands until a callback sequece is entered in the terminal."
+metadata/_custom_type_script = "uid://bcwfqttb2lhqa"

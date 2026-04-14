@@ -214,17 +214,18 @@ func _stream_connection_flow_async(target_sig: ActiveSignal, flow_serial: int) -
 		return
 
 	var full_text := "\n".join(lines)
-	var total_chars := full_text.length()
-	if total_chars <= 0:
+	var reveal_steps := _build_bbcode_safe_reveal_steps(full_text)
+	var total_steps := reveal_steps.size()
+	if total_steps <= 0:
 		_finish_connection_flow(flow_serial, target_sig)
 		return
 
-	var char_delay := CONNECTION_FLOW_TOTAL_DURATION / float(total_chars)
+	var char_delay := CONNECTION_FLOW_TOTAL_DURATION / float(total_steps)
 	char_delay = minf(char_delay, CONNECTION_FLOW_MAX_STEP_DELAY)
 	var base_text = history.text
-	var chars_revealed: float = 0.0
+	var reveal_progress: float = 0.0
 
-	while chars_revealed < total_chars:
+	while reveal_progress < total_steps:
 		if flow_serial != _connection_flow_serial:
 			return
 		if active_session == null or active_session.active_signal != target_sig:
@@ -232,21 +233,40 @@ func _stream_connection_flow_async(target_sig: ActiveSignal, flow_serial: int) -
 			return
 
 		var delta := get_process_delta_time()
-		var current_idx := int(chars_revealed)
-		if current_idx < total_chars and full_text[current_idx] == "\n":
-			chars_revealed += 1.0
-			history.text = base_text + full_text.substr(0, int(chars_revealed))
+		var current_step := int(reveal_progress)
+		var current_text := reveal_steps[current_step]
+		var next_text := reveal_steps[min(current_step + 1, total_steps - 1)]
+		if current_text.ends_with("\n") and current_text != next_text:
+			reveal_progress += 1.0
+			history.text = base_text + reveal_steps[min(int(reveal_progress), total_steps - 1)]
 			await get_tree().create_timer(minf(0.02, maxf(0.001, char_delay * 2.0))).timeout
 			continue
 
-		chars_revealed += delta / maxf(0.001, char_delay)
-		history.text = base_text + full_text.substr(0, int(chars_revealed))
+		reveal_progress += delta / maxf(0.001, char_delay)
+		history.text = base_text + reveal_steps[min(int(reveal_progress), total_steps - 1)]
 		await get_tree().process_frame
 
 	if flow_serial == _connection_flow_serial:
 		history.text = base_text + full_text + "\n"
 		active_session.history.append_array(lines)
 	_finish_connection_flow(flow_serial, target_sig)
+
+func _build_bbcode_safe_reveal_steps(full_text: String) -> Array[String]:
+	var steps: Array[String] = []
+	var cursor := 0
+	while cursor < full_text.length():
+		if full_text[cursor] == "[":
+			var closing_idx := full_text.find("]", cursor)
+			if closing_idx != -1:
+				var tag_end := closing_idx + 1
+				var current_prefix := full_text.substr(0, tag_end)
+				if steps.is_empty() or steps[-1] != current_prefix:
+					steps.append(current_prefix)
+				cursor = tag_end
+				continue
+		steps.append(full_text.substr(0, cursor + 1))
+		cursor += 1
+	return steps
 
 func _finish_connection_flow(flow_serial: int, target_sig: ActiveSignal) -> void:
 	if flow_serial != _connection_flow_serial:

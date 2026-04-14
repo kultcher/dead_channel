@@ -6,7 +6,7 @@ class_name BouncerModule extends ICModule
 var timer: Timer = null
 var effect_node: ICProgressRadial = null
 
-const DIFFICULTY_DISCONNECT_TIMES := [2.0, 3.0, 4.0, 5.0]
+const DIFFICULTY_DISCONNECT_TIMES := [5.0, 4.0, 3.0, 2.5]
 
 func get_desc():
 	return "Bouncer(%.1fs)" % time_to_disconnect
