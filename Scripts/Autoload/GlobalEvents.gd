@@ -23,6 +23,7 @@ signal heat_set_requested(amount)
 signal heat_state_changed(amount, last_source)
 signal escalation_threshold_triggered(tier_index, threshold_ratio)
 signal escalation_state_changed(active_tier_index, triggered_tier_count)
+signal escalation_signal_disabled(active_sig: ActiveSignal)
 
 signal runner_detected(active_sig: ActiveSignal)
 signal runners_damaged(amount: float)

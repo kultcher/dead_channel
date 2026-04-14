@@ -164,6 +164,9 @@ func create_escalation_signal(id: String, lane: int = 2) -> SignalData:
 	escalation.hackable = hackable
 
 	var ic := ICComponent.new()
+	var necromancer := NecromancerModule.new()
+	necromancer.set_difficulty(maxi(1, int(id)))
+	ic.add_module(necromancer)
 	escalation.ic_modules = ic
 
 	var escalation_component := EscalationComponent.new()

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cxtj1fq7mmq1h" path="res://Scripts/Components/DetectionComponent.gd" id="1_6yba5"]
 [ext_resource type="Script" uid="uid://bjwel5bmlp6x4" path="res://Scripts/Components/DetectionPatrolPoint.gd" id="1_qn1mi"]
-[ext_resource type="Resource" path="res://Resources/SignalVisuals/camera_visuals.tres" id="1_visuals"]
+[ext_resource type="Resource" uid="uid://jvfsw4ih31jf" path="res://Resources/SignalVisuals/camera_visuals.tres" id="1_visuals"]
 [ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="1_vx140"]
 [ext_resource type="Script" uid="uid://cysj06bgrv1ai" path="res://Scripts/Components/HackableComponent.gd" id="2_qn1mi"]
 [ext_resource type="Script" uid="uid://diftg5rgtn3kr" path="res://Scripts/Components/ICComponent.gd" id="4_30cmg"]

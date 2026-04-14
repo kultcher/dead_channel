@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CodexEntry" format=3 uid="uid://f0pmdy86ed6a"]
+
+[ext_resource type="Texture2D" uid="uid://b6am7duggd3ta" path="res://Visuals/Icons/Simple/fog.svg" id="1_7ov53"]
+[ext_resource type="Script" uid="uid://bcwfqttb2lhqa" path="res://Scripts/codex_entry.gd" id="2_igs6a"]
+
+[resource]
+script = ExtResource("2_igs6a")
+codex_id = &"haze"
+title = "Haze"
+category = "IC"
+extra = "Threat Level: 1"
+icon = ExtResource("1_7ov53")
+body_text = "Significantly increases the time it takes to scan a signal."
+metadata/_custom_type_script = "uid://bcwfqttb2lhqa"

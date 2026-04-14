@@ -1,8 +1,10 @@
 class_name BouncerModule extends ICModule
 
 @export var time_to_disconnect: float = 3.0
+@export var _effect_scene: PackedScene = preload("res://Scenes/ic_progress_radial.tscn")
 
 var timer: Timer = null
+var effect_node: ICProgressRadial = null
 
 const DIFFICULTY_DISCONNECT_TIMES := [2.0, 3.0, 4.0, 5.0]
 
@@ -12,11 +14,31 @@ func get_desc():
 func get_codex_id():
 	return &"codex_bouncer"
 
+func on_visuals_ready(active_sig: ActiveSignal, ic_effects: ICEffectsHost, module_index: int) -> void:
+	var effect_instance := _effect_scene.instantiate() as ICProgressRadial
+	if effect_instance == null:
+		return
+	effect_node = ic_effects.register_effect(
+		&"bouncer",
+		effect_instance,
+		module_index,
+		ICEffectsHost.RevealMode.ON_SCAN,
+		&"progress"
+	) as ICProgressRadial
+	if effect_node != null:
+		effect_node.configure(active_sig, time_to_disconnect)
+		effect_node.set_idle_visible(true)
+		effect_node.set_gradient("res://Visuals/Gradients/orange_gradient_tex.tres")
+
 func apply_difficulty(difficulty: int) -> void:
 	time_to_disconnect = float(_pick_difficulty_value(DIFFICULTY_DISCONNECT_TIMES, difficulty))
+	if effect_node != null:
+		effect_node.configure(null, time_to_disconnect)
 
 func apply_params(params: Dictionary) -> void:
 	time_to_disconnect = float(params.get("time_to_disconnect", time_to_disconnect))
+	if effect_node != null:
+		effect_node.configure(null, time_to_disconnect)
 
 func postprocess_action(action_context: ActionContext) -> void:
 	if action_context == null or not action_context.was_successful():
@@ -34,6 +56,8 @@ func postprocess_action(action_context: ActionContext) -> void:
 	GlobalEvents.add_child(timer)
 	timer.timeout.connect(_on_disconnect_timer_timeout.bind(active_sig), CONNECT_ONE_SHOT)
 	timer.start(time_to_disconnect)
+	if effect_node != null:
+		effect_node.start(time_to_disconnect, timer)
 
 func on_session_closed(_active_sig: ActiveSignal):
 	_clear_timer()
@@ -73,3 +97,5 @@ func _clear_timer() -> void:
 	if timer != null and is_instance_valid(timer):
 		timer.queue_free()
 	timer = null
+	if effect_node != null:
+		effect_node.stop()

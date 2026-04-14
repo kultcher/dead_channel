@@ -761,11 +761,11 @@ func _focus_heat_tracker() -> void:
 	window_manager.focus_control(heat_tracker, Vector2(24, 24))
 
 func _focus_door_lock_state(system_id: String) -> void:
+	print("is _focus_door_lock_state doing anything?")
 	var active_sig := _get_active_signal(system_id)
 	if active_sig == null or active_sig.instance_node == null:
 		window_manager.clear_focus_overlay()
 		return
-	active_sig.instance_node.show_tooltip()
 	var lock_rect = active_sig.instance_node.tooltip_main.get_lock_state_focus_rect()
 	if not _has_focus_rect(lock_rect):
 		window_manager.focus_signal(active_sig)

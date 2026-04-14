@@ -31,10 +31,23 @@ visual ideas:
 	maintenance drones - no detection but alerted but hacks and can fix
 	pulse drones: similar to 360 camera, but different cadence
 	civilians techs who flag tech issues
+	
 	alarm panels that civs or guards can trigger, but you can also hack to trigger as a distraction?
 	power/light switches?
-
+	jammer that blocks access
 	relay signal: force multiplier that buffs other signals
+	relay alt: multiplies heat gain
+	relay disruptor: blocks player access when runner close to it
+	- kill redundancy IC (activates puzzle only on kill)
+
+	Environmental Controller — HVAC, lighting, fire suppression, industrial equipment, etc.
+
+	Not a threat by default. Just an IoT device on the timeline.
+	When hacked, offers a menu of context-dependent effects:
+	Lighting controller: Activate to reduce detection range of cameras and guards in a radius. "Kill the lights."
+	HVAC / ventilation: Activate to generate noise that masks runner movement, raising motion sensor thresholds.
+	Fire suppression: Activate to create a brief zone of chaos — distracts guards, disables some electronics, but generates heat from the alarm.
+	Industrial equipment: Activate to create a hazard zone that blocks guard patrols, or to generate noise cover.
 
 
 	Stealing credentials from guards/terminals, escalating credentials

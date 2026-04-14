@@ -56,6 +56,11 @@ func build_action_from_command(cmd_context: CommandContext) -> ActionContext:
 		"HELP":
 			action.action_type = ActionContext.ActionType.SHOW_HELP
 			action.add_tag(&"terminal")
+		"CALLBACK":
+			action.action_type = ActionContext.ActionType.CALLBACK_INPUT
+			action.add_tag(&"terminal")
+			action.add_tag(&"callback")
+			action.set_metadata(&"callback_input", cmd_context.arg)
 		_:
 			action.action_type = ActionContext.ActionType.UNKNOWN
 			action.fail("Unsupported action.")
@@ -133,6 +138,8 @@ func _apply_core_effect(action_context: ActionContext) -> void:
 			_apply_access_signal(action_context)
 		ActionContext.ActionType.SHOW_HELP:
 			_apply_show_help(action_context)
+		ActionContext.ActionType.CALLBACK_INPUT:
+			_apply_callback_input(action_context)
 		ActionContext.ActionType.PROBE_SIGNAL:
 			_apply_probe_signal(action_context)
 		ActionContext.ActionType.KILL_SIGNAL:
@@ -186,6 +193,13 @@ func _apply_show_help(action_context: ActionContext) -> void:
 	if CommandDispatch.window_manager != null:
 		CommandDispatch.window_manager.show_help_overlay()
 	action_context.succeed("Opening terminal reference.")
+
+func _apply_callback_input(action_context: ActionContext) -> void:
+	if action_context == null:
+		return
+	if action_context.was_successful():
+		return
+	action_context.fail("No callback channel available.")
 
 func _ensure_target_is_responding(action_context: ActionContext) -> bool:
 	var target := action_context.primary_target

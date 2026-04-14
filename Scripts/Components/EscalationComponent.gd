@@ -34,6 +34,7 @@ func on_disabled(active_sig: ActiveSignal) -> void:
 	stop(active_sig)
 	if heat_clear_on_disable > 0.0:
 		GlobalEvents.heat_increased.emit(-heat_clear_on_disable, "Escalation neutralized.")
+	
 
 func on_enabled(active_sig: ActiveSignal) -> void:
 	start(active_sig)

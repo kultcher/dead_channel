@@ -1,24 +1,20 @@
 class_name EscalationManager extends Node
 
-const PANEL_BG := Color(0.05, 0.02, 0.02, 0.92)
-const PANEL_BORDER := Color(0.85, 0.2, 0.18, 1.0)
 const PIP_READY := Color(0.28, 0.12, 0.12, 1.0)
 const PIP_TRIGGERED := Color(0.78, 0.24, 0.18, 1.0)
-const PIP_ACTIVE := Color(1.0, 0.72, 0.5, 1.0)
-const BAR_IDLE := Color(0.24, 0.08, 0.08, 1.0)
-const BAR_ACTIVE := Color(0.95, 0.26, 0.18, 1.0)
+const PIP_ACTIVE := Color(1.0, 0.0, 0.22, 1.0)
+const ESCALATION_SIGNAL_SPACING := 72.0
 
 @export var escalation_thresholds: Array[float] = [0.25, 0.5, 0.75, 1.0]
-@export var tier_labels: Array[String] = ["TRACE", "PURSUIT", "LOCKDOWN", "HUNTER"]
-@export var panel_margin := Vector2(24.0, 24.0)
-@export var panel_min_size := Vector2(300.0, 168.0)
 
 @onready var heat_manager = $"../HeatManager"
 @onready var timeline_manager = $"../SignalTimeline/TimelineManager"
-@onready var escalation_panel: PanelContainer = $"../SignalTimeline/EscalationPanel"
-@onready var escalation_container: CenterContainer = $"../SignalTimeline/EscalationPanel/EscalationContainer"
 @onready var scan_controller = $"../SignalTimeline/ScanController"
 @onready var terminal_window = $"../WorkspaceAnchor/TerminalWindow"
+
+@onready var escalation_panel: PanelContainer = $"../SignalTimeline/EscalationPanel"
+@onready var escalation_pips: Array[Node] = $"../SignalTimeline/EscalationPanel/EscalationContainer/PipVbox".get_children()
+@onready var escalation_anchor: Node2D = $"../SignalTimeline/EscalationAnchor"
 
 var _signal_scene := preload("res://Scenes/signal_entity.tscn")
 var _spawner := SignalSpawner.new()
@@ -26,27 +22,20 @@ var _spawner := SignalSpawner.new()
 var _triggered_tiers: Array[bool] = []
 var _active_tier_index := -1
 
-var _panel_margin_box: MarginContainer
-var _panel_vbox: VBoxContainer
-var _alert_bar: ColorRect
-var _pip_row: HBoxContainer
-var _tier_pips: Array[ColorRect] = []
-var _signal_row: HBoxContainer
-var _signal_hosts: Dictionary = {}
 var _active_escalation_signals: Dictionary = {}
 
 func _ready() -> void:
 	if process_mode == Node.PROCESS_MODE_DISABLED: return
 	_initialize_tier_state()
-	_build_panel()
-	if escalation_panel != null:
-		panel_margin = escalation_panel.position
 	if GlobalEvents.heat_state_changed != null:
 		GlobalEvents.heat_state_changed.connect(_on_heat_state_changed)
+	if GlobalEvents.escalation_signal_disabled != null:
+		GlobalEvents.escalation_signal_disabled.connect(_on_escalation_signal_disabled)
 	if timeline_manager != null and timeline_manager.layout_changed != null:
 		timeline_manager.layout_changed.connect(_on_timeline_layout_changed)
-	_refresh_panel_layout()
-	_refresh_panel(heat_manager.get_heat_ratio() if heat_manager != null else 0.0)
+
+	_refresh_anchor_layout()
+	_refresh_panel()
 
 func get_active_tier_index() -> int:
 	return _active_tier_index
@@ -87,7 +76,7 @@ func _on_heat_state_changed(amount: float, _last_source: String) -> void:
 		heat_ratio = amount / max_heat
 
 	_update_thresholds(heat_ratio)
-	_refresh_panel(heat_ratio)
+	_refresh_panel()
 
 func _update_thresholds(heat_ratio: float) -> void:
 	var new_active_tier := -1
@@ -104,96 +93,30 @@ func _update_thresholds(heat_ratio: float) -> void:
 		_active_tier_index = new_active_tier
 		GlobalEvents.escalation_state_changed.emit(_active_tier_index, get_triggered_tier_count())
 
-func _build_panel() -> void:
-	if escalation_panel == null or escalation_container == null:
-		return
-
-	escalation_panel.visible = true
-	escalation_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-
-	var style := StyleBoxFlat.new()
-	style.bg_color = PANEL_BG
-	style.border_color = PANEL_BORDER
-	style.set_border_width_all(2)
-	style.corner_radius_top_left = 10
-	style.corner_radius_top_right = 10
-	style.corner_radius_bottom_left = 10
-	style.corner_radius_bottom_right = 10
-	escalation_panel.add_theme_stylebox_override("panel", style)
-
-	for child in escalation_container.get_children():
-		child.queue_free()
-
-	_panel_margin_box = MarginContainer.new()
-	_panel_margin_box.add_theme_constant_override("margin_left", 16)
-	_panel_margin_box.add_theme_constant_override("margin_top", 14)
-	_panel_margin_box.add_theme_constant_override("margin_right", 16)
-	_panel_margin_box.add_theme_constant_override("margin_bottom", 14)
-	escalation_container.add_child(_panel_margin_box)
-
-	_panel_vbox = VBoxContainer.new()
-	_panel_vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_panel_vbox.add_theme_constant_override("separation", 10)
-	_panel_margin_box.add_child(_panel_vbox)
-
-	_alert_bar = ColorRect.new()
-	_alert_bar.custom_minimum_size = Vector2(0.0, 8.0)
-	_alert_bar.color = BAR_IDLE
-	_panel_vbox.add_child(_alert_bar)
-
-	_pip_row = HBoxContainer.new()
-	_pip_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_pip_row.add_theme_constant_override("separation", 10)
-	_panel_vbox.add_child(_pip_row)
-
-	_tier_pips.clear()
-	for _i in range(escalation_thresholds.size()):
-		var pip := ColorRect.new()
-		pip.custom_minimum_size = Vector2(44.0, 20.0)
-		pip.color = PIP_READY
-		_pip_row.add_child(pip)
-		_tier_pips.append(pip)
-
-	_signal_row = HBoxContainer.new()
-	_signal_row.alignment = BoxContainer.ALIGNMENT_CENTER
-	_signal_row.add_theme_constant_override("separation", 18)
-	_panel_vbox.add_child(_signal_row)
-
-func _refresh_panel_layout() -> void:
-	if escalation_panel == null:
-		return
-	escalation_panel.position = panel_margin
-	escalation_panel.custom_minimum_size = panel_min_size
-	for tier_index in _signal_hosts.keys():
-		_refresh_signal_host_layout(int(tier_index))
-
 func _on_timeline_layout_changed(_viewport_size: Vector2) -> void:
-	_refresh_panel_layout()
+	_refresh_anchor_layout()
+	_refresh_signal_layout()
 
-func _refresh_panel(heat_ratio: float) -> void:
-	if escalation_panel == null or _alert_bar == null:
+func _refresh_anchor_layout() -> void:
+	if escalation_panel == null or escalation_anchor == null:
 		return
+	escalation_anchor.position = escalation_panel.get_rect().get_center()
 
-	_alert_bar.color = BAR_ACTIVE if _active_tier_index >= 0 else BAR_IDLE
-
-	for i in range(_tier_pips.size()):
-		var pip := _tier_pips[i]
+func _refresh_panel() -> void:
+	for i in range(escalation_pips.size()):
+		var pip := escalation_pips[i]
 		if pip == null:
 			continue
 		if i == _active_tier_index:
-			pip.color = PIP_ACTIVE
+			pip.self_modulate = PIP_ACTIVE
 		elif _triggered_tiers[i]:
-			pip.color = PIP_TRIGGERED
+			pip.self_modulate = PIP_TRIGGERED
 		else:
-			pip.color = PIP_READY
+			pip.self_modulate = PIP_READY
 
-	var width_scale := clampf(heat_ratio, 0.08, 1.0)
-	_alert_bar.custom_minimum_size.x = panel_min_size.x * width_scale
 
 func _spawn_escalation_signal_for_tier(tier_index: int) -> void:
 	if _active_escalation_signals.has(tier_index):
-		return
-	if _signal_row == null:
 		return
 
 	var tier_id := "%02d" % [tier_index + 1]
@@ -204,37 +127,88 @@ func _spawn_escalation_signal_for_tier(tier_index: int) -> void:
 	active_sig.generate_scan_layers()
 	_active_escalation_signals[tier_index] = active_sig
 
-	var host := Control.new()
-	host.custom_minimum_size = Vector2(84.0, 84.0)
-	host.mouse_filter = Control.MOUSE_FILTER_PASS
-	_signal_row.add_child(host)
-	_signal_hosts[tier_index] = host
-	host.resized.connect(_refresh_signal_host_layout.bind(tier_index))
-
 	var signal_node = _signal_scene.instantiate()
-	host.add_child(signal_node)
+	escalation_anchor.add_child(signal_node)
 	signal_node.setup(active_sig)
 	signal_node.signal_interaction.connect(_on_escalation_signal_left_clicked)
 	signal_node.scan_toggle_requested.connect(_on_escalation_signal_right_clicked)
 	signal_node.tooltip_lock_requested.connect(_on_escalation_signal_middle_clicked)
 	signal_node.hover_started.connect(_on_escalation_signal_mouse_enter)
 	signal_node.hover_ended.connect(_on_escalation_signal_mouse_exit)
+	signal_node.tree_exited.connect(_on_escalation_signal_tree_exited.bind(tier_index), CONNECT_ONE_SHOT)
 	active_sig.instance_node = signal_node
 
-	_refresh_signal_host_layout(tier_index)
+	_refresh_signal_layout()
 
-func _refresh_signal_host_layout(tier_index: int) -> void:
-	if not _signal_hosts.has(tier_index):
+func _on_escalation_signal_tree_exited(tier_index: int) -> void:
+	_active_escalation_signals.erase(tier_index)
+	_refresh_signal_layout()
+
+func _on_escalation_signal_disabled(active_sig: ActiveSignal) -> void:
+	if active_sig == null:
 		return
+
+	var tier_index := -1
+	for key in _active_escalation_signals.keys():
+		if _active_escalation_signals[key] == active_sig:
+			tier_index = int(key)
+			break
+
+	if tier_index == -1:
+		return
+
+	if terminal_window != null:
+		terminal_window.hide_tab_for_signal(active_sig)
+
+	_remove_disabled_escalation_signal_later(active_sig, tier_index)
+
+func _remove_disabled_escalation_signal_later(active_sig: ActiveSignal, tier_index: int) -> void:
 	if not _active_escalation_signals.has(tier_index):
 		return
-
-	var host: Control = _signal_hosts[tier_index]
-	var active_sig: ActiveSignal = _active_escalation_signals[tier_index]
-	if host == null or active_sig == null or active_sig.instance_node == null:
+	if _active_escalation_signals[tier_index] != active_sig:
 		return
 
-	active_sig.instance_node.position = host.size * 0.5
+	if active_sig.instance_node != null:
+		var signal_node := active_sig.instance_node
+		signal_node.modulate.a = 1.0
+		var fade_tween := signal_node.create_tween()
+		fade_tween.tween_property(signal_node, "modulate:a", 0.0, 3.0)
+		await fade_tween.finished
+
+		if not _active_escalation_signals.has(tier_index):
+			return
+		if _active_escalation_signals[tier_index] != active_sig:
+			return
+		if active_sig.instance_node != signal_node:
+			return
+
+		signal_node.queue_free()
+		return
+
+	_active_escalation_signals.erase(tier_index)
+	_refresh_signal_layout()
+
+func _refresh_signal_layout() -> void:
+	var sorted_tiers: Array[int] = []
+	for tier_index in _active_escalation_signals.keys():
+		var active_sig: ActiveSignal = _active_escalation_signals[tier_index]
+		if active_sig == null or active_sig.instance_node == null:
+			continue
+		sorted_tiers.append(int(tier_index))
+
+	sorted_tiers.sort()
+
+	var count := sorted_tiers.size()
+	if count <= 0:
+		return
+
+	var center_offset := float(count - 1) * 0.5
+	for i in range(count):
+		var active_sig: ActiveSignal = _active_escalation_signals[sorted_tiers[i]]
+		var signal_node := active_sig.instance_node
+		if signal_node == null:
+			continue
+		signal_node.position = Vector2((float(i) - center_offset) * ESCALATION_SIGNAL_SPACING, 0.0)
 
 func _is_escalation_signal_in_range(_active_sig: ActiveSignal) -> bool:
 	return true

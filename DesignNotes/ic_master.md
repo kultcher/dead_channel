@@ -25,20 +25,20 @@
 
 ### Tier 1:
 
-Reboot: Reboots a disabled signal after a delay.
+!Reboot: Reboots a disabled signal after a delay.
 - Player must wait to disable the threat.
 
-Faraday: Prevents a signal from interacted with until it is close to the runner.
+!Faraday: Prevents a signal from interacted with until it is close to the runner.
 - Player must wait to deal with the threat. More dangerous than reboot if there's a minigame attached.
 
-Bouncer: Force-disconnects a player after a short delay.
+!Bouncer: Force-disconnects a player after a short delay.
 - Forces the player to execute commands quickly once connected.
+
+!Fuzzy: Greatly delays scan progress.
+- Requires tying up time or RAM to gain information. May force player to operate blind.
 
 Stickler: No shortcuts or aliases allowed. Player must manually type full commands, can't click to connect to signals, etc.
 - Tests memory and accuracy, potentially creates time pressure. Potentially dangerous combo with Bouncer or Faraday.
-
-Fuzzy: Greatly delays scan progress.
-- Requires tying up time or RAM to gain information. May force player to operate blind.
 
 Shy: After a short delay, re-hides scanned information.
 - Forces player to remember a signal's setup or have to act immediately while it's still in mind.
@@ -50,15 +50,13 @@ Spammer: Randomly opens popups all over the screen.
 
 Failsafe: Signal presists for X seconds after being disabled.
 
-
+Callback: Have to echo a somewhat complicated passphrase back to the terminal.
+- Taxes time and attention, punishes carelessness.
 
 ### Tier 2:
 
 Backdoor: Can only connect to signal by running ACCESS from another signal. (Maybe needs special command or flag? Possibly can chain through multiple signals?)
 - Delays access, diverts attention.
-
-Callback: Have to echo a somewhat complicated passphrase back to the terminal.
-- Taxes time and attention, punishes carelessness.
 
 Tripwire: Triggers heat spike if disabled.
 - Punishes carelessness and bad scouting.

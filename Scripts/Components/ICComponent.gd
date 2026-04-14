@@ -39,6 +39,10 @@ func notify_connected(active_sig: ActiveSignal):
 	for module in modules:
 		module.on_connect(active_sig)
 
+func notify_initialized(active_sig: ActiveSignal):
+	for module in modules:
+		module.on_initialized(active_sig)
+
 func notify_session_closed(active_sig: ActiveSignal):
 	for module in modules:
 		module.on_session_closed(active_sig)
@@ -50,6 +54,19 @@ func notify_enabled(active_sig: ActiveSignal):
 func notify_disabled(active_sig: ActiveSignal):
 	for module in modules:
 		module.on_disabled(active_sig)
+
+func notify_visuals_ready(active_sig: ActiveSignal, ic_effects: ICEffectsHost) -> void:
+	for i in range(modules.size()):
+		var module = modules[i]
+		if module == null:
+			continue
+		module.on_visuals_ready(active_sig, ic_effects, i)
+
+func notify_visuals_cleared(active_sig: ActiveSignal) -> void:
+	for module in modules:
+		if module == null:
+			continue
+		module.on_visuals_cleared(active_sig)
 
 func get_connection_flow_lines(active_sig: ActiveSignal) -> Array[String]:
 	var lines: Array[String] = []

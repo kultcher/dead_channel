@@ -24,6 +24,7 @@
 [ext_resource type="Texture2D" uid="uid://bsp50rqqai1yc" path="res://Visuals/digital_background.png" id="12_0p2ub"]
 [ext_resource type="Shader" uid="uid://c16vuww6jgbkf" path="res://Shaders/circuits.gdshader" id="13_d5u5a"]
 [ext_resource type="Texture2D" uid="uid://b77pho6a4a6dm" path="res://Visuals/digital_toplayer.png" id="14_d5u5a"]
+[ext_resource type="Texture2D" uid="uid://ctbaarjmw75f8" path="res://Visuals/ram_light.png" id="14_j6fsd"]
 [ext_resource type="Shader" uid="uid://da2dfyfkllxrp" path="res://Shaders/digital_glitch.gdshader" id="18_3deqw"]
 [ext_resource type="Script" uid="uid://cbv73pnuu78pw" path="res://Scripts/cutscene_controller.gd" id="18_3xdhw"]
 [ext_resource type="Texture2D" uid="uid://bilm8u1f271kd" path="res://Visuals/NullSpikeKeyPH.png" id="20_26ak2"]
@@ -87,6 +88,15 @@ shadow_size = 25
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_wudor"]
 radius = 60.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_u2ltj"]
+bg_color = Color(0, 0, 0, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.8, 0, 0, 1)
+border_blend = true
 
 [sub_resource type="Gradient" id="Gradient_882wi"]
 
@@ -248,11 +258,48 @@ script = ExtResource("4_jx6wh")
 script = ExtResource("7_k8c5c")
 
 [node name="EscalationPanel" type="PanelContainer" parent="SignalTimeline" unique_id=95600055]
-offset_left = 750.0
-offset_right = 750.0
+offset_left = 820.0
+offset_top = 275.0
+offset_right = 1100.0
+offset_bottom = 343.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_u2ltj")
 
 [node name="EscalationContainer" type="CenterContainer" parent="SignalTimeline/EscalationPanel" unique_id=1685088219]
 layout_mode = 2
+mouse_filter = 2
+
+[node name="PipVbox" type="HBoxContainer" parent="SignalTimeline/EscalationPanel/EscalationContainer" unique_id=829675264]
+layout_mode = 2
+offset_transform_enabled = true
+offset_transform_position_ratio = Vector2(0, -2.35)
+mouse_filter = 2
+
+[node name="EscalationPip1" type="TextureRect" parent="SignalTimeline/EscalationPanel/EscalationContainer/PipVbox" unique_id=1943032988]
+self_modulate = Color(0.5263882, 0, 0.017018745, 1)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("14_j6fsd")
+
+[node name="EscalationPip2" type="TextureRect" parent="SignalTimeline/EscalationPanel/EscalationContainer/PipVbox" unique_id=789540898]
+self_modulate = Color(0.5263882, 0, 0.017018745, 1)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("14_j6fsd")
+
+[node name="EscalationPip3" type="TextureRect" parent="SignalTimeline/EscalationPanel/EscalationContainer/PipVbox" unique_id=26186262]
+self_modulate = Color(0.5263882, 0, 0.017018745, 1)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("14_j6fsd")
+
+[node name="EscalationPip4" type="TextureRect" parent="SignalTimeline/EscalationPanel/EscalationContainer/PipVbox" unique_id=368875042]
+self_modulate = Color(0.5263882, 0, 0.017018745, 1)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("14_j6fsd")
+
+[node name="EscalationAnchor" type="Node2D" parent="SignalTimeline" unique_id=1103074620]
 
 [node name="WorkspaceAnchor" type="Control" parent="." unique_id=52976337]
 layout_mode = 3
@@ -327,6 +374,7 @@ offset_bottom = 1307.0
 scale = Vector2(1.05, 0.85)
 mouse_filter = 2
 texture = ExtResource("12_0p2ub")
+metadata/_edit_lock_ = true
 
 [node name="CircuitBackground2" type="TextureRect" parent="." unique_id=1921801606]
 z_index = -14
@@ -336,6 +384,7 @@ offset_bottom = 1307.0
 scale = Vector2(1.05, 0.85)
 mouse_filter = 2
 texture = ExtResource("14_d5u5a")
+metadata/_edit_lock_ = true
 
 [node name="CutsceneController" type="Control" parent="." unique_id=165146185]
 visible = false

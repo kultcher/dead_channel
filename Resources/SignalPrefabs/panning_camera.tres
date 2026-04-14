@@ -7,7 +7,7 @@
 [ext_resource type="Resource" uid="uid://c43su3v53wrbw" path="res://Resources/ResponseEffects/base_camera_heat.tres" id="4_a1o0p"]
 [ext_resource type="Script" uid="uid://bwfquhgf0ae5f" path="res://Scripts/Components/ResponseComponent.gd" id="5_xrbng"]
 [ext_resource type="Script" uid="uid://bi5xrdfrjowij" path="res://Scripts/SignalBase/SignalData.gd" id="6_6doba"]
-[ext_resource type="Resource" path="res://Resources/SignalVisuals/camera_visuals.tres" id="7_n0sk7"]
+[ext_resource type="Resource" uid="uid://jvfsw4ih31jf" path="res://Resources/SignalVisuals/camera_visuals.tres" id="7_n0sk7"]
 
 [sub_resource type="Resource" id="Resource_a1o0p"]
 script = ExtResource("1_a1o0p")

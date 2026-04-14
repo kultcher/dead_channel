@@ -5,16 +5,17 @@
 [ext_resource type="PackedScene" uid="uid://dfbl7tsxqd446" path="res://Scenes/signal_detail_tooltip.tscn" id="2_ea3pi"]
 [ext_resource type="Shader" uid="uid://0wglleb1rff6" path="res://Shaders/signal_sweep_heartbeat.gdshader" id="2_lak2q"]
 [ext_resource type="Script" uid="uid://dio2n4hwtubvd" path="res://Scenes/signal_target_indicator.gd" id="2_xq7gi"]
+[ext_resource type="Script" uid="uid://cde4h2g687pjy" path="res://Scripts/ic_effects.gd" id="6_dhsqe"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_syivg"]
 size = Vector2(50, 50)
 
-[sub_resource type="Gradient" id="Gradient_7dtr8"]
+[sub_resource type="Gradient" id="Gradient_dhsqe"]
 offsets = PackedFloat32Array(0, 0.64935064, 0.7467533, 1)
 colors = PackedColorArray(0, 1, 0, 0, 0, 1, 0, 0.3, 0, 1, 0, 0.6, 0, 0, 0, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_6hws6"]
-gradient = SubResource("Gradient_7dtr8")
+gradient = SubResource("Gradient_dhsqe")
 width = 96
 height = 96
 fill = 1
@@ -97,6 +98,38 @@ collision_layer = 2
 script = ExtResource("2_6hws6")
 
 [node name="DetectionShape" type="CollisionShape2D" parent="DetectionController" unique_id=473789932]
+
+[node name="ICEffects" type="Control" parent="." unique_id=1770553564]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -40.0
+offset_right = 40.0
+offset_bottom = 40.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_dhsqe")
+
+[node name="ICProgress" type="Control" parent="ICEffects" unique_id=754565425]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ICOverlay" type="Control" parent="ICEffects" unique_id=1475762640]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 
 [connection signal="input_event" from="SignalIcon" to="." method="_on_area_2d_input_event"]
 [connection signal="mouse_entered" from="SignalIcon" to="." method="_on_area_2d_mouse_entered"]

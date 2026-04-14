@@ -13,6 +13,7 @@ func get_spawns() -> Array[Dictionary]:
 			.lane(2)
 			.vision(30.0, 1.0)
 			.add_ic_custom("reboot", {"reboot_time": 10.0})
+			.add_ic("haze", 1)
 			.build(),
 		spawn(PANNING_CAMERA, 5.5)
 			.id("cam_03")
@@ -20,15 +21,16 @@ func get_spawns() -> Array[Dictionary]:
 			.vision(20.0, 1.0)
 			.detection_sweep([-1, 3], [180, 3])
 			.add_ic_custom("reboot", {"reboot_time": 3.0})
-			.add_ic("haze", 1)
+			.add_ic("faraday", 1)
 			.build(),
-		#spawn(PANNING_CAMERA, 7.5)
-			#.id("cam_04")
-			#.lane(0)
-			#.vision(20.0, 1.0)
-			#.detection_sweep([-1, 3], [180, 3])
-			#.add_ic_custom("reboot", {"reboot_time": 3.0})
-			#.build(),
+		spawn(PANNING_CAMERA, 6.5)
+			.id("cam_04")
+			.lane(2)
+			.vision(20.0, 1.0)
+			.detection_sweep([-1, 3], [180, 3])
+			.add_ic("bouncer", 1)
+			.add_ic("callback", 1)
+			.build(),
 		#spawn(PANNING_CAMERA, 8.5)
 			#.id("cam_10")
 			#.lane(4)

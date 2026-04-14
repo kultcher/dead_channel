@@ -66,6 +66,8 @@ func setup():
 		data.puzzle.ensure_initial_lock_state()
 	if data.type == SignalData.Type.DOOR:
 		set_door_locked(data.door_locked)
+	if data.ic_modules != null:
+		data.ic_modules.notify_initialized(self)
 	if data.escalation != null:
 		data.escalation.initialize(self)
 
@@ -80,6 +82,7 @@ func disable_signal():
 		data.ic_modules.notify_disabled(self)
 	if data.escalation != null:
 		data.escalation.on_disabled(self)
+		GlobalEvents.escalation_signal_disabled.emit(self)
 
 func enable_signal():
 	is_disabled = false
@@ -152,22 +155,25 @@ func build_ic_layer(difficulty_modifier: float = 1.0):
 
 func get_revealed_scan_descriptions() -> Array[String]:
 	var revealed_lines: Array[String] = []
-	for layer in scan_layers:
-		if layer.revealed:
+	for i in range(scan_layers.size()):
+		var layer: ScanLayer = scan_layers[i]
+		if _is_scan_layer_effectively_revealed(layer, i):
 			revealed_lines.append(layer.description)
 	return revealed_lines
 
 func get_revealed_scan_descriptions_for_layer(layer_name: String) -> Array[String]:
 	var revealed_lines: Array[String] = []
-	for layer in scan_layers:
-		if layer.name == layer_name and layer.revealed:
+	for i in range(scan_layers.size()):
+		var layer: ScanLayer = scan_layers[i]
+		if layer.name == layer_name and _is_scan_layer_effectively_revealed(layer, i):
 			revealed_lines.append(layer.description)
 	return revealed_lines
 
 func is_scan_layer_revealed(layer_name: String) -> bool:
-	for layer in scan_layers:
+	for i in range(scan_layers.size()):
+		var layer: ScanLayer = scan_layers[i]
 		if layer.name == layer_name:
-			return layer.revealed
+			return _is_scan_layer_effectively_revealed(layer, i)
 	return false
 
 func get_total_scan_layer_count() -> int:
@@ -175,8 +181,9 @@ func get_total_scan_layer_count() -> int:
 
 func get_revealed_scan_layer_count() -> int:
 	var revealed_count := 0
-	for layer in scan_layers:
-		if layer.revealed:
+	for i in range(scan_layers.size()):
+		var layer: ScanLayer = scan_layers[i]
+		if _is_scan_layer_effectively_revealed(layer, i):
 			revealed_count += 1
 	return revealed_count
 
@@ -190,9 +197,35 @@ func get_scan_layer_count(layer_name: String) -> int:
 func get_revealed_scan_layer_count_for(layer_name: String) -> int:
 	var revealed_count := 0
 	for layer in scan_layers:
-		if layer.name == layer_name and layer.revealed:
+		if layer.name == layer_name and _is_scan_layer_effectively_revealed(layer):
 			revealed_count += 1
 	return revealed_count
+
+func is_ic_module_revealed(module_index: int) -> bool:
+	if module_index < 0:
+		return false
+	var ic_module_idx := 0
+	for i in range(scan_layers.size()):
+		var layer: ScanLayer = scan_layers[i]
+		if layer.name != "IC":
+			continue
+		if ic_module_idx == module_index:
+			return _is_scan_layer_effectively_revealed(layer, i)
+		ic_module_idx += 1
+	return false
+
+func _is_scan_layer_effectively_revealed(layer: ScanLayer, layer_index: int = -1) -> bool:
+	if layer == null:
+		return false
+	if layer.revealed:
+		return true
+	if current_scan_index >= scan_layers.size():
+		return true
+	if layer_index < 0:
+		layer_index = scan_layers.find(layer)
+	if layer_index == -1:
+		return false
+	return layer_index < current_scan_index
 
 func get_scan_status_icon_state() -> int:
 	if is_being_scanned and current_scan_index < scan_layers.size():

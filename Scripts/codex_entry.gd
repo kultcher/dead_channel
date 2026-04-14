@@ -7,4 +7,4 @@ enum CodexType { IC }
 @export var category: String
 @export var extra: String
 @export var icon: Texture2D
-@export var body_text: String
+@export_multiline() var body_text: String

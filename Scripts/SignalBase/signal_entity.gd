@@ -6,6 +6,7 @@ extends Node2D
 @onready var signal_icon: Area2D = $SignalIcon
 @onready var target_indicator: Node2D = $TargetIndicator
 
+@onready var ic_effects: Control = $ICEffects
 @onready var scan_radial = $ScanRadial
 @onready var scan_queue_label: Label = $ScanQueueLabel
 
@@ -59,6 +60,10 @@ func setup(signal_wrapper: ActiveSignal):
 	tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
 
 	detection_controller.initialize(self)
+	if ic_effects != null and ic_effects.has_method("initialize"):
+		ic_effects.initialize(my_active_sig, self)
+	if my_data != null and my_data.ic_modules != null and ic_effects != null:
+		my_data.ic_modules.notify_visuals_ready(my_active_sig, ic_effects)
 	_setup_mobility(signal_wrapper)
 	if my_data.type == SignalData.Type.GUARD and my_data.mobility != null:
 		set_guard_revealed(false)
@@ -88,6 +93,7 @@ func update_visuals():
 		shape.color = Color.DIM_GRAY
 
 	shape.rotation_degrees = _get_visual_facing_deg()
+	_sync_ic_effects_visibility()
 
 func _process(delta: float) -> void:
 	_update_signal_sweep_shader()
@@ -148,6 +154,7 @@ func set_guard_revealed(is_revealed: bool) -> void:
 		return
 
 	shape.visible = is_revealed
+	ic_effects.visible = is_revealed
 	tooltip_main.visible = is_revealed
 	signal_icon.input_pickable = is_revealed
 	detection_controller.set_overlay_visible(is_revealed)
@@ -181,6 +188,7 @@ func scan_cleanup():
 	scan_radial.visible = false
 	if my_active_sig != null:
 		refresh_scan_status()
+	_sync_ic_effects_visibility()
 
 func set_scan_queue_position(queue_position: int) -> void:
 	if scan_queue_label == null:
@@ -206,10 +214,9 @@ func initialize_tooltip():
 func append_tooltip(info: String):
 	tooltip_main.tt_body.text += info + "\n"
 
-func show_tooltip():
-	tooltip_main.show()
-	refresh_status_panels()
-	tooltip_main.set_tooltip_collapsed(my_active_sig.is_tooltip_collapsed)
+	
+func hide_tooltip():
+	tooltip_main.hide()
 
 func show_hover_tooltip():
 	tooltip_main.show()
@@ -245,8 +252,10 @@ func refresh_ic_status():
 		return
 	var ic_state := my_active_sig.get_ic_status_icon_state()
 	if ic_state == ActiveSignal.TooltipIconState.UNKNOWN_SCAN:
+		_sync_ic_effects_visibility()
 		return
 	tooltip_main.set_panel_state(tooltip_main.tt_ic_icon, ic_state)
+	_sync_ic_effects_visibility()
 
 func bring_to_front():
 	var parent = get_parent()
@@ -315,11 +324,13 @@ func show_scanning_tooltip():
 	if my_active_sig != null:
 		refresh_scan_status()
 		_sync_tooltip_body_visibility()
+	_sync_ic_effects_visibility()
 
 func show_scan_complete():
 	if my_active_sig != null:
 		refresh_status_panels()
 		_sync_tooltip_body_visibility()
+	_sync_ic_effects_visibility()
 
 func sync_tooltip_body_visibility() -> void:
 	_sync_tooltip_body_visibility()
@@ -334,3 +345,11 @@ func _sync_tooltip_body_visibility() -> void:
 		tooltip_main.show_body()
 		return
 	tooltip_main.fade_body_out()
+
+func _sync_ic_effects_visibility() -> void:
+	if ic_effects != null and ic_effects.has_method("sync_effect_visibility"):
+		ic_effects.sync_effect_visibility()
+
+func _exit_tree() -> void:
+	if my_active_sig != null and my_active_sig.data != null and my_active_sig.data.ic_modules != null:
+		my_active_sig.data.ic_modules.notify_visuals_cleared(my_active_sig)

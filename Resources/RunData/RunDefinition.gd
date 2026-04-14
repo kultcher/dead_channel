@@ -377,6 +377,7 @@ func _create_ic_module(name: String) -> ICModule:
 		"faraday": func() -> ICModule: return FaradayModule.new(),
 		"bouncer": func() -> ICModule: return BouncerModule.new(),
 		"haze": func() -> ICModule: return HazeModule.new(),
+		"callback": func() -> ICModule: return CallbackModule.new(),
 	}
 	var factory = factory_map.get(name, null)
 	if factory == null:

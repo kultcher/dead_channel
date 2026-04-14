@@ -83,15 +83,19 @@ Development Progress
 4/8/2026:
 - Brought tutorial up-to-date
 
+4/14/2026:
+- Added editor-level Escalation UI
+- Added Necromancer Escalation IC
+- Added IC effect visual layer, effects for Reboot, Haze, Bouncer and Faraday
+
 Short-term TODO:
-- Escalation ICE
-- Escalation passive difficulty
-- Fix escalation UI
-- More and more advanced IC
+- More and more advanced IC + escalation IC
 - procgen
 - Fuzz
-- Check to make sure that overrides aren't overwritten by difficulty scaling
 
+
+CRITICAL BEFORE NEXT RELEASE:
+- Fix external .md files not being included in export
 
 Polish TODO:
 Code:
@@ -139,10 +143,13 @@ x watch out for disabled terminal before null_lab
 
 
 Not Yet Implemented (priority):
-- planning mode prototype
 - expand jargonizer
 - New signals: hazards, terminals, motion sensors, cyberguards, turrets
+- Ice block or other heat management programs
+- IC visual layer
+- more disruptor types. AoE?
 - Terminal: SPOOF, PROBE
+- planning mode prototype
 
 Not Yet Implemented (long-term):
 Core:

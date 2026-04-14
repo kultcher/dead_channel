@@ -73,6 +73,8 @@ func process_command(input: String, active_sig: ActiveSignal = null) -> void:
 		return
 	if _try_special_command(input, active_sig):
 		return
+	if _try_callback_input(input, active_sig):
+		return
 	var parsed = parse_input(input)
 	if parsed.has("error"):
 		_fail(parsed.error, active_sig)
@@ -242,6 +244,26 @@ func _try_special_command(input: String, active_sig: ActiveSignal) -> bool:
 	cmd_context.log_text.append("NULL SPIKE INTERFACE STAGED")
 	GlobalEvents.null_spike_init.emit()
 	_finalize_command(cmd_context)
+	return true
+
+func _try_callback_input(input: String, active_sig: ActiveSignal) -> bool:
+	var trimmed := input.strip_edges()
+	if not trimmed.begins_with("$"):
+		return false
+	if active_sig == null or _is_root_session(active_sig):
+		_fail(ROOT_CONTEXT_ERROR, active_sig)
+		return true
+
+	var callback_value := trimmed.substr(1).strip_edges()
+	if callback_value.is_empty():
+		_fail("Callback sequence required after $.", active_sig)
+		return true
+
+	var cmd_context := CommandContext.new()
+	cmd_context.active_sig = active_sig
+	cmd_context.command = "CALLBACK"
+	cmd_context.arg = callback_value
+	_try_command(cmd_context)
 	return true
 
 func _try_command(cmd_context: CommandContext) -> void:

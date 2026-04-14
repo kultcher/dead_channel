@@ -1,8 +1,10 @@
 class_name RebootModule extends ICModule
 
 @export var reboot_time: float = 5.0
+@export var _effect_scene: PackedScene = preload("res://Scenes/ic_progress_radial.tscn")
 
 var timer: Timer
+var effect_node: ICProgressRadial = null
 
 const DIFFICULTY_REBOOT_TIMES := [3.0, 5.0, 10.0, 15.0]
 
@@ -15,6 +17,20 @@ func get_desc():
 
 func get_codex_id():
 	return &"codex_reboot"
+
+func on_visuals_ready(active_sig: ActiveSignal, ic_effects: ICEffectsHost, module_index: int) -> void:
+	var effect_instance := _effect_scene.instantiate() as ICProgressRadial
+	if effect_instance == null:
+		return
+	effect_node = ic_effects.register_effect(
+		&"reboot",
+		effect_instance,
+		module_index,
+		ICEffectsHost.RevealMode.ON_SCAN,
+		&"progress"
+	) as ICProgressRadial
+	if effect_node != null:
+		effect_node.configure(active_sig, reboot_time)
 
 func apply_difficulty(difficulty: int) -> void:
 	reboot_time = float(_pick_difficulty_value(DIFFICULTY_REBOOT_TIMES, difficulty))
@@ -42,16 +58,22 @@ func postprocess_action(action_context: ActionContext) -> void:
 	GlobalEvents.add_child(timer)
 	timer.timeout.connect(_reboot.bind(active_sig), CONNECT_ONE_SHOT)
 	timer.start(reboot_time)
+	if effect_node != null:
+		effect_node.start(reboot_time, timer)
 
 func on_enabled(_active_sig: ActiveSignal):
 	if timer != null and is_instance_valid(timer):
 		timer.queue_free()
 	timer = null
+	if effect_node != null:
+		effect_node.stop()
 	
 func _reboot(active_sig: ActiveSignal):
 	if timer != null and is_instance_valid(timer):
 		timer.queue_free()
 		timer = null
+	if effect_node != null:
+		effect_node.stop()
 	if active_sig == null or not active_sig.is_disabled:
 		return
 

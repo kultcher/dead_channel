@@ -56,6 +56,9 @@ func postprocess_action(_action_context: ActionContext) -> void:
 func on_connect(active_sig: ActiveSignal):
 	pass
 
+func on_initialized(active_sig: ActiveSignal):
+	pass
+
 func on_session_closed(active_sig: ActiveSignal):
 	pass
 
@@ -63,6 +66,12 @@ func on_disabled(active_sig: ActiveSignal):
 	pass
 
 func on_enabled(active_sig: ActiveSignal):
+	pass
+
+func on_visuals_ready(_active_sig: ActiveSignal, _ic_effects: ICEffectsHost, _module_index: int) -> void:
+	pass
+
+func on_visuals_cleared(_active_sig: ActiveSignal) -> void:
 	pass
 
 func get_connection_flow_lines(_active_sig: ActiveSignal) -> Array[String]:
